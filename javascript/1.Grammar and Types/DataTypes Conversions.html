@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript数据类型转换</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h2 {
+      color: #1a2a6c;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #fdbb2d;
+    }
+
+    .conversion-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .type-card {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      border-left: 4px solid #1a2a6c;
+    }
+
+    .type-card h3 {
+      color: #1a2a6c;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .type-card p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .demo-section {
+      margin-top: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #1a2a6c;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    button {
+      background: #1a2a6c;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #0d1a4a;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 5px;
+      border-left: 4px solid #fdbb2d;
+    }
+
+    .result h3 {
+      color: #1a2a6c;
+      margin-bottom: 10px;
+    }
+
+    .code-block {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin-top: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+
+    .highlight {
+      color: #fdbb2d;
+      font-weight: bold;
+    }
+
+    .object-examples {
+      margin-top: 20px;
+    }
+
+    .example-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 5px;
+    }
+
+    .example-item h4 {
+      color: #1a2a6c;
+      margin-bottom: 5px;
+    }
+
+    .example-item code {
+      background: #e9e9e9;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: white;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>JavaScript数据类型转换</h1>
+    <p class="subtitle">了解原始类型与对象类型之间的转换规则</p>
+  </header>
+
+  <div class="content">
+    <div class="card">
+      <h2>数据类型转换规则</h2>
+      <p>JavaScript中有两种类型转换:隐式转换和显式转换。原始类型包括:String, Number, Boolean, Null, Undefined, Symbol, BigInt。对象类型包括：Object, Array, Function, Date等。</p>
+
+      <div class="conversion-types">
+        <div class="type-card">
+          <h3>转换为字符串</h3>
+          <p>使用 <code>String()</code> 或 <code>toString()</code> 方法。对象会调用其 <code>toString()</code> 方法。</p>
+        </div>
+
+        <div class="type-card">
+          <h3>转换为数字</h3>
+          <p>使用 <code>Number()</code>, <code>parseInt()</code>, <code>parseFloat()</code> 或一元加号 <code>+</code>。</p>
+        </div>
+
+        <div class="type-card">
+          <h3>转换为布尔值</h3>
+          <p>使用 <code>Boolean()</code> 或双重否定 <code>!!</code>。只有 <code>false</code>, <code>0</code>, <code>""</code>, <code>null</code>, <code>undefined</code>, <code>NaN</code> 会转换为 <code>false</code>。</p>
+        </div>
+
+        <div class="type-card">
+          <h3>对象转换</h3>
+          <p>对象在转换时会先调用 <code>valueOf()</code>，如果返回原始值则使用，否则调用 <code>toString()</code>。</p>
+        </div>
+      </div>
+
+      <div class="object-examples">
+        <h3>对象转换示例</h3>
+
+        <div class="example-item">
+          <h4>数组转换为字符串</h4>
+          <code>String([1, 2, 3]) // "1,2,3"</code>
+        </div>
+
+        <div class="example-item">
+          <h4>对象转换为数字</h4>
+          <code>Number({}) // NaN</code>
+        </div>
+
+        <div class="example-item">
+          <h4>函数转换为字符串</h4>
+          <code>String(function() { return 1; }) // "function() { return 1; }"</code>
+        </div>
+
+        <div class="example-item">
+          <h4>日期对象转换</h4>
+          <code>String(new Date()) // "Mon Sep 25 2023 12:00:00 GMT+0800"</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>数据类型转换演示</h2>
+
+      <div class="demo-section">
+        <div class="input-group">
+          <label for="inputValue">输入值:</label>
+          <input type="text" id="inputValue" placeholder="输入任何值进行转换" value='{"name": "John", "age": 30}'>
+        </div>
+
+        <div class="input-group">
+          <label for="conversionType">转换类型:</label>
+          <select id="conversionType">
+            <option value="string">转换为字符串</option>
+            <option value="number">转换为数字</option>
+            <option value="boolean">转换为布尔值</option>
+            <option value="json">JSON解析与序列化</option>
+            <option value="object">转换为对象</option>
+          </select>
+        </div>
+
+        <button id="convertBtn">执行转换</button>
+
+        <div class="result">
+          <h3>转换结果:</h3>
+          <div id="conversionResult">等待转换...</div>
+        </div>
+
+        <div class="code-block" id="codeExample">
+          // 示例代码将在这里显示
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>JavaScript数据类型转换教程 &copy; 2023</p>
+  </footer>
+</div>
+
+<script>
+  document.getElementById('convertBtn').addEventListener('click', function() {
+    const inputValue = document.getElementById('inputValue').value;
+    const conversionType = document.getElementById('conversionType').value;
+    const resultElement = document.getElementById('conversionResult');
+    const codeElement = document.getElementById('codeExample');
+
+    let result;
+    let code = '';
+
+    try {
+      switch(conversionType) {
+        case 'string':
+          // 尝试将输入解析为JSON，如果失败则直接使用原始值
+          let parsedValue;
+          try {
+            parsedValue = JSON.parse(inputValue);
+          } catch(e) {
+            parsedValue = inputValue;
+          }
+
+          result = String(parsedValue);
+          code = `// 转换为字符串\nlet value = ${inputValue};\nlet result = String(value);\nconsole.log(result); // ${result}`;
+          break;
+
+        case 'number':
+          // 尝试将输入解析为JSON，如果失败则直接使用原始值
+          let numValue;
+          try {
+            numValue = JSON.parse(inputValue);
+          } catch(e) {
+            numValue = inputValue;
+          }
+
+          result = Number(numValue);
+          code = `// 转换为数字\nlet value = ${inputValue};\nlet result = Number(value);\nconsole.log(result); // ${result}`;
+          break;
+
+        case 'boolean':
+          // 尝试将输入解析为JSON，如果失败则直接使用原始值
+          let boolValue;
+          try {
+            boolValue = JSON.parse(inputValue);
+          } catch(e) {
+            boolValue = inputValue;
+          }
+
+          result = Boolean(boolValue);
+          code = `// 转换为布尔值\nlet value = ${inputValue};\nlet result = Boolean(value);\nconsole.log(result); // ${result}`;
+          break;
+
+        case 'json':
+          try {
+            // 尝试解析为JSON对象
+            const jsonObj = JSON.parse(inputValue);
+            result = JSON.stringify(jsonObj, null, 2);
+            code = `// JSON序列化与反序列化\nlet jsonString = '${inputValue}';\nlet parsedObj = JSON.parse(jsonString);\nlet serialized = JSON.stringify(parsedObj, null, 2);\nconsole.log(serialized);`;
+          } catch(e) {
+            result = '错误: 无效的JSON格式';
+            code = `// JSON解析错误\nlet jsonString = '${inputValue}';\ntry {\n  let parsedObj = JSON.parse(jsonString);\n} catch(e) {\n  console.error("JSON解析错误:", e.message);\n}`;
+          }
+          break;
+
+        case 'object':
+          try {
+            // 尝试解析为对象
+            const obj = JSON.parse(inputValue);
+            result = `对象类型: ${typeof obj}\n对象内容: ${JSON.stringify(obj)}`;
+            code = `// 转换为对象\nlet jsonString = '${inputValue}';\nlet obj = JSON.parse(jsonString);\nconsole.log(typeof obj); // ${typeof obj}\nconsole.log(obj); // ${JSON.stringify(obj)}`;
+          } catch(e) {
+            // 如果不是有效的JSON，尝试作为普通对象
+            const obj = new Object(inputValue);
+            result = `对象类型: ${typeof obj}\n对象内容: ${obj}`;
+            code = `// 转换为对象\nlet value = '${inputValue}';\nlet obj = new Object(value);\nconsole.log(typeof obj); // ${typeof obj}\nconsole.log(obj); // ${obj}`;
+          }
+          break;
+      }
+
+      resultElement.textContent = result;
+      codeElement.textContent = code;
+    } catch(error) {
+      resultElement.textContent = `转换错误: ${error.message}`;
+      codeElement.textContent = `// 转换过程中发生错误\nconsole.error("${error.message}");`;
+    }
+  });
+
+  // 初始加载时显示示例代码
+  document.getElementById('convertBtn').click();
+
+  // 添加更多示例代码
+  const additionalCode = `
+         // 更多数据类型转换示例
+
+         // 1. 原始类型转换
+        let str = "123";
+        let num = Number(str);        // 123
+        let bool = Boolean(str);      // true
+        let strAgain = String(num);   // "123"
+
+// 2. 对象转换为原始值
+let obj = {
+  name: "John",
+  age: 30,
+  toString() {
+    return \`Person: \${this.name}, \${this.age}\`;
+  },
+  valueOf() {
+    return this.age;
+  }
+};
+
+console.log(String(obj));  // "Person: John, 30"
+console.log(Number(obj));  // 30
+
+// 3. 数组转换
+let arr = [1, 2, 3];
+console.log(String(arr));  // "1,2,3"
+console.log(Number(arr));  // NaN (因为数组转换为字符串后再转换为数字是NaN)
+
+// 4. 函数转换
+let func = function(x) { return x * 2; };
+console.log(String(func)); // 函数的字符串表示
+
+// 5. 日期对象转换
+let date = new Date();
+console.log(String(date)); // 日期字符串
+console.log(Number(date)); // 时间戳
+
+// 6. 使用加法操作符的隐式转换
+console.log("5" + 3);     // "53" (字符串连接)
+console.log("5" - 3);     // 2 (数字减法)
+
+// 7. 使用逻辑操作符的隐式转换
+console.log(!"hello");    // false
+console.log(!!"hello");   // true
+console.log(!!0);         // false
+
+// 8. JSON转换
+let person = { name: "Alice", age: 25 };
+let jsonStr = JSON.stringify(person); // '{"name":"Alice","age":25}'
+let parsedPerson = JSON.parse(jsonStr); // { name: "Alice", age: 25 }
+`;
+
+  // 在页面加载后添加更多代码示例
+  setTimeout(() => {
+    const codeBlock = document.createElement('div');
+    codeBlock.className = 'code-block';
+    codeBlock.textContent = additionalCode;
+    document.querySelector('.card:first-child').appendChild(codeBlock);
+  }, 1000);
+</script>
+</body>
+</html>
