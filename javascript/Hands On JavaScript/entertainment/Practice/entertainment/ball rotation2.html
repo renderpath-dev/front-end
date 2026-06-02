@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="EN">
+<head>
+  <title>Bouncing Ball Hexagon</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; } /* Prevent scrollbars */
+  </style>
+</head>
+<body>
+
+<canvas id="myCanvas"></canvas>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = 800;
+    canvas.height = 600;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const hexagonRadius = 200;
+    let rotationAngle = 0;
+    const rotationSpeed = 0.01; // radians per frame
+
+    const ball = {
+      x: centerX,
+      y: centerY - 100,
+      radius: 15,
+      vx: 5,  // Initial horizontal velocity
+      vy: 0,  // Initial vertical velocity
+      gravity: 0.5,
+      friction: 0.01, // Air friction
+      bounceLoss: 0.8  // Energy loss on bounce (0 to 1)
+    };
+
+    function getHexagonPoints(angle) {
+      const points = [];
+      for (let i = 0; i < 6; i++) {
+        const currentAngle = angle + (Math.PI * 2 / 6) * i;
+        points.push({
+          x: centerX + hexagonRadius * Math.cos(currentAngle),
+          y: centerY + hexagonRadius * Math.sin(currentAngle)
+        });
+      }
+      return points;
+    }
+
+    function drawHexagon(angle) {
+      const points = getHexagonPoints(angle);
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'red';
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function checkCollision() {
+      const points = getHexagonPoints(rotationAngle);
+
+      for (let i = 0; i < points.length; i++) {
+        const p1 = points[i];
+        const p2 = points[(i + 1) % points.length];
+
+        // Calculate distance from ball center to the line segment (edge)
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const segmentLengthSq = dx * dx + dy * dy;
+
+        let t = ((ball.x - p1.x) * dx + (ball.y - p1.y) * dy) / segmentLengthSq;
+        t = Math.max(0, Math.min(1, t)); // Clamp t to be between 0 and 1
+
+        const closestPointOnSegment = {
+          x: p1.x + t * dx,
+          y: p1.y + t * dy
+        };
+
+        const distSq = (ball.x - closestPointOnSegment.x) ** 2 + (ball.y - closestPointOnSegment.y) ** 2;
+
+        if (distSq <= ball.radius ** 2) {
+          // Collision detected!
+          const normalX = -(p2.y - p1.y); // Normal vector to the edge (perpendicular)
+          const normalY = (p2.x - p1.x);
+          const normalLength = Math.sqrt(normalX * normalX + normalY * normalY);
+          const normalizedNormalX = normalX / normalLength;
+          const normalizedNormalY = normalY / normalLength;
+
+          // Calculate dot product of ball velocity and normal
+          const dotProduct = ball.vx * normalizedNormalX + ball.vy * normalizedNormalY;
+
+          // Reflect velocity vector along the normal
+          ball.vx -= 2 * dotProduct * normalizedNormalX;
+          ball.vy -= 2 * dotProduct * normalizedNormalY;
+
+          // Apply bounce loss
+          ball.vx *= ball.bounceLoss;
+          ball.vy *= ball.bounceLoss;
+
+          // Slightly move the ball out to prevent sticking
+          ball.x += normalizedNormalX * (ball.radius - Math.sqrt(distSq)) * 1.1; // 1.1 to push slightly more
+          ball.y += normalizedNormalY * (ball.radius - Math.sqrt(distSq)) * 1.1;
+
+          return; // Only react to one collision per frame to simplify
+        }
+      }
+    }
+
+
+    function update() {
+      // Apply gravity
+      ball.vy += ball.gravity;
+
+      // Apply friction (air resistance)
+      ball.vx *= (1 - ball.friction);
+      ball.vy *= (1 - ball.friction);
+
+      // Update ball position
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      // Rotate hexagon
+      rotationAngle += rotationSpeed;
+
+      // Check for collisions with hexagon edges
+      checkCollision();
+
+      // Boundary collisions (Canvas edges - optional, can remove if you only want hexagon bounds)
+      if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+        ball.vx = -ball.vx * ball.bounceLoss;
+        ball.x = ball.x + (ball.x + ball.radius > canvas.width ? -(ball.x + ball.radius - canvas.width) : -(ball.x - ball.radius)); // Keep ball within bounds
+      }
+      if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+        ball.vy = -ball.vy * ball.bounceLoss;
+        ball.y = ball.y + (ball.y + ball.radius > canvas.height ? -(ball.y + ball.radius - canvas.height) : -(ball.y - ball.radius)); // Keep ball within bounds
+      }
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+      drawHexagon(rotationAngle);
+      drawBall();
+
+      update();
+
+      requestAnimationFrame(gameLoop); // Call next frame
+    }
+
+    gameLoop(); // Start the animation loop
+  });
+</script>
+
+</body>
+</html>

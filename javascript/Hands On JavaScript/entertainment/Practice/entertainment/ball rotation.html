@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bouncing Ball in Rotating Hexagon</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="800" height="600"></canvas>
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // 中心和六边形参数
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const hexRadius = 200;
+    let hexRotation = 0;
+    const rotationSpeed = 0.02;
+
+    // 球参数
+    const ball = {
+        x: centerX,
+        y: centerY,
+        radius: 12,
+        vx: 3,
+        vy: 0,
+        gravity: 0.4,
+        bounce: 0.8,
+        friction: 0.7
+    };
+
+    // 生成六边形顶点坐标
+    function getHexVertices(rotation) {
+        const vertices = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = rotation + (Math.PI / 3) * i;
+            vertices.push({
+                x: centerX + hexRadius * Math.cos(angle),
+                y: centerY + hexRadius * Math.sin(angle)
+            });
+        }
+        return vertices;
+    }
+
+    // 向量归一化
+    function normalize(x, y) {
+        const length = Math.sqrt(x * x + y * y);
+        return length > 0 ? { x: x/length, y: y/length } : { x: 0, y: 0 };
+    }
+
+    // 更新球的状态
+    function updateBall() {
+        // 应用物理效果
+        ball.vy += ball.gravity;
+        ball.vx *= 0.99;
+        ball.vy *= 0.99;
+
+        // 更新位置
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        // 获取六边形顶点
+        const vertices = getHexVertices(hexRotation);
+
+        // 碰撞检测
+        for (let i = 0; i < 6; i++) {
+            const a = vertices[i];
+            const b = vertices[(i + 1) % 6];
+
+            // 计算最近点
+            const ab = { x: b.x - a.x, y: b.y - a.y };
+            const ap = { x: ball.x - a.x, y: ball.y - a.y };
+            const t = Math.max(0, Math.min(1, (ap.x * ab.x + ap.y * ab.y) / (ab.x * ab.x + ab.y * ab.y)));6.
+            const closest = {
+                x: a.x + t * ab.x,
+                y: a.y + t * ab.y
+            };
+
+            // 计算距离和法线
+            const dx = ball.x - closest.x;
+            const dy = ball.y - closest.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < ball.radius) {
+                // 计算法线（指向中心）
+                const mid = { x: (a.x + b.x)/2, y: (a.y + b.y)/2 };
+                const normal = normalize(centerX - mid.x, centerY - mid.y);
+
+                // 位置修正
+                const overlap = ball.radius - distance;
+                ball.x += normal.x * overlap;
+                ball.y += normal.y * overlap;
+
+                // 速度反射
+                const dot = ball.vx * normal.x + ball.vy * normal.y;
+                if (dot < 0) {
+                    const vn = { x: dot * normal.x, y: dot * normal.y };
+                    const vt = { x: ball.vx - vn.x, y: ball.vy - vn.y };
+
+                    ball.vx = vt.x * ball.friction + vn.x * -ball.bounce;
+                    ball.vy = vt.y * ball.friction + vn.y * -ball.bounce;
+                }
+            }
+        }
+    }
+
+    // 绘制函数
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 绘制六边形
+        ctx.beginPath();
+        const vertices = getHexVertices(hexRotation);
+        ctx.moveTo(vertices[0].x, vertices[0].y);
+        vertices.forEach(v => ctx.lineTo(v.x, v.y));
+        ctx.closePath();
+        ctx.strokeStyle = '#3498db';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // 绘制球
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#e74c3c';
+        ctx.fill();
+    }
+
+    // 动画循环
+    function animate() {
+        updateBall();
+        hexRotation += rotationSpeed;
+        draw();
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+</script>
+</body>
+</html>

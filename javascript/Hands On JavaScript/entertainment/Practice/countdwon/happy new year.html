@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year 2025</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        h1, #countdown {
+            z-index: 10;
+            text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.8);
+        }
+
+        h1 {
+            font-size: 48px;
+        }
+
+        #countdown {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Happy New Year 2025</h1>
+<div id="countdown"></div>
+<canvas id="fireworks"></canvas>
+
+<script>
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Firework {
+        constructor(x, y, colors) {
+            this.x = x;
+            this.y = y;
+            this.colors = colors;
+            this.particles = [];
+
+            for (let i = 0; i < 200; i++) {
+                this.particles.push(new Particle(this.x, this.y, this.colors));
+            }
+        }
+
+        draw() {
+            this.particles.forEach(particle => particle.update());
+        }
+    }
+
+    class Particle {
+        constructor(x, y, colors) {
+            this.x = x;
+            this.y = y;
+            this.speed = Math.random() * 6 + 2;
+            this.angle = Math.random() * 2 * Math.PI;
+            this.radius = Math.random() * 3 + 1;
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.life = 100;
+            this.decay = Math.random() * 0.02 + 0.005;
+            this.gravity = 0.05;
+            this.shrink = Math.random() * 0.05 + 0.02;
+        }
+
+        update() {
+            this.life -= this.decay;
+            this.speed *= 0.98;
+            this.radius -= this.shrink;
+            this.y += Math.sin(this.angle) * this.speed + this.gravity;
+            this.x += Math.cos(this.angle) * this.speed;
+            this.draw();
+        }
+
+        draw() {
+            if (this.radius > 0) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.join(",")},${this.life})`;
+                ctx.fill();
+            }
+        }
+    }
+
+    const fireworks = [];
+
+    function createFirework() {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height / 2;
+        const colors = [
+            [255, 69, 0],
+            [255, 215, 0],
+            [135, 206, 250],
+            [144, 238, 144],
+            [255, 105, 180]
+        ];
+
+        fireworks.push(new Firework(x, y, colors));
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas completely
+
+        fireworks.forEach((firework, index) => {
+            firework.draw();
+
+            if (firework.particles.every(p => p.life <= 0)) {
+                fireworks.splice(index, 1);
+            }
+        });
+
+        requestAnimationFrame(animate);
+    }
+
+    setInterval(createFirework, 300);
+    animate();
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+
+    function updateCountdown() {
+        const now = new Date();
+        const newYear = new Date('January 1, 2025 00:00:00');
+        const diff = newYear - now;
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('countdown').textContent = `Countdown: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+        if (diff <= 0) {
+            document.getElementById('countdown').textContent = "Happy New Year!";
+        }
+    }
+
+    setInterval(updateCountdown, 1000);
+</script>
+</body>
+</html>

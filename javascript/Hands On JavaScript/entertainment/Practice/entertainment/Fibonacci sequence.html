@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>斐波那契数列实现</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .method {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .method h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .sequence {
+            background-color: #f1f8ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .performance {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+        .error {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .explanation {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>斐波那契数列实现</h1>
+
+    <div class="input-group">
+        <label for="fibInput">请输入要计算的斐波那契数列项数：</label>
+        <input type="number" id="fibInput" min="0" max="50" value="10">
+        <small>提示：对于递归方法，建议不要超过35，以免页面卡顿</small>
+    </div>
+
+    <div>
+        <button id="calculateAll">计算所有方法</button>
+        <button id="calculateRecursive">仅计算递归方法</button>
+        <button id="calculateIterative">仅计算迭代方法</button>
+        <button id="calculateMemo">仅计算记忆化递归</button>
+    </div>
+
+    <div class="results" id="results">
+        <!-- 结果将在这里显示 -->
+    </div>
+
+    <div class="explanation">
+        <h3>方法说明：</h3>
+        <ul>
+            <li><strong>递归方法</strong>：代码简洁但效率低，时间复杂度为O(2^n)，有大量重复计算</li>
+            <li><strong>迭代方法</strong>：效率高，时间复杂度为O(n)，是计算斐波那契数列的最佳方法</li>
+            <li><strong>记忆化递归</strong>：结合递归的简洁和迭代的效率，时间复杂度为O(n)</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // 获取DOM元素
+    const fibInput = document.getElementById('fibInput');
+    const calculateAllBtn = document.getElementById('calculateAll');
+    const calculateRecursiveBtn = document.getElementById('calculateRecursive');
+    const calculateIterativeBtn = document.getElementById('calculateIterative');
+    const calculateMemoBtn = document.getElementById('calculateMemo');
+    const resultsDiv = document.getElementById('results');
+
+    // 斐波那契数列实现
+
+    // 1. 递归方法
+    function fibonacciRecursive(n) {
+        if (n < 0) return "输入必须是非负整数";
+        if (n === 0) return 0;
+        if (n === 1) return 1;
+        return fibonacciRecursive(n - 1) + fibonacciRecursive(n - 2);
+    }
+
+    // 2. 迭代方法
+    function fibonacciIterative(n) {
+        if (n < 0) return "输入必须是非负整数";
+        if (n === 0) return 0;
+        if (n === 1) return 1;
+
+        let prev = 0;
+        let curr = 1;
+
+        for (let i = 2; i <= n; i++) {
+            let next = prev + curr;
+            prev = curr;
+            curr = next;
+        }
+
+        return curr;
+    }
+
+    // 3. 记忆化递归方法
+    function fibonacciMemoized() {
+        const cache = {};
+
+        function fib(n) {
+            if (n < 0) return "输入必须是非负整数";
+            if (n in cache) return cache[n];
+
+            if (n === 0) return 0;
+            if (n === 1) return 1;
+
+            cache[n] = fib(n - 1) + fib(n - 2);
+            return cache[n];
+        }
+
+        return fib;
+    }
+
+    // 生成斐波那契数列序列
+    function generateSequence(n, method) {
+        const sequence = [];
+        for (let i = 0; i <= n; i++) {
+            sequence.push(method(i));
+        }
+        return sequence;
+    }
+
+    // 性能测量函数
+    function measurePerformance(fn, n) {
+        const startTime = performance.now();
+        const result = fn(n);
+        const endTime = performance.now();
+        return {
+            result,
+            time: endTime - startTime
+        };
+    }
+
+    // 显示结果
+    function displayResults(n, methods) {
+        resultsDiv.innerHTML = '';
+
+        if (n > 50) {
+            resultsDiv.innerHTML = '<div class="error">输入值过大，可能导致性能问题，请输入小于等于50的值</div>';
+            return;
+        }
+
+        methods.forEach(method => {
+            const methodDiv = document.createElement('div');
+            methodDiv.className = 'method';
+
+            const title = document.createElement('h3');
+            title.textContent = method.name;
+            methodDiv.appendChild(title);
+
+            // 测量性能
+            const performanceResult = measurePerformance(method.fn, n);
+
+            // 生成序列
+            const sequence = generateSequence(n, method.fn);
+
+            const sequenceDiv = document.createElement('div');
+            sequenceDiv.className = 'sequence';
+            sequenceDiv.textContent = sequence.join(', ');
+            methodDiv.appendChild(sequenceDiv);
+
+            const performanceDiv = document.createElement('div');
+            performanceDiv.className = 'performance';
+            performanceDiv.textContent = `计算结果: F(${n}) = ${performanceResult.result} | 计算时间: ${performanceResult.time.toFixed(4)} 毫秒`;
+            methodDiv.appendChild(performanceDiv);
+
+            resultsDiv.appendChild(methodDiv);
+        });
+    }
+
+    // 事件监听
+    calculateAllBtn.addEventListener('click', () => {
+        const n = parseInt(fibInput.value);
+        displayResults(n, [
+            { name: '递归方法', fn: fibonacciRecursive },
+            { name: '迭代方法', fn: fibonacciIterative },
+            { name: '记忆化递归方法', fn: fibonacciMemoized() }
+        ]);
+    });
+
+    calculateRecursiveBtn.addEventListener('click', () => {
+        const n = parseInt(fibInput.value);
+        if (n > 35) {
+            resultsDiv.innerHTML = '<div class="error">递归方法对于大于35的输入值会很慢，建议使用其他方法</div>';
+            return;
+        }
+        displayResults(n, [{ name: '递归方法', fn: fibonacciRecursive }]);
+    });
+
+    calculateIterativeBtn.addEventListener('click', () => {
+        const n = parseInt(fibInput.value);
+        displayResults(n, [{ name: '迭代方法', fn: fibonacciIterative }]);
+    });
+
+    calculateMemoBtn.addEventListener('click', () => {
+        const n = parseInt(fibInput.value);
+        displayResults(n, [{ name: '记忆化递归方法', fn: fibonacciMemoized() }]);
+    });
+
+    // 初始化显示
+    displayResults(10, [
+        { name: '递归方法', fn: fibonacciRecursive },
+        { name: '迭代方法', fn: fibonacciIterative },
+        { name: '记忆化递归方法', fn: fibonacciMemoized() }
+    ]);
+</script>
+</body>
+</html>

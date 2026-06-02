@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 New Year Countdown</title>
+    <style>
+        /* --- CSS STYLES --- */
+
+        /* Basic Reset & Body Styling */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            background-color: #000000; /* Ensure background covers entire viewport */
+        }
+
+        #container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+        }
+
+        /* Countdown Timer Styling */
+        #countdown {
+            z-index: 10;
+            /* Add accessibility enhancement - make sure text is readable even without effects */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #countdown-label {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        #timer {
+            display: inline-block;
+            font-size: clamp(3rem, 25vw, 20rem); /* Responsive font size with min/max limits */
+            font-weight: bold;
+            color: #00ccff;
+            text-shadow:
+                    0 0 5px rgba(255, 255, 255, 0.8), 0 0 15px #00ccff,
+                    0 0 25px #00ccff, 0 0 40px #0055aa,
+                    3px 3px 6px rgba(0, 0, 0, 0.5);
+            transition: transform 0.15s ease-out, color 0.2s ease;
+        }
+
+        #timer.jump {
+            transform: scale(1.15) translateY(-8px);
+            color: #ffffff;
+        }
+
+        /* Celebration Message Styling */
+        #celebration {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        /* Glowing Scrolling Multi-Color Text Effect */
+        #celebration.celebrating h1,
+        #celebration.celebrating p {
+            background: linear-gradient(
+                    90deg,
+                    #ff00ff, /* Magenta */
+                    #00ffff, /* Cyan */
+                    #ffff00, /* Yellow */
+                    #00ff00, /* Lime Green */
+                    #ff00ff  /* Magenta again for smooth loop */
+            );
+
+            background-size: 400% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            animation: scrollTextColor 8s linear infinite;
+            filter:
+                    drop-shadow(0 0 3px rgba(255, 255, 255, 0.8))
+                    drop-shadow(0 0 8px white)
+                    drop-shadow(0 0 15px #00ffff);
+            text-shadow: none;
+        }
+
+        /* Define the keyframes for the scrolling text background */
+        @keyframes scrollTextColor {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Base styles for h1/p (before animation takes over) */
+        #celebration h1 {
+            font-size: clamp(2rem, 7vw, 5rem);
+            color: #FFD700; /* Fallback color */
+            text-shadow: none;
+            margin-bottom: 15px;
+        }
+
+        #celebration p {
+            font-size: clamp(1rem, 2.5vw, 2rem);
+            color: #f0f0f0; /* Fallback color */
+            line-height: 1.5;
+            text-shadow: none;
+        }
+
+        /* Canvas Styling */
+        #fireworksCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 5;
+            display: block;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* Controls */
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 20;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: rgba(0, 0, 0, 0.8);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        button:focus {
+            outline: 2px solid #00ccff;
+        }
+
+        /* Media Queries */
+        @media (max-width: 600px) {
+            #timer.jump { transform: scale(1.15) translateY(-5px); }
+
+            #celebration.celebrating h1,
+            #celebration.celebrating p {
+                filter:
+                        drop-shadow(0 0 2px rgba(255, 255, 255, 0.7))
+                        drop-shadow(0 0 5px white)
+                        drop-shadow(0 0 10px #00ffff);
+                background-size: 500% 100%;
+            }
+
+            #controls {
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+
+        /* High-contrast mode for accessibility */
+        @media (prefers-contrast: more) {
+            #timer, #celebration h1, #celebration p {
+                text-shadow: none;
+                filter: none;
+                -webkit-text-fill-color: white;
+                color: white;
+                background: none;
+                animation: none;
+            }
+
+            #timer {
+                color: white;
+                -webkit-text-fill-color: white;
+            }
+
+            #celebration.celebrating h1,
+            #celebration.celebrating p {
+                color: white;
+                -webkit-text-fill-color: white;
+                background: none;
+                animation: none;
+                filter: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <div id="countdown" aria-live="polite">
+        <div id="countdown-label">Countdown to 2026</div>
+        <span id="timer" aria-label="seconds remaining">30</span>
+        <span class="visually-hidden" id="countdown-description">Seconds until New Year 2026</span>
+    </div>
+
+    <div id="celebration" class="hidden" aria-live="polite">
+        <h1>Happy New Year 2026!</h1>
+        <p id="blessings"></p>
+    </div>
+
+    <canvas id="fireworksCanvas" aria-hidden="true"></canvas>
+
+    <div id="controls">
+        <button id="restart-btn" class="hidden">Restart</button>
+        <button id="pause-btn">Pause</button>
+        <button id="reduce-effects-btn">Reduce Effects</button>
+    </div>
+</div>
+
+<script>
+    // --- JAVASCRIPT LOGIC ---
+
+    // DOM Elements
+    const container = document.getElementById('container');
+    const countdownElement = document.getElementById('countdown');
+    const timerElement = document.getElementById('timer');
+    const celebrationElement = document.getElementById('celebration');
+    const blessingsElement = document.getElementById('blessings');
+    const canvas = document.getElementById('fireworksCanvas');
+    const ctx = canvas.getContext('2d');
+    const restartBtn = document.getElementById('restart-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const reduceEffectsBtn = document.getElementById('reduce-effects-btn');
+
+    // Configuration Constants
+    const CONFIG = {
+        countdownDuration: 30,  // seconds
+        maxParticles: 1500,     // limit total particles for performance
+        maxRockets: 20,         // limit total rockets
+        basePerformanceMode: false, // default performance mode
+        // New Year date/time (January 1st, 2026)
+        targetDate: new Date('January 1, 2026 00:00:00').getTime()
+    };
+
+    // State Variables
+    let particles = [];
+    let rockets = [];
+    let fireworksActive = false;
+    let isPaused = false;
+    let countdown;
+    let countdownStartTime;
+    let countdownPausedTimeRemaining = CONFIG.countdownDuration;
+    let countdownInterval;
+    let animationFrameId;
+    let lastTime = 0;
+    let performanceMode = CONFIG.basePerformanceMode;
+
+    // Performance settings
+    const performanceSettings = {
+        standard: {
+            particlesPerExplosion: () => 100 + Math.random() * 100,
+            launchFrequency: 0.03,
+            increasedLaunchFrequency: 0.12,
+            particleSize: [1, 3],
+            particleSpeed: [-3, 3],
+        },
+        reduced: {
+            particlesPerExplosion: () => 30 + Math.random() * 40,
+            launchFrequency: 0.02,
+            increasedLaunchFrequency: 0.05,
+            particleSize: [1, 2],
+            particleSpeed: [-2, 2],
+        }
+    };
+
+    // Current settings based on performance mode
+    let settings = performanceSettings.standard;
+
+    // New Year blessings
+    const blessings = [
+        "Wishing you joy and prosperity!",
+        "May your year be filled with happiness and success.",
+        "Cheers to health, wealth, and love!",
+        "Hoping your dreams take flight in the New Year.",
+        "May your days be bright and your heart be light.",
+        "Sending you warm wishes for a wonderful year ahead.",
+        "May 2026 bring you endless possibilities!"
+    ];
+
+    // Utility Functions
+    function random(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function resizeCanvas() {
+        // Set canvas to window dimensions for full-screen effect
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    // Particle class for firework explosions
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.size = random(...settings.particleSize);
+            this.alpha = 1;
+            this.life = random(0.5, 1.5);
+            this.vx = random(...settings.particleSpeed);
+            this.vy = random(-5, 1);
+            this.gravity = 0.08;
+        }
+
+        update(deltaTime) {
+            if (isPaused) return;
+
+            this.x += this.vx * deltaTime * 60;
+            this.y += this.vy * deltaTime * 60;
+            this.vy += this.gravity * deltaTime * 60;
+            this.life -= deltaTime;
+            this.alpha = Math.max(0, this.life / 1.0);
+        }
+
+        draw() {
+            ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.alpha})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // Rocket class for firework launch
+    class Rocket {
+        constructor() {
+            this.x = random(canvas.width * 0.2, canvas.width * 0.8);
+            this.y = canvas.height;
+            this.color = {
+                r: Math.floor(random(150, 255)),
+                g: Math.floor(random(150, 255)),
+                b: Math.floor(random(150, 255))
+            };
+            this.size = 2;
+            this.vy = random(-8, -14);
+            this.gravity = 0.05;
+            this.explodeHeight = random(canvas.height * 0.15, canvas.height * 0.5);
+            this.trail = []; // Add trail for rocket
+        }
+
+        update(deltaTime) {
+            if (isPaused) return;
+
+            // Add current position to trail
+            if (this.trail.length > 10) this.trail.shift();
+            this.trail.push({x: this.x, y: this.y, alpha: 1});
+
+            // Update trail alpha
+            this.trail.forEach(point => point.alpha *= 0.9);
+
+            this.y += this.vy * deltaTime * 60;
+            this.vy += this.gravity * deltaTime * 60;
+        }
+
+        draw() {
+            // Draw trail
+            this.trail.forEach((point, index) => {
+                const trailAlpha = point.alpha * 0.5;
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${trailAlpha})`;
+                const size = this.size * (index / this.trail.length);
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Draw rocket
+            ctx.fillStyle = `rgb(${this.color.r}, ${this.color.g}, ${this.color.b})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        shouldExplode() {
+            return this.vy >= -1 || this.y <= this.explodeHeight;
+        }
+    }
+
+    // Create firework explosion
+    function createExplosion(x, y, color) {
+        const particleCount = Math.min(
+            settings.particlesPerExplosion(),
+            CONFIG.maxParticles - particles.length
+        );
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle(x, y, color));
+        }
+    }
+
+    // Animation loop using requestAnimationFrame
+    function animate(currentTime) {
+        if (!lastTime) lastTime = currentTime;
+        const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.1); // Cap delta time
+        lastTime = currentTime;
+
+        // Clear with semi-transparent black for trail effect
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Add new rockets if fireworks are active
+        if (fireworksActive && !isPaused && Math.random() < settings.launchFrequency &&
+            rockets.length < CONFIG.maxRockets) {
+            rockets.push(new Rocket());
+        }
+
+        // Update and draw rockets
+        for (let i = rockets.length - 1; i >= 0; i--) {
+            rockets[i].update(deltaTime);
+            rockets[i].draw();
+
+            if (rockets[i].shouldExplode()) {
+                createExplosion(rockets[i].x, rockets[i].y, rockets[i].color);
+                rockets.splice(i, 1);
+            }
+        }
+
+        // Update and draw particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update(deltaTime);
+            particles[i].draw();
+
+            if (particles[i].life <= 0) {
+                particles.splice(i, 1);
+            }
+        }
+
+        animationFrameId = requestAnimationFrame(animate);
+    }
+
+    // Synchronized countdown using performance.now()
+    function startCountdown() {
+        // Initialize countdown with configured duration
+        countdownStartTime = performance.now();
+        countdown = CONFIG.countdownDuration;
+        timerElement.textContent = countdown;
+
+        // Clear any existing interval
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        // Update display every second, but sync with actual elapsed time
+        countdownInterval = setInterval(() => {
+            if (isPaused) return;
+
+            const elapsedSeconds = Math.floor((performance.now() - countdownStartTime) / 1000);
+            countdown = CONFIG.countdownDuration - elapsedSeconds;
+
+            // Update display and add animation
+            timerElement.textContent = Math.max(0, countdown);
+            timerElement.setAttribute('aria-label', `${Math.max(0, countdown)} seconds remaining`);
+
+            // Add jump effect
+            timerElement.classList.add('jump');
+            setTimeout(() => {
+                timerElement.classList.remove('jump');
+            }, 150);
+
+            // Check if countdown finished
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                triggerCelebration();
+            }
+        }, 1000);
+    }
+
+    // Celebration when countdown reaches zero
+    function triggerCelebration() {
+        // Hide countdown
+        countdownElement.style.opacity = '0';
+        setTimeout(() => {
+            countdownElement.classList.add('hidden');
+            countdownElement.style.display = 'none';
+        }, 500);
+
+        // Show celebration
+        celebrationElement.classList.remove('hidden');
+        celebrationElement.style.display = 'block';
+        celebrationElement.classList.add('celebrating');
+        setTimeout(() => {
+            celebrationElement.style.opacity = '1';
+        }, 50);
+
+        // Select random blessings
+        let selectedBlessings = [];
+        let blessingsCopy = [...blessings];
+
+        for (let i = 0; i < 3 && blessingsCopy.length > 0; i++) {
+            let randomIndex = Math.floor(Math.random() * blessingsCopy.length);
+            selectedBlessings.push(blessingsCopy.splice(randomIndex, 1)[0]);
+        }
+
+        blessingsElement.innerHTML = selectedBlessings.join('<br>');
+
+        // Activate fireworks
+        fireworksActive = true;
+        settings.launchFrequency = settings.increasedLaunchFrequency;
+
+        // Show restart button
+        restartBtn.classList.remove('hidden');
+    }
+
+    // Reset the countdown and celebration
+    function resetCountdown() {
+        // Reset celebration
+        celebrationElement.classList.add('hidden');
+        celebrationElement.style.opacity = '0';
+        setTimeout(() => {
+            celebrationElement.classList.remove('celebrating');
+        }, 500);
+
+        // Reset countdown
+        countdownElement.classList.remove('hidden');
+        countdownElement.style.display = 'flex';
+        countdownElement.style.opacity = '1';
+
+        // Clear particles and rockets
+        particles = [];
+        rockets = [];
+
+        // Reset fireworks
+        fireworksActive = false;
+        settings.launchFrequency = performanceSettings[performanceMode ? 'reduced' : 'standard'].launchFrequency;
+
+        // Hide restart button
+        restartBtn.classList.add('hidden');
+
+        // Restart countdown
+        startCountdown();
+    }
+
+    // Toggle pause state
+    function togglePause() {
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            pauseBtn.textContent = 'Resume';
+            countdownPausedTimeRemaining = countdown;
+            if (countdownInterval) clearInterval(countdownInterval);
+        } else {
+            pauseBtn.textContent = 'Pause';
+            // Adjust countdown start time to account for pause duration
+            countdownStartTime = performance.now() - ((CONFIG.countdownDuration - countdownPausedTimeRemaining) * 1000);
+            startCountdown();
+        }
+    }
+
+    // Toggle performance mode
+    function togglePerformanceMode() {
+        performanceMode = !performanceMode;
+
+        if (performanceMode) {
+            settings = performanceSettings.reduced;
+            reduceEffectsBtn.textContent = 'Standard Effects';
+        } else {
+            settings = performanceSettings.standard;
+            reduceEffectsBtn.textContent = 'Reduce Effects';
+        }
+    }
+
+    // Event listeners
+    window.addEventListener('resize', resizeCanvas);
+    restartBtn.addEventListener('click', resetCountdown);
+    pauseBtn.addEventListener('click', togglePause);
+    reduceEffectsBtn.addEventListener('click', togglePerformanceMode);
+
+    // Keyboard controls for accessibility
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'p' || e.key === 'P' || e.key === ' ') {
+            togglePause();
+            e.preventDefault();
+        } else if (e.key === 'r' || e.key === 'R') {
+            if (!restartBtn.classList.contains('hidden')) {
+                resetCountdown();
+                e.preventDefault();
+            }
+        } else if (e.key === 'e' || e.key === 'E') {
+            togglePerformanceMode();
+            e.preventDefault();
+        }
+    });
+
+    // Initialize
+    resizeCanvas();
+    startCountdown();
+    requestAnimationFrame(animate);
+</script>
+</body>
+</html>

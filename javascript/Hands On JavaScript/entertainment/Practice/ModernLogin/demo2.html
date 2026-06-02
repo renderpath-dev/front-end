@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Interface</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f9; /* Light background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            width: 400px;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 20px;
+        }
+
+        .login-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        .social-login {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            background-color: #eee;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        .social-btn:hover {
+            background-color: #ddd;
+        }
+
+        .social-btn img {
+            height: 20px; /* Adjust icon size */
+        }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #999;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .or-divider:not(:empty)::before {
+            margin-right: .25em;
+        }
+
+        .or-divider:not(:empty)::after {
+            margin-left: .25em;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left; /* Align labels to the left */
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box; /* Important for padding to be inside width */
+            transition: border-color 0.3s ease;
+        }
+
+        .input-field:focus {
+            border-color: #62a8ea; /* Highlight on focus */
+            outline: none; /* Remove default focus outline */
+            box-shadow: 0 0 0 2px rgba(62, 168, 234, 0.2); /* Subtle focus shadow */
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            justify-content: flex-start; /* Align to the start of the container */
+        }
+
+        .remember-me input[type="checkbox"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            color: #777;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .login-btn {
+            background-color: #62a8ea; /* Primary color */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+            width: 100%; /* Full width button */
+        }
+
+        .login-btn:hover {
+            background-color: #4a8ac7; /* Darker shade on hover */
+        }
+
+        .login-footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .login-footer a {
+            color: #62a8ea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .login-footer a:hover {
+            color: #4a8ac7;
+            text-decoration: underline;
+        }
+
+        /* JavaScript enhanced elements (example - hover effect on social buttons) */
+        .social-btn.js-hover-effect:hover {
+            transform: scale(1.05); /* Slightly scale up on hover */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add a small shadow */
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-header">
+        <h2>Welcome Back</h2>
+        <p>Login to continue to our application</p>
+    </div>
+
+    <div class="social-login">
+        <button class="social-btn js-hover-effect">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">  <!-- Updated Google Logo URL -->
+
+        </button>
+        <button class="social-btn js-hover-effect">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple ID">
+            Apple ID
+        </button>
+    </div>
+
+    <div class="or-divider">Or</div>
+
+    <form id="loginForm">
+        <div class="input-group">
+            <label for="emailOrPhone">Email or Phone Number</label>
+            <input type="text" id="emailOrPhone" class="input-field" placeholder="your@email.com or phone number" required>
+        </div>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="input-field" placeholder="Your Password" required>
+        </div>
+
+        <div class="remember-me">
+            <input type="checkbox" id="rememberMe">
+            <label for="rememberMe">Remember Me</label>
+        </div>
+
+        <button type="submit" class="login-btn">Login</button>
+    </form>
+
+    <div class="login-footer">
+        <a href="#">Forgot Password?</a> | <a href="#">Sign Up</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const emailOrPhone = document.getElementById('emailOrPhone').value;
+        const password = document.getElementById('password').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+
+        // In a real application, you would send this data to your backend for authentication.
+        // For this example, we'll just log the details to the console.
+
+        console.log('Login Attempt:');
+        console.log('Email or Phone:', emailOrPhone);
+        console.log('Password:', password);
+        console.log('Remember Me:', rememberMe);
+
+        if (rememberMe) {
+            // Store "Remember Me" preference (e.g., in localStorage or cookies - simplified example)
+            localStorage.setItem('rememberMe', 'true');
+            // In a real app, you might store user ID or token securely if "remember me" is checked.
+        } else {
+            localStorage.removeItem('rememberMe'); // Clear if not checked
+        }
+
+        alert('Login details submitted (check console for details). In a real app, this would be sent to the backend.');
+    });
+
+    // Example of JavaScript enhanced element (hover effect is already in CSS, but could be added dynamically if needed)
+    // For instance, if you want to dynamically add classes based on events, you could do something like:
+    const socialButtons = document.querySelectorAll('.social-btn');
+    socialButtons.forEach(button => {
+        button.addEventListener('mouseenter', () => {
+            // Example of dynamic JS enhancement - could add more complex animation or style here
+            // For this example, the hover effect is already handled by CSS class .js-hover-effect
+            // You could add more dynamic behavior if needed.
+        });
+    });
+
+    // Check for "Remember Me" on page load (example - very basic, not secure for real login)
+    if (localStorage.getItem('rememberMe') === 'true') {
+        document.getElementById('rememberMe').checked = true;
+        // In a real application, you might attempt auto-login based on stored credentials (handle securely!).
+        console.log('Remember Me was previously checked.');
+    }
+</script>
+
+</body>
+</html>

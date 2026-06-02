@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Login & Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        }
+
+        .container {
+            position: relative;
+            width: 800px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .form-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            transition: 0.6s;
+        }
+
+        .login-container {
+            display: flex;
+        }
+
+        .register-container {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #4ecdc4;
+            outline: none;
+        }
+
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            cursor: pointer;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .social-login {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .btn-social {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+        }
+
+        .btn-google {
+            background: #db4437;
+            color: white;
+        }
+
+        .btn-apple {
+            background: #000;
+            color: white;
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .toggle-form a {
+            color: #4ecdc4;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .verification-code {
+            display: none;
+        }
+
+        .show-verification {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 登录表单 -->
+    <div class="form-container login-container">
+        <div class="form">
+            <h2 class="form-title">Welcome Back</h2>
+            <div class="social-login">
+                <div class="social-buttons">
+                    <button class="btn btn-social btn-google">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                    <button class="btn btn-social btn-apple">
+                        <i class="fab fa-apple"></i> Apple
+                    </button>
+                </div>
+                <div class="divider">or</div>
+            </div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <input type="text" placeholder="Email or Phone" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Password" id="loginPassword" required>
+                    <i class="fas fa-eye" onclick="togglePassword('loginPassword')"></i>
+                </div>
+                <div class="remember-forgot">
+                    <label>
+                        <input type="checkbox"> Remember me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+            </form>
+
+            <div class="toggle-form">
+                Don't have an account? <a onclick="showRegister()">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册表单 -->
+    <div class="form-container register-container">
+        <div class="form">
+            <h2 class="form-title">Create Account</h2>
+            <form id="registerForm">
+                <div class="input-group">
+                    <input type="email" placeholder="Email" required>
+                </div>
+                <div class="input-group">
+                    <input type="tel" placeholder="Phone Number" required>
+                </div>
+                <div class="input-group verification-code">
+                    <input type="text" placeholder="Verification Code">
+                    <button type="button" class="btn btn-primary" id="sendCode">Send Code</button>
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="Password" id="registerPassword" required>
+                    <i class="fas fa-eye" onclick="togglePassword('registerPassword')"></i>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+            </form>
+
+            <div class="toggle-form">
+                Already have an account? <a onclick="showLogin()">Sign In</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 切换登录/注册表单
+    function showRegister() {
+        document.querySelector('.login-container').style.display = 'none';
+        document.querySelector('.register-container').style.display = 'flex';
+        document.querySelector('.verification-code').classList.add('show-verification');
+    }
+
+    function showLogin() {
+        document.querySelector('.register-container').style.display = 'none';
+        document.querySelector('.login-container').style.display = 'flex';
+    }
+
+    // 切换密码可见性
+    function togglePassword(inputId) {
+        const passwordInput = document.getElementById(inputId);
+        const icon = passwordInput.nextElementSibling;
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    // 验证码发送功能
+    let countdown = 30;
+    let timer = null;
+
+    document.getElementById('sendCode').addEventListener('click', function() {
+        this.disabled = true;
+        this.textContent = `Resend (${countdown})`;
+
+        timer = setInterval(() => {
+            countdown--;
+            this.textContent = `Resend (${countdown})`;
+
+            if (countdown <= 0) {
+                clearInterval(timer);
+                this.disabled = false;
+                this.textContent = 'Send Code';
+                countdown = 30;
+            }
+        }, 1000);
+    });
+
+    // 表单验证
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        // 添加登录逻辑
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        // 添加注册逻辑
+    });
+
+    // 第三方登录模拟
+    document.querySelectorAll('.btn-social').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('第三方登录功能需要后端集成');
+        });
+    });
+</script>
+</body>
+</html>
