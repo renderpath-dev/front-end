@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0d82025a-776d-4cf5-93c7-b1fd076a17d9" name="更改" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="19" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+        <option value="HTML File" />
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="33pTCurgoq7uTBdOxAZa60W1apB" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JavaScript Debug.Fibonacci sequence.html.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.index.html.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Fronted_Practical&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.appearance&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\WebStorm 2025.3.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Fronted_Practical\Practice\entertainment" />
+      <recent name="D:\Fronted_Practical\Practice\ModernLogin" />
+      <recent name="D:\Fronted_Practical\Practice\countdwon" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JavaScript Debug.index.html">
+    <configuration name="Fibonacci sequence.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/WS-Project/Fibonacci sequence.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <configuration name="index.html" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:63342/WS-Project/index.html" useBuiltInWebServerPort="true">
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.index.html" />
+        <item itemvalue="JavaScript Debug.Fibonacci sequence.html" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-WS-261.23567.141" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="0d82025a-776d-4cf5-93c7-b1fd076a17d9" name="更改" comment="" />
+      <created>1760012889852</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1760012889852</updated>
+      <workItem from="1760012891098" duration="64000" />
+      <workItem from="1760014500047" duration="30000" />
+      <workItem from="1760019021710" duration="921000" />
+      <workItem from="1760020473814" duration="94000" />
+      <workItem from="1760020574883" duration="75000" />
+      <workItem from="1760454738766" duration="982000" />
+      <workItem from="1761037858442" duration="144000" />
+      <workItem from="1761382340918" duration="383000" />
+      <workItem from="1761908275961" duration="1425000" />
+      <workItem from="1761966961182" duration="3402000" />
+      <workItem from="1762096673520" duration="613000" />
+      <workItem from="1762263514106" duration="846000" />
+      <workItem from="1762787479483" duration="372000" />
+      <workItem from="1762837266359" duration="1476000" />
+      <workItem from="1762868306398" duration="4887000" />
+      <workItem from="1763223890470" duration="26000" />
+      <workItem from="1763629857867" duration="18000" />
+      <workItem from="1763646939895" duration="872000" />
+      <workItem from="1764047778707" duration="581000" />
+      <workItem from="1765013702983" duration="860000" />
+      <workItem from="1765681508506" duration="180000" />
+      <workItem from="1766381312235" duration="4000" />
+      <workItem from="1766417227880" duration="603000" />
+      <workItem from="1766418471703" duration="155000" />
+      <workItem from="1766925225227" duration="1634000" />
+      <workItem from="1767870910479" duration="315000" />
+      <workItem from="1767871446731" duration="191000" />
+      <workItem from="1768633955795" duration="702000" />
+      <workItem from="1768634921127" duration="113000" />
+      <workItem from="1768635044569" duration="122000" />
+      <workItem from="1768635198303" duration="140000" />
+      <workItem from="1768635347008" duration="53000" />
+      <workItem from="1768635411350" duration="403000" />
+      <workItem from="1768635869296" duration="21000" />
+      <workItem from="1769239237680" duration="642000" />
+      <workItem from="1769239891299" duration="66000" />
+      <workItem from="1769239964955" duration="128000" />
+      <workItem from="1769246161324" duration="261000" />
+      <workItem from="1769246609872" duration="7000" />
+      <workItem from="1769248326955" duration="106000" />
+      <workItem from="1769248449186" duration="1097000" />
+      <workItem from="1769249642542" duration="2382000" />
+      <workItem from="1769262823414" duration="873000" />
+      <workItem from="1769308038855" duration="177000" />
+      <workItem from="1769318679872" duration="938000" />
+      <workItem from="1769690466412" duration="816000" />
+      <workItem from="1769691298941" duration="9000" />
+      <workItem from="1769691332157" duration="202000" />
+      <workItem from="1769691552170" duration="166000" />
+      <workItem from="1769691739608" duration="59000" />
+      <workItem from="1769691819605" duration="632000" />
+      <workItem from="1769746581333" duration="8000" />
+      <workItem from="1774874994652" duration="41000" />
+      <workItem from="1777110992799" duration="120000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
