@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Cheatsheet Writer"
+  short_description: "Write concise frontend cheatsheets"
+  default_prompt: "Use $frontend-cheatsheet-writer to write a concise standalone Markdown cheatsheet for a JavaScript, TypeScript, React, Node.js, Next.js, or frontend engineering topic."

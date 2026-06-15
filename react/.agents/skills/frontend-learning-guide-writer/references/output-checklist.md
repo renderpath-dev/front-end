@@ -1,0 +1,49 @@
+# Output Checklist
+
+Before finishing, verify:
+
+- The guide is teaching-oriented, not a summary.
+- The chapter explains what problem it solves.
+- Prerequisites are listed.
+- Core terms include English names and layer classification.
+- Ordinary structure headings are Chinese and do not keep English template headings such as `File Positioning`, `What Problem This Chapter Solves`, `Clear Conclusion`, or `Technical Meaning`.
+- Table headers are not forced to be Chinese; clear English headers such as `Concept`, `Layer`, `Meaning`, and `Common Mistake` are allowed.
+- The document starts with `## 目录` after the chapter title and any local `<style>` block.
+- `## 目录` appears before `## 0. 文件定位`.
+- The directory includes every numbered top-level section in the actual guide.
+- The directory includes all core `### 9.x` sections under `## 9. 分节教学与练习`.
+- The directory includes important `###` sections under `## 12. 最终小项目`.
+- The directory does not include internal bold teaching labels such as `结论`, `本节解决的问题`, `技术意义`, `逐行解释`, or `最终记忆模型`.
+- If the chapter contains real practice files or final mini-project files, it includes `## 本章代码定位索引`.
+- The code location index connects learning goals, real files or snippets, type, and section location.
+- Real file paths in the code location index can be found in the recommended directory structure, code-window title bars, and final file list.
+- Concept snippets in the code location index are marked as `概念 snippet` and do not masquerade as real file paths.
+- Core concept sections inside `## 9. 分节教学与练习` use `###` concept headings plus bold teaching labels, not a long stack of H4 headings.
+- JavaScript runtime and TypeScript type system are separated.
+- Framework runtime and language mechanism are separated.
+- `当前项目结构`, `本章文档结构`, `概念示例结构`, and `最终小项目结构` are clearly distinguished when they appear.
+- React chapter 1 may be mostly conceptual, but React chapter 2 and later include real practice file structures.
+- For React chapter 2 and later, each core concept has an independent directory when practical.
+- Practice file names reveal the knowledge point, exercise goal, or component responsibility.
+- The guide avoids overusing `App.tsx`, `main.tsx`, `index.tsx`, `example.tsx`, `demo.tsx`, or `test.tsx` as the main learning files for multiple unrelated concepts.
+- Non-trivial code has line-by-line explanation.
+- Execution process is explicit.
+- Common mistakes include wrong code, error type, violated rule, correction, and recognition method.
+- The guide includes a mini project.
+- The guide includes a cheatsheet.
+- The guide includes official documentation reading list.
+- Real file paths in code-window title bars can be found in the nearest relevant structure block.
+- Concept snippets use logical `Snippet:` or `Template:` title-bar names and do not masquerade as real file paths.
+- Concept snippets are not mixed into the final file list as final files.
+- The final file list includes only files actually created or real final-practice files that should be created, kept, or replaced.
+- The final file list includes file path, role, and status.
+- Code and code comments contain no Chinese characters.
+- Every code example uses the macOS-style HTML title bar plus a normal Markdown fenced code block.
+- Every title bar has red/yellow/green dots.
+- Every title bar displays a file name, logical snippet name, `Terminal`, `Output`, or `Error`.
+- Decorative UI elements are outside the actual source code.
+- Source code remains clean, copyable, and executable.
+- No real source code is placed inside raw HTML `<pre><code>`.
+- Correct fenced code language identifier is used: `ts`, `tsx`, `js`, `jsx`, `bash`, `json`, `html`, `css`, or `txt`.
+- CSS includes `.macos-code-titlebar + pre` when local styling is included.
+- The final response includes a self-check checklist.

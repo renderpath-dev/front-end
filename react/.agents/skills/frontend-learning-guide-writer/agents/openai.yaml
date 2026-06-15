@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Learning Guide Writer"
+  short_description: "Write rigorous frontend learning guides"
+  default_prompt: "Use $frontend-learning-guide-writer to write a mechanism-first Markdown chapter guide for a JavaScript, TypeScript, React, Node.js, or Next.js topic."
