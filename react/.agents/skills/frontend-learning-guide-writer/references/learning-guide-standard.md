@@ -11,6 +11,43 @@ Use this standard for substantial Markdown learning guides about JavaScript, Typ
 - Do not assume the learner already understands `this`, prototypes, closures, module scope, async scheduling, type erasure, generic inference, framework rendering, or server/browser boundaries.
 - Do not add unrelated advanced topics unless they directly support the chapter.
 
+## Explanation-First Content Rule
+
+A full chapter guide must derive most of its value from mechanism-focused teaching explanation. Code, API tables, the final mini project, directory trees, checklists, and cheatsheets are supporting material; they must not replace conceptual explanation.
+
+When space is limited, preserve content in this order:
+
+1. Core concept explanation.
+2. Underlying mechanism.
+3. Line-by-line explanation.
+4. Execution process.
+5. Error causes and violated rules.
+6. Relationship to real projects.
+
+Do not provide only file structures and source code, use the final mini project instead of section-by-section teaching, use API tables or checklists instead of explanation, or give each section only a short overview before moving directly to code.
+
+## No Label-Only Filling Rule
+
+Required teaching labels are an outline, not proof of teaching quality. A core section is incomplete when labels such as `技术意义`, `底层机制`, `执行过程`, `变量与引用变化`, `常见错误为什么错`, `与真实项目的关系`, and `最终记忆模型` are present but the text beneath them remains generic.
+
+Bind every explanation to the current subsection's actual concept, variables, values, references, code path, UI result, compiler result, and project scenario. Apply this portability test: if a paragraph can be copied unchanged into a different React, JavaScript, or TypeScript chapter, it is too generic and must be rewritten with section-specific evidence.
+
+Do not use statements such as `React 会重新渲染`, `TypeScript 会检查类型`, `这样可以提高可维护性`, or `这个写法更清晰` as the main mechanism explanation. Continue by naming the concrete render owner, state snapshot, consumer, key identity, reducer transition, hook position, runtime value, or compiler relationship.
+
+## Mechanism Evidence Chain Rule
+
+Every core `9.x` section must include at least one mechanism evidence chain that explains all of the following:
+
+1. The user action or code operation that starts the process.
+2. The concrete variables, objects, arrays, closures, functions, or calls created or read by the JavaScript runtime.
+3. The render snapshot, state or hook cell, context value, ref object, fiber or key identity, reducer transition, or hook call position React stores or reads.
+4. The exact type relationship TypeScript checks and what it does not validate or execute at runtime.
+5. Why these steps produce the observed UI, output, error, or type-check result.
+6. The exact mechanism rule violated by an incorrect form.
+7. How to recognize the same class of failure in a real project.
+
+The chain may be prose, a numbered sequence, or a compact table, but it must trace concrete values and identities from trigger to result.
+
 ## Research Requirement
 
 - Before writing any framework, library, tool, runtime, or version-sensitive content, inspect the relevant local reference files first.
@@ -28,6 +65,27 @@ Use this standard for substantial Markdown learning guides about JavaScript, Typ
 - Keep code identifiers, filenames, package names, commands, APIs, raw errors, runtime UI strings, and source-code comments in English.
 - Do not write Chinese characters inside source-code blocks.
 - Do not leave English template headings such as `File Positioning`, `What Problem This Chapter Solves`, `Clear Conclusion`, `Technical Meaning`, or `Final Memory Model` in the final document.
+
+## Chapter Title Rule
+
+The H1 of every full chapter learning guide must contain all three of these elements:
+
+1. The technology or technical topic.
+2. The chapter number.
+3. The concrete chapter name.
+
+Examples:
+
+```markdown
+# React 第 6 章：Forms 与 Controlled Components
+# React 第 7 章：Effects、Refs 与外部系统同步
+# TypeScript 第 9 章：Framework Types 与 React TSX 边界
+# React 06：Forms-Controlled-Components
+```
+
+Do not use generic H1 titles such as `# React 学习指导`, `# Chapter Learning Guide`, `# Forms Guide`, or `# React Chapter`.
+
+For a new chapter, keep the chapter identity consistent across the directory name, file name, H1, directory, code location index, code-window paths, and final file list. For an existing guide revision, do not rename established paths only to satisfy this rule; update the H1 and in-document file locations so they identify the specific chapter.
 
 ## Required Full Chapter Structure
 
@@ -115,6 +173,8 @@ The directory and code location index are mandatory structure rules, but the tem
 - Place the directory near the top of the document, after the chapter title and any local `<style>` block, and before `## 0. 文件定位`.
 - The directory must list every numbered top-level section from `## 0` through `## 18`.
 - The directory must include every core `### 9.x` section under `## 9. 分节教学与练习`.
+- Listing only `9. 分节教学与练习` is not sufficient. Expand the TOC with `9.1`, `9.2`, `9.3`, and every later core subsection through the chapter's final `9.x` heading.
+- If `## 9. 分节教学与练习` is the chapter's main teaching body and any core child heading is absent from the TOC, the delivery check must fail.
 - The directory must include important `###` sections under `## 12. 最终小项目`, such as project goal, structure, complete code, run command, expected output, execution flow, and common errors.
 - Do not include internal bold teaching labels in the directory, such as `结论`, `本节解决的问题`, `技术意义`, `逐行解释`, `执行过程`, or `最终记忆模型`.
 - Prefer Markdown heading links. If the target renderer has uncertain support for Chinese heading anchors, a plain text reading index is acceptable, but it must stay complete and ordered.
@@ -176,6 +236,21 @@ Recommended labels:
 ```
 
 If a concept section has no new API, explicitly say that the section has no new API and focuses on mechanism.
+
+Every core `9.x` section must be led by explanation rather than code. Code may be included, but sufficient explanation must appear before and after it. After every non-trivial code block, explain the code line by line, describe the execution process, track relevant variable and reference changes, explain why the result occurs, compare a meaningful contrasting case, identify common mistakes and their violated rules, and explain how to recognize similar mistakes later. If a section needs a long example, explain the core mechanism first and then show only the necessary code.
+
+## React Section-Specific Data-Flow Rule
+
+Every core `9.x` section in a React chapter must trace the subsection's most important data flow from creation through transfer, reading, and update. Select the concrete trace that matches the topic:
+
+- Props chapter: props object, child parameter, and callback prop.
+- State chapter: state snapshot, setter, and update queue.
+- Lists and keys chapter: array element, key, sibling scope, and retained identity.
+- Forms chapter: `event.currentTarget.value` or `checked`, controlled prop, and form state object.
+- Effects and refs chapter: effect closure, dependency, cleanup, ref object, and `ref.current`.
+- State architecture chapter: source state, derived data, state owner, action object, reducer state, dispatch, context value, and custom-hook call identity.
+
+A section that does not trace any specific value's creation, transfer, read, and update is incomplete.
 
 ## Structure Type Rules
 
@@ -251,6 +326,28 @@ macOS-style code window title bars may show a real file path, logical snippet na
 - Do not make readers think every snippet title is a file they must create.
 - When a chapter requires learners to actually create files, prefer real file-path title bars and make those paths exactly match the recommended directory structure.
 
+## Self-Contained macOS Code Window Rule
+
+If a guide uses `.macos-code-window`, `.macos-code-titlebar`, `.macos-code-dot`, or related HTML, place a `<style>` block near the beginning of the Markdown file and define all of these selectors:
+
+- `.macos-code-window`
+- `.macos-code-titlebar`
+- `.macos-code-dot`
+- `.macos-code-dot-red`
+- `.macos-code-dot-yellow`
+- `.macos-code-dot-green`
+- `.macos-code-title`
+- `.macos-code-titlebar + pre`
+- `.macos-code-titlebar + pre code`
+
+Missing any required selector is a delivery failure. If a future project intentionally uses an external stylesheet, identify its exact source in the guide and preserve enough in-document explanation that standalone Markdown readers still understand the code-window structure.
+
+## Real File Existence Rule
+
+Every path presented as a real file in the code location index, recommended directory structure, real-file code-window title bar, final file list, or final mini-project structure must exist in the local repository before delivery. If it does not exist, either create the file or relabel the example as `Snippet:`, `Template:`, or explicitly not required.
+
+Do not mark a missing path as `已创建`, `已更新`, or `真实练习文件`. Real-file title bars, directory structures, and final file lists must agree. Concept snippets must never enter the real final file list.
+
 ## Concept Snippet Rules
 
 - Each core section with multiple snippets should first include a `概念示例结构` block listing the snippet names.
@@ -311,6 +408,12 @@ Do not only write directory structure. Explain file-system routing and module bo
 
 Every full guide must include a final mini project. The project must integrate the chapter's core mechanism instead of randomly combining APIs.
 
+The final mini project is a chapter summary and integration exercise, not a substitute for the core `9.x` teaching sections. Do not increase the project's code or prose to justify reducing mechanism explanations earlier in the guide. Even when project code is long, keep the project explanation-led by covering file responsibilities, state ownership, data flow, execution flow, decomposition decisions, and common errors.
+
+Open the final mini project section with a natural sentence equivalent to: `最终小项目只用于整合本章机制，不替代前面的分节教学。`
+
+Reject the chapter when any core concept appears only in the final project, when final-project code and explanation clearly outweigh shallow `9.x` teaching, or when adding project files and code does not improve mechanism understanding. Preserve complete project code, but complete code is not a substitute for evidence-led explanations in the earlier sections.
+
 Include:
 
 - Project goal.
@@ -362,3 +465,24 @@ Every full guide must include an extra cheatsheet with:
 - Error type table.
 - Real project usage table.
 - Minimal code templates.
+
+## Delivery Requirement
+
+After completing a chapter, perform an evidence-based self-check against `output-checklist.md`.
+
+The self-check must use this table structure:
+
+| 检查项 | 结果 | 证据 |
+| --- | --- | --- |
+
+Mark each result as `PASS`, `FAIL`, or `UNKNOWN` and provide specific evidence. Do not write only `已检查`.
+
+Delivery Gate instructions, self-check tables, `PASS` / `FAIL` / `UNKNOWN`, change summaries, and Codex execution notes belong only in the final response. Do not place them in the learning guide body. A guide must read like a natural textbook and must not contain `Delivery Gate`, `evidence-based self-check`, `本次修订`, `按照 skill 检查`, or `Codex 已完成` as instructional prose.
+
+Use `UNKNOWN` when a check was not actually performed. Never mark `PASS` without verifiable evidence such as an exact path, heading, command result, file count, required style selector, or complete-code mapping.
+
+If any critical item is `FAIL`:
+
+- Do not end the task.
+- Do not deliver the guide as the final result.
+- Continue revising until all critical checks pass.

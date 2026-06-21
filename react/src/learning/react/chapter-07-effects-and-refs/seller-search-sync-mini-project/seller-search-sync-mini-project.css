@@ -1,0 +1,145 @@
+.seller-search-project {
+  margin-top: 56px;
+  padding: 30px;
+  color: #172033;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.seller-search-project-header,
+.seller-search-results-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.seller-search-project-header h2,
+.seller-search-results-heading h3 {
+  margin: 6px 0 0;
+}
+
+.seller-search-project-header > div > p:last-child {
+  max-width: 680px;
+  color: #526077;
+  line-height: 1.6;
+}
+
+.seller-search-project button {
+  padding: 10px 14px;
+  color: #ffffff;
+  border: 1px solid #0f766e;
+  border-radius: 7px;
+  background: #0f766e;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.seller-search-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr);
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.seller-search-controls label {
+  display: grid;
+  gap: 7px;
+  color: #344054;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.seller-search-controls input,
+.seller-search-controls select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  color: #172033;
+  border: 1px solid #94a3b8;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.seller-search-results {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #d8dee9;
+}
+
+.sync-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.sync-badge-pending {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.sync-badge-success {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.sync-summary,
+.seller-search-empty {
+  color: #667085;
+}
+
+.seller-product-list {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seller-product-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #d8dee9;
+  border-radius: 7px;
+  background: #f8fafc;
+}
+
+.seller-product-list li > div {
+  display: grid;
+  gap: 4px;
+}
+
+.seller-product-list span {
+  color: #667085;
+  font-size: 0.88rem;
+}
+
+.seller-product-metrics {
+  justify-items: end;
+}
+
+@media (max-width: 680px) {
+  .seller-search-project {
+    padding: 22px;
+  }
+
+  .seller-search-project-header,
+  .seller-search-results-heading,
+  .seller-product-list li {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .seller-search-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-product-metrics {
+    justify-items: start;
+  }
+}

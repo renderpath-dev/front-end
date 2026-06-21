@@ -1,0 +1,73 @@
+.chapter-01-demo-page {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.chapter-01-hero-panel {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.chapter-01-eyebrow {
+  margin: 0;
+  color: #28715f;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-01-hero-panel h1 {
+  max-width: 760px;
+  margin: 0;
+  color: #172033;
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1;
+}
+
+.chapter-01-intro {
+  max-width: 760px;
+  margin: 0;
+  color: #4c5870;
+  font-size: 1.05rem;
+}
+
+.chapter-01-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.chapter-01-demo-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid #d7dde8;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.chapter-01-demo-card span {
+  color: #65728a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.chapter-01-demo-card h2 {
+  margin: 0;
+  color: #172033;
+}
+
+.chapter-01-demo-card p {
+  margin: 0;
+  color: #4c5870;
+}
+
+@media (max-width: 760px) {
+  .chapter-01-card-grid {
+    grid-template-columns: 1fr;
+  }
+}

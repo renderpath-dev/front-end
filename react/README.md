@@ -64,45 +64,61 @@ If the local PDF conflicts with current official documentation, follow the offic
 - Key topics: render, commit, state snapshots, batched updates, and object or array state updates.
 - Related official docs: `Adding Interactivity`.
 
-### 5. State Modeling and Component Collaboration
+### 5. Lists, Keys, and Conditional Rendering
 
-- Derive the smallest useful state from the UI.
-- Lifting state up, sharing state, preserving state, and resetting state.
-- Use `useReducer` for more complex state transitions.
-- Use `Context` for cross-level data sharing, but do not use it as a replacement for every prop.
-- Related official docs: `Managing State`.
+- Render typed arrays with `map()` and use stable domain IDs as keys.
+- Keep loading, error, empty, and success branches distinct.
+- Derive filtered and sorted lists without mutating props or state.
+- Related official docs: `Rendering Lists` and `Conditional Rendering`.
 
-### 6. Effects, Refs, and Custom Hooks
+### 6. Forms and Controlled Components
+
+- Understand browser form submission and React `onSubmit` handling.
+- Control text inputs, textareas, selects, checkboxes, and radio groups with React state.
+- Model related form values with immutable object state.
+- Keep validation errors, pending submission, and success feedback distinct.
+- Apply TypeScript event, form-value, and field-name types to form boundaries.
+- Current notes and exercises: `docs/react/chapter-06-forms/`, `src/learning/react/chapter-06-forms/`.
+
+### 7. Effects and Refs
 
 - Refs store values that do not participate in rendering, or they provide access to DOM nodes.
 - Effects synchronize React with external systems. Ordinary derived data should usually stay out of effects.
 - Separate event logic from effect synchronization.
-- When extracting a custom hook, keep the Hook call rules and dependency relationships clear.
 - Related official docs: `Escape Hatches`.
 
-### 7. Forms, Async Data, and Real App Practice
+### 8. State Architecture, Reducer, Context, and Custom Hooks
 
-- Controlled components, form submission, validation, and user feedback.
-- Loading, error, empty, and success state modeling.
-- Fetching, refetching, pagination, sorting, and cache boundaries.
-- Practice state flow with browser-local persistence first, then introduce a backend only when the requirement calls for it.
-- Related local PDF topics: forms, asynchronous data, data fetching, and real-world React.
+- Keep state minimal by deriving values and choosing an explicit state owner.
+- Preserve or reset state intentionally through UI-tree position and `key`.
+- Use `useReducer` when state transitions benefit from explicit actions.
+- Use `Context` for cross-level data sharing, not as a replacement for every prop.
+- Extract custom hooks while keeping Hook call rules and dependency relationships clear.
+- Keep TypeScript state, action, context, ref, and hook types separate from JavaScript runtime behavior.
 
-### 8. TypeScript in React
+### 9. Async Data, Fetch Lifecycle, and UI State
 
-- TypeScript files containing JSX use the `.tsx` extension.
-- The `jsx` option in `tsconfig` controls how JSX is handed to the rest of the toolchain.
-- Props, event handlers, state, refs, and custom hooks all require a clear distinction between TypeScript type-system behavior and JavaScript runtime behavior.
-- `@types/react` and `@types/react-dom` provide React and DOM types. They do not change runtime code.
-- Related official docs: `Using TypeScript with React` and TypeScript Handbook `JSX`.
+- Model remote data with explicit idle, pending, success, empty, and error states.
+- Separate user-driven requests from effect-driven synchronization with committed criteria.
+- Handle HTTP status, runtime response validation, abort, obsolete results, and request races.
+- Use reducers, custom hooks, and Context only after request ownership and lifecycle boundaries are explicit.
+- Current notes and exercises: `docs/react/chapter-09-async-data/`, `src/learning/react/chapter-09-async-data/`.
 
-### 9. Styling, Testing, Performance, and Project Structure
+### 10. Routing, URL State, and Navigation
 
-- Start styling with plain CSS, then understand CSS modules, component-level styling, and SVG/import asset boundaries.
-- Test verifiable TypeScript logic first, then expand to component behavior.
-- Optimize performance only after locating a real issue. Then consider memoization, render splitting, or data-structure changes.
-- Organize project structure around learning chapters and app boundaries. Avoid early abstractions.
-- Related local PDF topics: styling, maintenance, testing, performance, and project structure.
+- Treat the browser URL and history stack as application state boundaries.
+- Use React Router declarative routing for route matching, links, nested layouts, params, search params, navigation, and fallback routes.
+- Keep URL state, local component state, Context state, and location state in their appropriate ownership boundaries.
+- Connect route params and search params to the async request criteria learned in Chapter 9.
+- Current notes and exercises: `docs/react/chapter-10-routing-url-state/`, `src/learning/react/chapter-10-routing-url-state/`.
+
+### 11. Performance, Memoization, and Code Splitting
+
+- Separate React render work, reconciliation, DOM commits, browser paint, and bundle loading before optimizing.
+- Use `memo`, `useMemo`, and `useCallback` only when measured work and stable identity make them useful.
+- Prefer state colocation, minimal derived data, stable keys, and clear component boundaries before memoization.
+- Use `Profiler` for render evidence and `lazy` with `Suspense` for meaningful page-level code-splitting boundaries.
+- Current notes and exercises: `docs/react/chapter-11-performance-memoization/`, `src/learning/react/chapter-11-performance-memoization/`.
 
 ## Chapter Progress
 
@@ -111,12 +127,14 @@ If the local PDF conflicts with current official documentation, follow the offic
 | 01 | React introduction and app boundary | Done | `docs/react/chapter-01-react-introduction/` |
 | 02 | JSX and component basics | Done | `docs/react/chapter-02-jsx-and-components/`, `src/learning/react/chapter-02-jsx-and-components/` |
 | 03 | Props basics and TypeScript props types | Done | `docs/react/chapter-03-props-basics/` |
-| 04 | State and events | Planned | `src/learning/react/chapter-04-state-and-events/` |
-| 05 | Lists, keys, and conditional rendering | Planned | `src/learning/react/chapter-05-rendering-data/` |
-| 06 | Forms and controlled components | Planned | `src/learning/react/chapter-06-forms/` |
-| 07 | Effects and refs | Planned | `src/learning/react/chapter-07-effects-and-refs/` |
-| 08 | Reducer, context, and custom hooks | Planned | `src/learning/react/chapter-08-state-architecture/` |
-| 09 | App practice and persistence | In progress | `src/sudoku/` |
+| 04 | State and events | Done | `docs/react/chapter-04-state-and-events/`, `src/learning/react/chapter-04-state-and-events/` |
+| 05 | Lists, keys, and conditional rendering | Done | `docs/react/chapter-05-rendering-data/`, `src/learning/react/chapter-05-rendering-data/` |
+| 06 | Forms and controlled components | Done | `docs/react/chapter-06-forms/`, `src/learning/react/chapter-06-forms/` |
+| 07 | Effects and refs | Done | `docs/react/chapter-07-effects-and-refs/`, `src/learning/react/chapter-07-effects-and-refs/` |
+| 08 | State architecture, reducer, context, and custom hooks | Done | `docs/react/chapter-08-state-architecture/`, `src/learning/react/chapter-08-state-architecture/` |
+| 09 | Async data, fetch lifecycle, and UI state | Done | `docs/react/chapter-09-async-data/`, `src/learning/react/chapter-09-async-data/` |
+| 10 | Routing, URL state, and navigation | Done | `docs/react/chapter-10-routing-url-state/`, `src/learning/react/chapter-10-routing-url-state/` |
+| 11 | Performance, memoization, and code splitting | Done | `docs/react/chapter-11-performance-memoization/`, `src/learning/react/chapter-11-performance-memoization/` |
 
 ## Practice Principles
 
