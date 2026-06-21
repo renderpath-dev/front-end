@@ -1,7 +1,57 @@
-# Chapter Title
+# React 第 6 章：Forms 与 Controlled Components
+
+生成实际章节时，必须把上面的示范标题替换为当前技术主题、章节数字和具体章节名称，并保持目录名、文件名、H1、代码定位索引和最终文件清单一致。
 
 <style>
+.macos-code-window {
+  overflow: hidden;
+  margin: 16px 0;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  background: #0d1117;
+}
 
+.macos-code-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-bottom: 1px solid #30363d;
+  background: #161b22;
+}
+
+.macos-code-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+
+.macos-code-dot-red { background: #ff5f57; }
+.macos-code-dot-yellow { background: #ffbd2e; }
+.macos-code-dot-green { background: #28c840; }
+
+.macos-code-title {
+  margin-left: 8px;
+  color: #c9d1d9;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+}
+
+.macos-code-titlebar + pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 16px;
+  border-radius: 0 0 12px 12px;
+  background: transparent;
+}
+
+.macos-code-titlebar + pre code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 14px;
+}
 </style>
 
 ## 目录
@@ -16,6 +66,9 @@
 - [7. 推荐目录结构](#7-推荐目录结构)
 - [8. 示例运行方式](#8-示例运行方式)
 - [9. 分节教学与练习](#9-分节教学与练习)
+  - [9.1 controlled input 的 event-state-render 数据流](#91-controlled-input-的-event-state-render-数据流)
+  - [9.2 第二个核心概念（生成时替换）](#92-第二个核心概念生成时替换)
+  - [9.3 第三个核心概念（生成时替换）](#93-第三个核心概念生成时替换)
 - [10. API / 语法索引](#10-api--语法索引)
 - [11. 常见错误表](#11-常见错误表)
 - [12. 最终小项目](#12-最终小项目)
@@ -30,7 +83,7 @@
 
 | 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
 | --- | --- | --- | --- |
-| Replace with actual concept | `replace-with-actual-file-path.tsx` | 真实练习文件 | 9.x |
+| Template row: replace with actual concept | `Template: replace with a verified real path or snippet label` | 模板占位 | 9.x |
 
 生成实际章节时，必须根据实际标题、小节和真实文件路径更新目录和代码定位索引，不能保留 placeholder。
 
@@ -175,43 +228,43 @@ npm run dev
 
 ## 9. 分节教学与练习
 
-### 9.1 核心概念标题
+### 9.1 controlled input 的 event-state-render 数据流
 
 **结论：**
 
-先给出本节最重要的结论。
+受控文本框不是“变量和 DOM 自动双向绑定”。browser 先产生候选输入值，handler 把该 string 排入 React state update，下一次 render 才用新的 `value` prop 把结果提交回 DOM。
 
 **本节解决的问题：**
 
-说明本节解决的具体问题。
+解释用户输入 `Lamp` 时，`event.currentTarget.value`、`productName` render snapshot、React state cell 和最终 DOM value 分别在什么时候变化。
 
 **技术意义：**
 
-说明概念的技术含义，并在首次出现时补充 English term。
+受控输入（controlled input）让 React state 成为字段 current value 的 owner，因此 preview、validation 和 submit payload 可以读取同一个 render snapshot，而不是分别读取 DOM 和复制 state。
 
 **概念解释：**
 
-用教学语言解释概念，不只给定义。
+`value={productName}` 描述本次 render 希望 input 显示的 string；`onChange={handleProductNameChange}` 注册用户编辑后的更新路径。setter 不会修改当前函数调用中的 `productName` binding，而是请求 React 用 next state 再调用 component。
 
 **边界：语法、运行时、对象模型、类型系统、框架约定与平台 API：**
 
-明确这个概念分别属于哪些层，不属于哪些层，避免把不同层混在一起。
+Browser 创建 input event 并在 DOM control 上提供候选 `value`；JavaScript runtime 调用 handler、读取 string 并调用 setter；React 按 hook call position 找到 state cell、排队 update、重新调用 owner component 并 commit 新 `value`；TypeScript 只检查 `ChangeEvent<HTMLInputElement>` 和 string setter 参数，运行时不会验证输入内容。
 
 **底层机制：**
 
-说明运行时、编译器、框架或平台实际做了什么。
+初次 render 的 `productName` 是 `'Desk Lamp'`。用户输入后，旧 handler closure 仍捕获该次 render 的 binding，但 `event.currentTarget.value` 已是 browser control 的候选值。React 处理 `setProductName(nextValue)` 后创建新 render snapshot，新 JSX 同时把该值交给 input 与 preview paragraph。
 
 **API / 语法规则：**
 
-如果本节没有新 API，明确写出：本节没有新的 API，重点是理解机制。
+可编辑 controlled text input 必须同时提供 string `value` 和同步更新 backing state 的 `onChange`。空字段从 `''` 开始，不能先传 `undefined` 再切换为 string。
 
 **固定属性名 / 固定方法名 / 参数签名：**
 
-列出固定名称、方法名、参数签名或说明本节不涉及固定 API。
+固定属性名是 `value` 与 `onChange`；示例 handler 签名是 `function handleProductNameChange(event: ChangeEvent<HTMLInputElement>): void`；候选 string 从 `event.currentTarget.value` 读取。
 
 **概念示例结构：**
 
-如果本节包含多个 conceptual snippets，先列出 snippet 名称，并说明它们不需要创建为真实文件。
+下面三个 logical snippets 只示范机制、对比和错误，不代表真实文件。生成 React 第二章及后续章节时，应优先改成已在本地创建并验证存在的真实练习文件。
 
 <div class="macos-code-window">
   <div class="macos-code-titlebar">
@@ -223,33 +276,49 @@ npm run dev
 
 ```txt
 Conceptual snippets in this section:
-  Snippet: correct mechanism
-  Snippet: common mistake
-  Snippet: corrected version
+  Snippet: controlled product name
+  Snippet: uncontrolled initial value
+  Snippet: value without update path
 ```
 </div>
 
 **示例代码：**
 
-概念示例使用 `Snippet:` 或 `Template:` 逻辑标题；真实练习文件才使用真实文件路径。
+该示范必须在生成实际章节时替换为当前小节的真实代码与变量名；若 title bar 改用真实路径，该文件必须已经存在。
 
 <div class="macos-code-window">
   <div class="macos-code-titlebar">
     <span class="macos-code-dot macos-code-dot-red"></span>
     <span class="macos-code-dot macos-code-dot-yellow"></span>
     <span class="macos-code-dot macos-code-dot-green"></span>
-    <span class="macos-code-title">Snippet: concept mechanism</span>
+    <span class="macos-code-title">Snippet: controlled product name</span>
   </div>
 
-```ts
-const value = 1;
-console.log(value);
+```tsx
+import { useState } from 'react'
+import type { ChangeEvent } from 'react'
+
+export function ProductNameField() {
+  const [productName, setProductName] = useState('Desk Lamp')
+
+  function handleProductNameChange(event: ChangeEvent<HTMLInputElement>): void {
+    setProductName(event.currentTarget.value)
+  }
+
+  return (
+    <label>
+      Product name
+      <input onChange={handleProductNameChange} value={productName} />
+      <span>{productName}</span>
+    </label>
+  )
+}
 ```
 </div>
 
 **逐行解释：**
 
-逐行解释代码在语法层和运行时层分别发生什么。
+`useState` 声明 state cell 的初始 string；typed handler 从所属 input 的 `currentTarget` 读取候选值；setter 排队 next string；input 和 span 都读取同一个 `productName` snapshot，因此下一次 render 后两处显示一致。
 
 **运行方式：**
 
@@ -277,21 +346,31 @@ npm run dev
   </div>
 
 ```txt
-1
+Initial UI: input and preview show Desk Lamp
+After typing Lamp: input and preview show Lamp
 ```
 </div>
 
 **执行过程：**
 
-按顺序说明执行过程。
+1. Browser 接收一次键盘输入并更新 control 的候选 value。
+2. React 调用当前 render 创建的 `handleProductNameChange` closure。
+3. JavaScript 读取 `event.currentTarget.value`，得到例如 `'Lamp'`。
+4. `setProductName('Lamp')` 把 update 加入该 hook state cell 的 queue。
+5. React 再次调用 `ProductNameField`，新 snapshot 中的 `productName` 是 `'Lamp'`。
+6. React commit 新 JSX，input 与 span 同时显示 `'Lamp'`。
+
+**机制证据链：**
+
+触发动作是用户键入字符；JavaScript runtime 创建 event callback invocation 和 `nextValue` string；React 按 `ProductNameField` 的 hook call position 读取同一个 state cell，并从 update queue 计算 next snapshot；TypeScript 只确认 event element 和 setter parameter 都是 string，不会在 runtime 保存或验证商品名；最终 UI 一致是因为 input 与 span 都消费同一 snapshot。若遗漏同步 setter，代码违反 controlled value 必须有 update path 的规则；真实项目中可通过“输入回弹、read-only warning、preview 不更新”识别这一类错误。
 
 **变量与引用变化：**
 
-说明变量绑定、对象引用、状态变化或闭包捕获如何变化。
+旧 closure 中的 `productName` binding 保持 `'Desk Lamp'`，不会被 setter 原地改写；event object 只服务本次 handler 调用；state cell 在 React 内部接收 next string；下一次 component call 创建值为 `'Lamp'` 的新 binding。
 
 **为什么会得到这个结果：**
 
-解释为什么会得到这个输出。
+input 和 span 都由同一个 owner component render，并读取同一个 `productName`。handler 把 browser 候选值送入该 owner 的 state queue，所以 commit 后不存在两份需要手工同步的 source state。
 
 **对比情况：**
 
@@ -300,16 +379,17 @@ npm run dev
     <span class="macos-code-dot macos-code-dot-red"></span>
     <span class="macos-code-dot macos-code-dot-yellow"></span>
     <span class="macos-code-dot macos-code-dot-green"></span>
-    <span class="macos-code-title">Snippet: contrasting case</span>
+    <span class="macos-code-title">Snippet: uncontrolled initial value</span>
   </div>
 
-```ts
-const value = "1";
-console.log(value);
+```tsx
+export function UncontrolledProductNameField() {
+  return <input defaultValue="Desk Lamp" />
+}
 ```
 </div>
 
-说明对比代码改变了什么规则或执行过程。
+`defaultValue` 只提供 initial value。后续 edits 由 DOM control 保存，不进入 React state，因此其他 JSX 不能直接从 component snapshot 派生同步 preview。
 
 **常见错误为什么错：**
 
@@ -318,27 +398,38 @@ console.log(value);
     <span class="macos-code-dot macos-code-dot-red"></span>
     <span class="macos-code-dot macos-code-dot-yellow"></span>
     <span class="macos-code-dot macos-code-dot-green"></span>
-    <span class="macos-code-title">Snippet: common mistake</span>
+    <span class="macos-code-title">Snippet: value without update path</span>
   </div>
 
-```ts
-missingIdentifier;
+```tsx
+export function ReadOnlyByMistake() {
+  const [productName] = useState('Desk Lamp')
+  return <input value={productName} />
+}
 ```
 </div>
 
-说明错误类型、违反的规则、修正方式，以及以后如何识别类似错误。
+React 每次 commit 都强制 input value 等于旧 snapshot，但没有 handler 更新 backing state，所以用户输入会回弹并产生 warning。修正方式是提供同步 `onChange`、改用 `defaultValue`，或在确实只读时显式添加 `readOnly`。
 
 **与真实项目的关系：**
 
-说明这个机制在真实项目中的使用场景。
+Seller product form 的 name、description 与 price preview 都依赖同一 values snapshot；如果其中一个字段绕过 state 只留在 DOM，validation 与 preview 就会读取不同 source of truth。
 
 **与当前学习路径的关系：**
 
-说明本节如何连接到前后知识。
+本节承接 event handler 与 render snapshot，并为后续 object form state、field validation 和 submission status 建立字段 ownership 基础。
 
 **最终记忆模型：**
 
-用少量句子总结本节最终要记住的模型。
+Browser 提供候选值，JavaScript handler 读取它，React setter 更新 state cell，下一次 render 产生新 snapshot，commit 再把 `value` 写回 DOM。TypeScript 只检查这条路径的静态类型，不参与 runtime state 保存。
+
+### 9.2 第二个核心概念（生成时替换）
+
+生成实际章节时，必须替换此标题，并像 9.1 一样追踪该概念自己的 trigger、JavaScript values/calls、React snapshot/cell/identity、TypeScript runtime boundary、结果原因、错误规则和真实项目识别信号。不得复制 9.1 的 controlled-input 解释来填充其他主题。
+
+### 9.3 第三个核心概念（生成时替换）
+
+生成实际章节时，必须替换此标题并提供另一条可验证的机制证据链。若本章实际拥有更多核心小节，继续添加 `9.4`、`9.5`，直到最后一个核心小节，并同步展开 TOC。
 
 ## 10. API / 语法索引
 
@@ -354,6 +445,8 @@ missingIdentifier;
 
 ## 12. 最终小项目
 
+最终小项目只用于整合本章机制，不替代前面的分节教学。任何在项目中使用的核心概念，都必须先在对应 `9.x` 小节中用独立机制证据链讲清楚。
+
 ### 项目目标
 
 说明项目目标。
@@ -364,7 +457,7 @@ missingIdentifier;
 
 ### 最终小项目结构
 
-真实文件路径必须与下面结构完全一致。
+真实文件路径必须与下面结构完全一致。生成实际章节时必须替换所有 placeholder，并在本地创建或验证每个路径；不存在的示例只能标为 `Snippet:` 或 `Template:`。
 
 <div class="macos-code-window">
   <div class="macos-code-titlebar">
@@ -440,7 +533,7 @@ npm run dev
 
 ## 14. 最终文件清单
 
-只列出本次实际创建的文档文件，以及最终 mini project 中建议保留或替换的真实练习文件。不要混入配置文件、资料来源、官方文档或概念 snippets。
+只列出本次实际创建的文档文件，以及最终 mini project 中建议保留或替换的真实练习文件。不要混入配置文件、资料来源、官方文档或概念 snippets。生成实际章节时必须删除下面的 placeholder rows，并用已经在本地验证存在的真实路径替换。
 
 | File | Role | Status |
 | --- | --- | --- |

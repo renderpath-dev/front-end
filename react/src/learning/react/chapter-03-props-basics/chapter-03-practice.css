@@ -1,0 +1,79 @@
+.props-practice-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.props-practice-header {
+  margin-bottom: 28px;
+}
+
+.chapter-eyebrow {
+  margin: 0 0 8px;
+  color: #335c81;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.props-practice-header h1 {
+  margin: 0;
+  color: #172033;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1;
+}
+
+.props-practice-header p:last-child {
+  max-width: 760px;
+  margin: 16px 0 0;
+  color: #526070;
+  line-height: 1.6;
+}
+
+.props-practice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.props-panel {
+  min-height: 220px;
+  padding: 22px;
+  border: 1px solid #d8e0ea;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgb(23 32 51 / 8%);
+}
+
+.props-panel h2,
+.props-panel h3 {
+  margin: 0 0 12px;
+  color: #172033;
+  line-height: 1.15;
+}
+
+.props-panel p {
+  margin: 8px 0;
+  color: #526070;
+  line-height: 1.5;
+}
+
+.props-pill {
+  display: inline-flex;
+  align-items: center;
+  margin: 6px 8px 0 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e8f0f8;
+  color: #24496c;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.props-card {
+  padding: 16px;
+  border: 1px solid #c8d5e3;
+  border-radius: 8px;
+  background: #f8fbff;
+}

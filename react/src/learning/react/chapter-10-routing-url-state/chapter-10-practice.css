@@ -1,0 +1,469 @@
+:root {
+  color: #17211a;
+  background: #f4f7f4;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #f4f7f4;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: #12643a;
+  font-weight: 700;
+}
+
+button {
+  min-height: 40px;
+  border: 1px solid #12643a;
+  border-radius: 6px;
+  padding: 0 14px;
+  color: #ffffff;
+  background: #12643a;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0d4e2c;
+}
+
+code {
+  overflow-wrap: anywhere;
+  color: #8c2d18;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+.chapter-ten-shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 64px;
+}
+
+.chapter-ten-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 24px 0 28px;
+  border-bottom: 3px solid #17211a;
+}
+
+.chapter-ten-header h1 {
+  max-width: 760px;
+  margin: 6px 0 10px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+.chapter-ten-header p {
+  max-width: 760px;
+  margin: 0;
+  color: #4c5c51;
+  line-height: 1.65;
+}
+
+.chapter-ten-eyebrow,
+.routing-practice-kicker,
+.chapter-ten-section-heading > div > p,
+.sellerhub-page-heading p {
+  margin: 0;
+  color: #12643a;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-ten-nav,
+.routing-practice-actions,
+.sellerhub-main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chapter-ten-nav a {
+  border: 1px solid #b9c6bd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  background: #ffffff;
+  text-decoration: none;
+}
+
+.chapter-ten-section-heading,
+.sellerhub-workspace-header,
+.sellerhub-page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.chapter-ten-section-heading {
+  padding: 32px 0 18px;
+}
+
+.chapter-ten-section-heading h2,
+.sellerhub-workspace-header h2,
+.sellerhub-page-heading h3 {
+  margin: 4px 0 0;
+  letter-spacing: 0;
+}
+
+.routing-practice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.routing-practice-panel {
+  min-width: 0;
+  border: 1px solid #cad4cd;
+  border-radius: 8px;
+  padding: 20px;
+  background: #ffffff;
+}
+
+.routing-practice-panel h2 {
+  margin: 6px 0 12px;
+  font-size: 1.2rem;
+}
+
+.routing-practice-panel p {
+  line-height: 1.55;
+}
+
+.routing-practice-actions {
+  align-items: center;
+  margin: 14px 0;
+}
+
+.routing-practice-actions a,
+.routing-intent-link {
+  border: 1px solid #b9c6bd;
+  border-radius: 6px;
+  padding: 9px 11px;
+  background: #f8faf8;
+  text-decoration: none;
+}
+
+.routing-intent-link-active {
+  border-color: #12643a;
+  color: #ffffff;
+  background: #12643a;
+}
+
+.routing-practice-note {
+  color: #5d6b61;
+  font-size: 0.9rem;
+}
+
+.routing-match-list {
+  display: grid;
+  gap: 8px;
+  padding-left: 24px;
+}
+
+.routing-match-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.routing-match-list span {
+  color: #5d6b61;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.8rem;
+}
+
+.routing-outlet-frame,
+.routing-result-box {
+  margin-top: 14px;
+  border-left: 4px solid #12643a;
+  padding: 12px 14px;
+  background: #edf5ef;
+}
+
+.routing-field {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0;
+  font-weight: 700;
+}
+
+.routing-field input,
+.routing-field select,
+.routing-field textarea {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #9eaea3;
+  border-radius: 6px;
+  padding: 9px 10px;
+  color: #17211a;
+  background: #ffffff;
+}
+
+.routing-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.routing-segmented-control {
+  display: inline-flex;
+  max-width: 100%;
+  border: 1px solid #12643a;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.routing-segmented-control button {
+  border: 0;
+  border-right: 1px solid #12643a;
+  border-radius: 0;
+  color: #12643a;
+  background: #ffffff;
+}
+
+.routing-segmented-control button:last-child {
+  border-right: 0;
+}
+
+.routing-segmented-control button[aria-pressed="true"] {
+  color: #ffffff;
+  background: #12643a;
+}
+
+.routing-boundary-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0 0;
+}
+
+.routing-boundary-list div {
+  border-top: 2px solid #cad4cd;
+  padding-top: 8px;
+}
+
+.routing-boundary-list dt {
+  color: #5d6b61;
+  font-size: 0.78rem;
+}
+
+.routing-boundary-list dd {
+  margin: 4px 0 0;
+  font-weight: 800;
+}
+
+.routing-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.routing-toggle-row input {
+  width: 18px;
+  height: 18px;
+}
+
+.routing-error-text {
+  color: #a22d1a;
+  font-weight: 700;
+}
+
+.routing-success-text {
+  color: #12643a;
+  font-weight: 700;
+}
+
+.sellerhub-workspace {
+  margin-top: 32px;
+  border-top: 3px solid #17211a;
+  padding-top: 28px;
+}
+
+.sellerhub-workspace-header {
+  align-items: flex-start;
+}
+
+.sellerhub-auth-status {
+  border: 1px solid #cad4cd;
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #4c5c51;
+  background: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.sellerhub-main-nav {
+  margin: 20px 0;
+  border-bottom: 1px solid #cad4cd;
+}
+
+.sellerhub-nav-link {
+  padding: 10px 4px 12px;
+  border-bottom: 3px solid transparent;
+  color: #4c5c51;
+  text-decoration: none;
+}
+
+.sellerhub-nav-link-active {
+  border-bottom-color: #12643a;
+  color: #12643a;
+}
+
+.sellerhub-route-stage {
+  min-height: 420px;
+  border: 1px solid #cad4cd;
+  border-radius: 8px;
+  padding: 24px;
+  background: #ffffff;
+}
+
+.sellerhub-filter-row {
+  display: grid;
+  grid-template-columns: 220px minmax(240px, 1fr);
+  gap: 16px;
+}
+
+.sellerhub-product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.sellerhub-product-card,
+.sellerhub-detail-card,
+.sellerhub-login-panel,
+.sellerhub-not-found {
+  border: 1px solid #cad4cd;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.sellerhub-product-card h4,
+.sellerhub-detail-card h3,
+.sellerhub-login-panel h3,
+.sellerhub-not-found h3 {
+  margin: 6px 0;
+}
+
+.sellerhub-product-card > span,
+.sellerhub-detail-card > span {
+  color: #5d6b61;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.sellerhub-seller-layout {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  min-height: 320px;
+}
+
+.sellerhub-seller-layout aside {
+  border-right: 1px solid #cad4cd;
+  padding-right: 18px;
+}
+
+.sellerhub-seller-layout nav {
+  display: grid;
+  gap: 6px;
+}
+
+.sellerhub-subnav-link {
+  border-radius: 6px;
+  padding: 9px 10px;
+  color: #4c5c51;
+  text-decoration: none;
+}
+
+.sellerhub-subnav-link-active {
+  color: #ffffff;
+  background: #12643a;
+}
+
+.sellerhub-seller-content {
+  min-width: 0;
+  padding-left: 22px;
+}
+
+.sellerhub-order-count {
+  margin-top: 24px;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+@media (max-width: 760px) {
+  .chapter-ten-shell {
+    width: min(100% - 22px, 1180px);
+    padding-top: 12px;
+  }
+
+  .chapter-ten-header,
+  .chapter-ten-section-heading,
+  .sellerhub-workspace-header,
+  .sellerhub-page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .routing-practice-grid,
+  .sellerhub-product-grid,
+  .sellerhub-filter-row,
+  .sellerhub-seller-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .routing-boundary-list {
+    grid-template-columns: 1fr;
+  }
+
+  .sellerhub-seller-layout aside {
+    border-right: 0;
+    border-bottom: 1px solid #cad4cd;
+    padding: 0 0 16px;
+  }
+
+  .sellerhub-seller-content {
+    padding: 18px 0 0;
+  }
+
+  .sellerhub-route-stage {
+    padding: 16px;
+  }
+
+  .routing-segmented-control {
+    display: flex;
+  }
+
+  .routing-segmented-control button {
+    flex: 1;
+    min-width: 0;
+    padding: 0 8px;
+  }
+}
