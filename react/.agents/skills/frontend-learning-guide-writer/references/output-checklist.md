@@ -25,6 +25,10 @@ Before finishing, verify:
 - The directory includes every numbered top-level section in the actual guide.
 - The directory includes all core `### 9.x` sections under `## 9. 分节教学与练习`.
 - The TOC expands every core subsection from `9.1` through the final `9.x`; listing only section 9 is a failure.
+- TOC `9.x` links use stable `#section-9-x` anchors.
+- Each core `9.x` heading has the matching explicit `<a id="section-9-x"></a>` HTML anchor immediately before the heading, with at most one blank line between them.
+- No core section anchor ID is duplicated.
+- Meaningful heading text was not changed only to satisfy anchor generation.
 - The directory includes important `###` sections under `## 12. 最终小项目`.
 - The directory does not include internal bold teaching labels such as `结论`, `本节解决的问题`, `技术意义`, `逐行解释`, or `最终记忆模型`.
 - If the chapter contains real practice files or final mini-project files, it includes `## 本章代码定位索引`.
@@ -96,3 +100,4 @@ Treat any item below as `FAIL`:
 8. A `Snippet:` or `Template:` is listed as a real final file.
 9. The self-check contains claims without verifiable evidence.
 10. Lint/build was not run, but the final response claims it passed.
+11. Any core `9.x` TOC entry does not use its matching stable `#section-9-x` target, any core heading lacks its matching explicit anchor, any section anchor ID is duplicated, or heading text was changed only to influence anchor generation.

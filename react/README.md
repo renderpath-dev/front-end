@@ -4,8 +4,8 @@ This directory is a React + TypeScript learning project. It uses Vite for local 
 
 ## Current Contents
 
-- `docs/react/`: React learning notes. Chapters 1 through 3 are currently available.
-- `src/learning/react/`: Runnable TSX exercises that match the learning chapters.
+- `docs/react/`: React learning notes for chapters 1 through 16.
+- `src/learning/react/`: Runnable TSX exercises for chapters 1 through 16, linked from the local learning home.
 - `src/sudoku/`: A Daily Sudoku practice app covering React state, event handlers, derived rendering, a browser-local `localStorage` leaderboard, and pure TypeScript puzzle logic.
 - `references/books/react/`: Local React PDF reference directory. PDF files are local-only study material and are not committed to the public repository.
 
@@ -14,8 +14,26 @@ This directory is a React + TypeScript learning project. It uses Vite for local 
 - Install dependencies: `npm install`
 - Start the development server: `npm run dev`
 - Run linting: `npm run lint`
+- Run type checking: `npm run typecheck`
+- Run tests: `npm run test`
 - Build for production: `npm run build`
 - Preview the production build locally: `npm run preview`
+
+## Local Entry Points
+
+Run `npm run dev`, then open the local URL printed by Vite. The root page is the learning home. It links to:
+
+- Daily Sudoku at `/sudoku`.
+- React chapter practice roots for chapters 1 through 9 at `/react/chapter-01` through `/react/chapter-09`.
+- Chapter 10 routing practice at `/practice`; its existing React Router workspace continues through `/catalog`, `/seller`, `/checkout`, and `/login`.
+- Chapter 11 performance practice and workspace under `/performance/*`.
+- Chapter 12 testing and quality-gate practice at `/react/chapter-12`.
+- Chapter 13 Next.js boundary practice at `/react/chapter-13`.
+- Chapter 14 React 19 Actions and Compiler boundary practice at `/react/chapter-14`.
+- Chapter 15 production frontend architecture practice at `/react/chapter-15`.
+- Chapter 16 SellerHub capstone at `/react/chapter-16/catalog`.
+
+`index.html` loads `src/sudoku/main.tsx`, which mounts the root `src/App.tsx` learning navigation. Each destination is loaded only when selected, and every practice page includes a link back to the learning home.
 
 ## Source Priority
 
@@ -25,8 +43,9 @@ The learning path follows current official documentation first. The local PDF is
 2. [React API Reference](https://react.dev/reference/react)
 3. [Using TypeScript with React](https://react.dev/learn/typescript)
 4. [TypeScript Handbook: JSX](https://www.typescriptlang.org/docs/handbook/jsx.html)
-5. Local-only PDF: `references/books/react/the-road-to-react-the-reactjs-19-with-hooks-in-javascript-book-2025-edition_compress.pdf`
-6. Existing project notes and practice code
+5. [Next.js App Router Documentation](https://nextjs.org/docs/app)
+6. Local-only PDF: `references/books/react/the-road-to-react-the-reactjs-19-with-hooks-in-javascript-book-2025-edition_compress.pdf`
+7. Existing project notes and practice code
 
 If the local PDF conflicts with current official documentation, follow the official documentation and mark the PDF content as potentially outdated in notes.
 
@@ -120,13 +139,52 @@ If the local PDF conflicts with current official documentation, follow the offic
 - Use `Profiler` for render evidence and `lazy` with `Suspense` for meaningful page-level code-splitting boundaries.
 - Current notes and exercises: `docs/react/chapter-11-performance-memoization/`, `src/learning/react/chapter-11-performance-memoization/`.
 
+### 12. Testing, Quality Gates, and Frontend Engineering
+
+- Test user-visible behavior and business rules instead of component implementation details.
+- Use Vitest for runner behavior, React Testing Library for component behavior, user-event for realistic interactions, jest-dom for DOM assertions, and MSW for request-boundary mocks.
+- Keep unit, component, integration, and E2E boundaries distinct.
+- Treat lint, typecheck, test, and build as separate quality gates.
+- Current notes and exercises: `docs/react/chapter-12-testing-quality/`, `src/learning/react/chapter-12-testing-quality/`.
+
+### 13. Next.js App Router, SSR, Hydration, and Server Components
+
+- Treat Next.js as a React framework boundary, not as a file-based replacement for React Router.
+- Understand App Router route segments, layouts, pages, loading, error, not-found, Route Handlers, Proxy, metadata, and runtime boundaries.
+- Separate Server Components, Client Components, `"use client"` module boundaries, serializable props, SSR, streaming, and hydration.
+- Practice hydration mismatch diagnosis and browser-only API guards without converting this Vite learning app into a Next.js project.
+- Current notes and exercises: `docs/react/chapter-13-nextjs-ssr-rsc/`, `src/learning/react/chapter-13-nextjs-ssr-rsc/`.
+
+### 14. React 19 Actions, use API, and React Compiler
+
+- Model async mutations with Actions, `useActionState`, form Actions, and form status.
+- Separate optimistic projections from confirmed state and practice rollback or reconciliation.
+- Distinguish runnable client APIs from Server Function, cached Promise, static rendering, and framework boundaries.
+- Treat React Compiler as an explicit build-time optimization with lint and migration evidence, not an automatic runtime feature.
+- Current notes and exercises: `docs/react/chapter-14-react-19-actions-compiler/`, `src/learning/react/chapter-14-react-19-actions-compiler/`.
+
+### 15. Production Frontend Architecture, Design System, and Engineering Governance
+
+- Define production architecture through ownership, dependency direction, public APIs, and evidence gates.
+- Separate design tokens, primitive components, compound accessibility contracts, feature modules, and shared modules.
+- Adapt runtime-validated DTOs into domain and view models, then normalize errors and release decisions.
+- Model i18n, observability, performance budgets, security boundaries, migration, ADRs, and review standards.
+- Current notes and exercises: `docs/react/chapter-15-production-frontend-architecture/`, `src/learning/react/chapter-15-production-frontend-architecture/`.
+
+### 16. SellerHub Capstone, Production Feature Delivery, and Portfolio Evidence
+
+- Reorganize the React learning path around buyer, seller, operations, and review journeys.
+- Connect routes, URL criteria, runtime DTO validation, adapters, reducer state, controlled forms, Context, permissions, and action-like mutations.
+- Deliver accessible primitives, user behavior tests, quality gates, engineering documents, and honest portfolio evidence.
+- Current notes and exercises: `docs/react/chapter-16-sellerhub-capstone/`, `src/learning/react/chapter-16-sellerhub-capstone/`.
+
 ## Chapter Progress
 
 | Chapter | Topic | Status | Main files |
 | --- | --- | --- | --- |
-| 01 | React introduction and app boundary | Done | `docs/react/chapter-01-react-introduction/` |
+| 01 | React introduction and app boundary | Done | `docs/react/chapter-01-react-introduction/`, `src/learning/react/chapter-01-react-introduction/` |
 | 02 | JSX and component basics | Done | `docs/react/chapter-02-jsx-and-components/`, `src/learning/react/chapter-02-jsx-and-components/` |
-| 03 | Props basics and TypeScript props types | Done | `docs/react/chapter-03-props-basics/` |
+| 03 | Props basics and TypeScript props types | Done | `docs/react/chapter-03-props-basics/`, `src/learning/react/chapter-03-props-basics/` |
 | 04 | State and events | Done | `docs/react/chapter-04-state-and-events/`, `src/learning/react/chapter-04-state-and-events/` |
 | 05 | Lists, keys, and conditional rendering | Done | `docs/react/chapter-05-rendering-data/`, `src/learning/react/chapter-05-rendering-data/` |
 | 06 | Forms and controlled components | Done | `docs/react/chapter-06-forms/`, `src/learning/react/chapter-06-forms/` |
@@ -135,6 +193,11 @@ If the local PDF conflicts with current official documentation, follow the offic
 | 09 | Async data, fetch lifecycle, and UI state | Done | `docs/react/chapter-09-async-data/`, `src/learning/react/chapter-09-async-data/` |
 | 10 | Routing, URL state, and navigation | Done | `docs/react/chapter-10-routing-url-state/`, `src/learning/react/chapter-10-routing-url-state/` |
 | 11 | Performance, memoization, and code splitting | Done | `docs/react/chapter-11-performance-memoization/`, `src/learning/react/chapter-11-performance-memoization/` |
+| 12 | Testing, quality gates, and frontend engineering | Done | `docs/react/chapter-12-testing-quality/`, `src/learning/react/chapter-12-testing-quality/` |
+| 13 | Next.js App Router, SSR, Hydration, and Server Components | Done | `docs/react/chapter-13-nextjs-ssr-rsc/`, `src/learning/react/chapter-13-nextjs-ssr-rsc/` |
+| 14 | React 19 Actions, use API, and React Compiler | Done | `docs/react/chapter-14-react-19-actions-compiler/`, `src/learning/react/chapter-14-react-19-actions-compiler/` |
+| 15 | Production frontend architecture, design system, and engineering governance | Done | `docs/react/chapter-15-production-frontend-architecture/`, `src/learning/react/chapter-15-production-frontend-architecture/` |
+| 16 | SellerHub capstone, production feature delivery, and portfolio evidence | Done | `docs/react/chapter-16-sellerhub-capstone/`, `src/learning/react/chapter-16-sellerhub-capstone/` |
 
 ## Practice Principles
 

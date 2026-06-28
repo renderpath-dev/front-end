@@ -1,0 +1,166 @@
+.chapter-twelve-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0 72px;
+  color: #172033;
+}
+
+.chapter-twelve-header {
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #d9e2ef;
+}
+
+.chapter-twelve-eyebrow,
+.skill-pill {
+  margin: 0 0 8px;
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter-twelve-header h1 {
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  line-height: 1.05;
+}
+
+.chapter-twelve-header p {
+  max-width: 760px;
+  margin: 0;
+  color: #526175;
+}
+
+.practice-panel {
+  margin: 18px 0;
+  padding: 20px;
+  border: 1px solid #d9e2ef;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.topic-summary {
+  margin-bottom: 16px;
+}
+
+.topic-summary h2,
+.practice-panel h2,
+.workflow-card h3 {
+  margin: 0 0 8px;
+}
+
+.testing-boundary-grid,
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.topic-card,
+.workflow-card {
+  padding: 16px;
+  border: 1px solid #d9e2ef;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.topic-card h3 {
+  margin: 0 0 8px;
+}
+
+.topic-card p,
+.topic-card span,
+.workflow-card p,
+.practice-panel p {
+  color: #526175;
+}
+
+.summary-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.summary-list div {
+  padding: 12px;
+  border-radius: 8px;
+  background: #f1f5f9;
+}
+
+.summary-list dt {
+  color: #526175;
+}
+
+.summary-list dd {
+  margin: 4px 0 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.field-label {
+  display: block;
+  margin: 12px 0 6px;
+  font-weight: 700;
+}
+
+.text-input,
+select {
+  width: 100%;
+  max-width: 420px;
+  padding: 10px 12px;
+  border: 1px solid #b8c4d6;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.checkbox-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 14px 0;
+}
+
+.quantity-control {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+}
+
+.practice-panel button,
+.workflow-card button {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #1d4ed8;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.practice-panel button:disabled,
+.workflow-card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.quality-gate-list {
+  display: grid;
+  gap: 10px;
+  padding-left: 20px;
+}
+
+.quality-gate-list li {
+  display: grid;
+  gap: 4px;
+}
+
+.quality-gate-list code {
+  color: #0f172a;
+  font-weight: 700;
+}

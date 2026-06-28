@@ -175,6 +175,9 @@ The directory and code location index are mandatory structure rules, but the tem
 - The directory must include every core `### 9.x` section under `## 9. 分节教学与练习`.
 - Listing only `9. 分节教学与练习` is not sufficient. Expand the TOC with `9.1`, `9.2`, `9.3`, and every later core subsection through the chapter's final `9.x` heading.
 - If `## 9. 分节教学与练习` is the chapter's main teaching body and any core child heading is absent from the TOC, the delivery check must fail.
+- Apply the stable section anchor rule to every core `9.x` subsection: use `#section-9-1`, `#section-9-2`, and so on in the TOC, and place the matching `<a id="section-9-1"></a>` immediately before each `### 9.1 ...` heading.
+- Keep at most one blank line between an explicit section anchor and its heading, keep every anchor ID unique, and continue the numbering through the actual final core subsection.
+- Do not depend on automatic heading slugs that contain Chinese text, abbreviations, `.`, `/`, quotes, colons, arrows, or other punctuation. Do not change meaningful heading text merely to make automatic slug generation easier.
 - The directory must include important `###` sections under `## 12. 最终小项目`, such as project goal, structure, complete code, run command, expected output, execution flow, and common errors.
 - Do not include internal bold teaching labels in the directory, such as `结论`, `本节解决的问题`, `技术意义`, `逐行解释`, `执行过程`, or `最终记忆模型`.
 - Prefer Markdown heading links. If the target renderer has uncertain support for Chinese heading anchors, a plain text reading index is acceptable, but it must stay complete and ordered.
@@ -182,6 +185,20 @@ The directory and code location index are mandatory structure rules, but the tem
 - The code location index connects learning goals, exact real file paths or `Snippet:` labels, type, and section location.
 - Real paths in the code location index must exactly match the recommended directory structure, code-window title bars, and final file list.
 - Concept snippets in the code location index must be marked as `概念 snippet` and must not look like real file paths.
+
+## Stable Section Anchor Rule
+
+Core `9.x` sections must use stable explicit HTML anchors so the chapter directory works consistently across Markdown renderers.
+
+```markdown
+  - [9.1 Section title](#section-9-1)
+
+<a id="section-9-1"></a>
+
+### 9.1 Section title
+```
+
+Repeat this pattern from `9.1` through the actual final core subsection. The TOC target, explicit anchor ID, and section number must match exactly. Missing anchors, complex automatic slug targets, duplicate IDs, or heading changes made only for anchor generation are delivery failures.
 
 ## Required Core Concept Section Structure
 

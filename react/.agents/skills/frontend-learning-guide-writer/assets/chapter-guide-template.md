@@ -66,9 +66,9 @@
 - [7. 推荐目录结构](#7-推荐目录结构)
 - [8. 示例运行方式](#8-示例运行方式)
 - [9. 分节教学与练习](#9-分节教学与练习)
-  - [9.1 controlled input 的 event-state-render 数据流](#91-controlled-input-的-event-state-render-数据流)
-  - [9.2 第二个核心概念（生成时替换）](#92-第二个核心概念生成时替换)
-  - [9.3 第三个核心概念（生成时替换）](#93-第三个核心概念生成时替换)
+  - [9.1 controlled input 的 event-state-render 数据流](#section-9-1)
+  - [9.2 第二个核心概念（生成时替换）](#section-9-2)
+  - [9.3 第三个核心概念（生成时替换）](#section-9-3)
 - [10. API / 语法索引](#10-api--语法索引)
 - [11. 常见错误表](#11-常见错误表)
 - [12. 最终小项目](#12-最终小项目)
@@ -227,6 +227,8 @@ npm run dev
 说明运行环境、命令、预期入口和常见启动失败原因。
 
 ## 9. 分节教学与练习
+
+<a id="section-9-1"></a>
 
 ### 9.1 controlled input 的 event-state-render 数据流
 
@@ -423,9 +425,13 @@ Seller product form 的 name、description 与 price preview 都依赖同一 val
 
 Browser 提供候选值，JavaScript handler 读取它，React setter 更新 state cell，下一次 render 产生新 snapshot，commit 再把 `value` 写回 DOM。TypeScript 只检查这条路径的静态类型，不参与 runtime state 保存。
 
+<a id="section-9-2"></a>
+
 ### 9.2 第二个核心概念（生成时替换）
 
 生成实际章节时，必须替换此标题，并像 9.1 一样追踪该概念自己的 trigger、JavaScript values/calls、React snapshot/cell/identity、TypeScript runtime boundary、结果原因、错误规则和真实项目识别信号。不得复制 9.1 的 controlled-input 解释来填充其他主题。
+
+<a id="section-9-3"></a>
 
 ### 9.3 第三个核心概念（生成时替换）
 

@@ -66,6 +66,7 @@ This is an instruction-only skill. Do not add scripts or new project dependencie
    - Include at least one mechanism evidence chain in every core `9.x` section. Trace: the triggering action; concrete JavaScript variables, objects, arrays, closures, or calls; the React snapshot, state/hook cell, context value, ref object, fiber/key identity, reducer transition, or hook call position involved; what TypeScript checks and does not do at runtime; why the observed UI/output/error follows; the exact rule violated by the incorrect form; and how to recognize the same failure in a real project.
    - Do not use sentences such as `React 会重新渲染`, `TypeScript 会检查类型`, `这样可以提高可维护性`, or `这个写法更清晰` as the mechanism explanation by themselves. Name the concrete owner, snapshot, consumer, identity, transition, value, or call position.
    - List every core `9.x` heading in `## 目录`, from `9.1` through the final core subsection. Listing only `9. 分节教学与练习` is a delivery failure.
+   - Apply the stable section anchor rule to every core `9.x` subsection. Add a unique explicit HTML anchor such as `<a id="section-9-1"></a>` immediately before `### 9.1 ...`, with at most one blank line between them, and link the TOC entry to `#section-9-1`. Continue the same pattern through the actual final `9.x` subsection. Do not rely on complex automatic heading slugs containing Chinese text, abbreviations, `.`, `/`, quotes, colons, arrows, or other punctuation, and do not change meaningful heading text merely to influence slug generation.
 
 5. Teach mechanisms.
    - For JavaScript, separate syntax, runtime behavior, language mechanism, object model/prototype model, and platform API when relevant.
@@ -82,6 +83,7 @@ This is an instruction-only skill. Do not add scripts or new project dependencie
    - Check the generated Markdown against `references/output-checklist.md`.
    - Check that every full chapter guide has `## 目录` before `## 0. 文件定位`.
    - Check that the directory matches the actual headings and does not include internal bold teaching labels.
+   - Check that every core `9.x` TOC link uses the matching stable `#section-9-x` target, every core heading has the corresponding explicit HTML anchor immediately before it, and no section anchor ID is duplicated.
    - Check that guides with real practice files include `## 本章代码定位索引`, and that paths or `Snippet:` labels in the index match the guide structures, code-window title bars, and final file list.
    - Check that non-trivial code examples include correct code, expected output or compiler result, line-by-line explanation, execution process, common mistake, violated rule, correction, and recognition method.
    - Check that every full chapter guide includes a final mini project and an extra cheatsheet.
@@ -105,6 +107,7 @@ Do not deliver a full chapter guide unless every requirement below passes:
 5. The final mini project does not replace the earlier section-by-section teaching.
 6. API tables, directories, file structures, and cheatsheets do not replace core concept explanations.
 7. Every critical item in `references/output-checklist.md` passes.
+8. Every core `9.x` TOC entry and heading passes the stable section anchor rule.
 
 Hard-fail the delivery if any of the following is true:
 
@@ -118,6 +121,7 @@ Hard-fail the delivery if any of the following is true:
 8. A `Snippet:` or `Template:` is listed as a real final file.
 9. The self-check provides only claims such as `已检查` instead of verifiable evidence.
 10. Required lint/build commands were not run, but the final response claims they passed.
+11. Any core `9.x` TOC entry relies on a complex automatic heading slug, lacks its matching explicit `section-9-x` anchor, uses a duplicate anchor ID, or changes meaningful heading text only to satisfy anchor generation.
 
 Before final delivery, produce an evidence-based self-check table with the columns `检查项`, `结果`, and `证据`. Mark every result `PASS`, `FAIL`, or `UNKNOWN`. Cite concrete evidence such as a file path, exact heading, command result, verified file count, required style class, or complete-code mapping; do not write only `已检查`. If any item is `FAIL`, continue revising and do not deliver the guide as a final result. Use `UNKNOWN` when a check was not actually performed and do not present the guide as fully verified.
 
