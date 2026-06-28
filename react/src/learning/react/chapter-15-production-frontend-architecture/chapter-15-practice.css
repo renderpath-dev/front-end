@@ -1,0 +1,255 @@
+.chapter15-shell {
+  min-height: 100vh;
+  padding: 40px clamp(16px, 4vw, 56px);
+  color: #17302f;
+  background: #f3f7f6;
+}
+
+.chapter15-hero,
+.chapter15-panel {
+  max-width: 1120px;
+  margin: 0 auto 24px;
+}
+
+.chapter15-hero {
+  padding: 8px 0 16px;
+}
+
+.chapter15-hero h1,
+.chapter15-panel h2 {
+  margin: 0 0 12px;
+  color: #0f2f2c;
+  line-height: 1.15;
+}
+
+.chapter15-hero p,
+.chapter15-panel > p {
+  max-width: 900px;
+  line-height: 1.65;
+}
+
+.chapter15-kicker,
+.chapter15-eyebrow {
+  margin: 0 0 8px;
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter15-panel {
+  padding: 24px;
+  border: 1px solid #ccdcda;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgb(15 47 44 / 0.06);
+}
+
+.chapter15-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.chapter15-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #d9e5e3;
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.chapter15-card h3 {
+  margin: 0 0 10px;
+}
+
+.chapter15-card p {
+  line-height: 1.55;
+}
+
+.chapter15-definition-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.chapter15-definition-list div {
+  display: grid;
+  gap: 3px;
+}
+
+.chapter15-definition-list dt {
+  color: #55706d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.chapter15-definition-list dd {
+  margin: 0;
+}
+
+.chapter15-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.chapter15-button,
+.chapter15-tab {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid #0f766e;
+  border-radius: 6px;
+  color: #ffffff;
+  background: #0f766e;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.chapter15-button:focus-visible,
+.chapter15-tab:focus-visible,
+.chapter15-link:focus-visible,
+.chapter15-control select:focus-visible {
+  outline: 3px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.chapter15-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.chapter15-tab[aria-selected='false'] {
+  color: #0f766e;
+  background: #ffffff;
+}
+
+.chapter15-tab-panel {
+  margin-top: 12px;
+  padding: 18px;
+  border-left: 4px solid #0f766e;
+  background: #eef9f7;
+}
+
+.chapter15-list {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter15-list li {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid #d9e5e3;
+  border-radius: 6px;
+}
+
+.chapter15-list code,
+.chapter15-card code {
+  overflow-wrap: anywhere;
+}
+
+.chapter15-note {
+  margin-top: 16px;
+  padding: 11px 13px;
+  border-left: 4px solid #0f766e;
+  background: #eef9f7;
+}
+
+.chapter15-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.chapter15-control select {
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 1px solid #8fa9a5;
+  border-radius: 6px;
+  color: inherit;
+  background: #ffffff;
+  font: inherit;
+}
+
+.chapter15-table {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  margin-top: 18px;
+  border: 1px solid #ccdcda;
+  border-radius: 8px;
+  background: #ccdcda;
+}
+
+.chapter15-table-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) auto minmax(130px, 1fr) minmax(80px, auto);
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.chapter15-pass {
+  color: #087f5b;
+}
+
+.chapter15-warn {
+  color: #9a6700;
+}
+
+.chapter15-fail {
+  color: #b42318;
+}
+
+.chapter15-link {
+  display: inline-block;
+  margin-top: 16px;
+  color: #0b5e57;
+  font-weight: 750;
+}
+
+.chapter15-timeline {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0 0;
+  padding-left: 22px;
+}
+
+.chapter15-timeline li {
+  padding: 12px 14px;
+  border-left: 4px solid #0f766e;
+  background: #f5fbfa;
+}
+
+.chapter15-timeline span,
+.chapter15-timeline strong,
+.chapter15-timeline small {
+  display: block;
+}
+
+.chapter15-timeline span {
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+@media (max-width: 720px) {
+  .chapter15-table-row {
+    grid-template-columns: 1fr;
+  }
+}

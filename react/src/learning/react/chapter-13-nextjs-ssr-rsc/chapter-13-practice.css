@@ -1,0 +1,210 @@
+.chapter13-shell {
+  min-height: 100vh;
+  padding: 40px clamp(16px, 4vw, 56px);
+  color: #172033;
+  background: #f5f7fb;
+}
+
+.chapter13-hero {
+  max-width: 960px;
+  margin: 0 auto 32px;
+}
+
+.chapter13-hero h1,
+.chapter13-panel h2 {
+  margin: 0 0 12px;
+  color: #0f172a;
+  line-height: 1.1;
+}
+
+.chapter13-hero p,
+.chapter13-panel > p {
+  max-width: 860px;
+  color: #475569;
+}
+
+.chapter13-kicker {
+  margin: 0 0 8px;
+  color: #2563eb;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chapter13-panel {
+  max-width: 1120px;
+  margin: 0 auto 24px;
+  padding: 24px;
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgb(15 23 42 / 0.06);
+}
+
+.chapter13-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.chapter13-card {
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.chapter13-card h3 {
+  margin: 8px 0;
+  color: #0f172a;
+}
+
+.chapter13-card p,
+.chapter13-card dd,
+.chapter13-card span {
+  color: #475569;
+}
+
+.chapter13-card dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.chapter13-card dt {
+  color: #1e293b;
+  font-weight: 800;
+}
+
+.chapter13-card dd {
+  margin: 0;
+}
+
+.chapter13-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 24px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.chapter13-pill-allowed,
+.chapter13-pill-server {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.chapter13-pill-blocked,
+.chapter13-pill-client {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.chapter13-table {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  margin-top: 18px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #dbe3ef;
+}
+
+.chapter13-table-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr;
+  gap: 1px;
+  background: #ffffff;
+}
+
+.chapter13-table-row span {
+  padding: 12px;
+}
+
+.chapter13-table-head {
+  color: #0f172a;
+  font-weight: 800;
+  background: #eff6ff;
+}
+
+.chapter13-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.chapter13-button {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #1e293b;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.chapter13-button-active {
+  color: #ffffff;
+  border-color: #2563eb;
+  background: #2563eb;
+}
+
+.chapter13-summary {
+  display: inline-flex;
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #1e3a8a;
+  background: #dbeafe;
+  font-weight: 800;
+}
+
+.chapter13-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.chapter13-section-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.chapter13-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter13-list li {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.chapter13-list li:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.chapter13-final-project {
+  border-color: #bfdbfe;
+  background: #f8fbff;
+}
+
+@media (max-width: 720px) {
+  .chapter13-table-row {
+    grid-template-columns: 1fr;
+  }
+}

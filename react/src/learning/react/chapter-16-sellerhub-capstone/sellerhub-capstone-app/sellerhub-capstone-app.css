@@ -1,0 +1,390 @@
+.sellerhub-app-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+  color: #17312d;
+  border: 1px solid #c8d9d5;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 46px rgb(23 49 45 / 0.08);
+}
+
+.sellerhub-app-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px;
+  border-bottom: 1px solid #c8d9d5;
+}
+
+.sellerhub-app-header h1 {
+  margin: 0 0 8px;
+  font-size: 2.3rem;
+}
+
+.sellerhub-app-header p {
+  max-width: 680px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.sellerhub-eyebrow {
+  margin: 0 0 6px;
+  color: #0b6b5f;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sellerhub-release-summary {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  min-width: 170px;
+  color: #526b67;
+  text-align: right;
+}
+
+.sellerhub-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px 20px;
+  border-bottom: 1px solid #c8d9d5;
+  background: #edf4f2;
+}
+
+.sellerhub-navigation a {
+  padding: 9px 12px;
+  color: #17312d;
+  border-radius: 6px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.sellerhub-navigation a:hover,
+.sellerhub-navigation a.is-active {
+  color: #ffffff;
+  background: #0b6b5f;
+}
+
+.sellerhub-context-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 12px 28px;
+  border-bottom: 1px solid #c8d9d5;
+}
+
+.sellerhub-context-controls label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 750;
+}
+
+.sellerhub-context-controls select,
+.sellerhub-field input,
+.sellerhub-field select,
+.sellerhub-field textarea,
+.sellerhub-cart-list input {
+  min-height: 40px;
+  padding: 8px 10px;
+  color: inherit;
+  border: 1px solid #8ba7a1;
+  border-radius: 6px;
+  background: #ffffff;
+  font: inherit;
+}
+
+.sellerhub-route-surface {
+  min-height: 460px;
+  padding: 28px;
+}
+
+.sellerhub-section-heading,
+.sellerhub-card-heading,
+.sellerhub-cart-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sellerhub-section-heading h2,
+.sellerhub-route-state h2,
+.sellerhub-detail h2 {
+  margin: 0 0 12px;
+}
+
+.sellerhub-filter-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.6fr) auto;
+  gap: 16px;
+  align-items: end;
+  margin: 20px 0;
+}
+
+.sellerhub-field {
+  display: grid;
+  gap: 6px;
+}
+
+.sellerhub-field label {
+  font-weight: 750;
+}
+
+.sellerhub-field-error,
+.sellerhub-submit-error {
+  margin: 0;
+  color: #a4342f;
+  font-weight: 700;
+}
+
+.sellerhub-field-hint {
+  margin: 0;
+  color: #526b67;
+}
+
+.sellerhub-status-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sellerhub-status-tab {
+  min-height: 40px;
+  padding: 8px 12px;
+  color: #0b6b5f;
+  border: 1px solid #0b6b5f;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.sellerhub-status-tab:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.sellerhub-status-tab:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.sellerhub-status-tab[aria-selected='true'] {
+  color: #ffffff;
+  background: #0b6b5f;
+}
+
+.sellerhub-product-grid,
+.sellerhub-order-list,
+.sellerhub-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.sellerhub-card,
+.sellerhub-detail,
+.sellerhub-route-state {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #d6e3e0;
+  border-radius: 8px;
+  background: #fbfdfc;
+}
+
+.sellerhub-card h3 {
+  margin: 0;
+}
+
+.sellerhub-card p,
+.sellerhub-card small,
+.sellerhub-card strong {
+  display: block;
+  line-height: 1.55;
+}
+
+.sellerhub-card code {
+  overflow-wrap: anywhere;
+}
+
+.sellerhub-card ul {
+  display: grid;
+  gap: 10px;
+  padding-left: 18px;
+}
+
+.sellerhub-card li span,
+.sellerhub-card li small {
+  display: block;
+}
+
+.sellerhub-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.sellerhub-card-actions a,
+.sellerhub-primary-link {
+  color: #075f55;
+  font-weight: 800;
+}
+
+.sellerhub-status {
+  display: inline-block;
+  padding: 3px 8px;
+  color: #075f55;
+  border-radius: 999px;
+  background: #dff3ed;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.sellerhub-status-archived {
+  color: #755000;
+  background: #fff1cc;
+}
+
+.sellerhub-button {
+  min-height: 40px;
+  padding: 8px 14px;
+  color: #ffffff;
+  border: 1px solid #0b6b5f;
+  border-radius: 6px;
+  background: #0b6b5f;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sellerhub-button-secondary {
+  color: #0b6b5f;
+  background: #ffffff;
+}
+
+.sellerhub-button-danger {
+  border-color: #a4342f;
+  background: #a4342f;
+}
+
+.sellerhub-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.sellerhub-button:focus-visible,
+.sellerhub-status-tab:focus-visible,
+.sellerhub-navigation a:focus-visible,
+.sellerhub-app-shell input:focus-visible,
+.sellerhub-app-shell select:focus-visible,
+.sellerhub-app-shell textarea:focus-visible {
+  outline: 3px solid #f4b942;
+  outline-offset: 2px;
+}
+
+.sellerhub-cart-list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.sellerhub-cart-list li {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #d6e3e0;
+  border-radius: 8px;
+}
+
+.sellerhub-cart-list li div,
+.sellerhub-cart-list label {
+  display: grid;
+  gap: 4px;
+}
+
+.sellerhub-cart-list input {
+  width: 84px;
+}
+
+.sellerhub-cart-summary {
+  align-items: center;
+  margin-top: 18px;
+  padding: 18px;
+  background: #edf4f2;
+}
+
+.sellerhub-form {
+  display: grid;
+  gap: 16px;
+  max-width: 620px;
+  margin-top: 20px;
+}
+
+.sellerhub-checkbox-field {
+  display: grid;
+  gap: 6px;
+}
+
+.sellerhub-checkbox-field label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: 750;
+}
+
+.sellerhub-definition-list {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.sellerhub-definition-list div {
+  display: grid;
+  gap: 4px;
+}
+
+.sellerhub-definition-list dt {
+  color: #526b67;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.sellerhub-definition-list dd {
+  margin: 0;
+}
+
+@media (max-width: 760px) {
+  .sellerhub-app-header,
+  .sellerhub-section-heading,
+  .sellerhub-cart-summary {
+    display: grid;
+  }
+
+  .sellerhub-release-summary {
+    text-align: left;
+  }
+
+  .sellerhub-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .sellerhub-cart-list li {
+    grid-template-columns: 1fr;
+  }
+
+  .sellerhub-route-surface,
+  .sellerhub-app-header,
+  .sellerhub-context-controls {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+}
