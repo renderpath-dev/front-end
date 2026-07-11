@@ -48,11 +48,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -88,7 +88,7 @@
   - [12.7 运行方式、预期行为与边界地图](#127-运行方式预期行为与边界地图)
   - [12.8 常见错误与扩展任务](#128-常见错误与扩展任务)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -120,30 +120,13 @@
 
 未带完整前缀的 `contracts/`、`composables/`、`components/`、`ts-contract-lab/` 均相对 `src/learning/vue/chapter-05-vue-typescript-boundaries/`。
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-指南位于 `docs/vue/chapter-05-vue-typescript-boundaries/vue-chapter-05-learning-guide.md`。可运行文件位于 `src/learning/vue/chapter-05-vue-typescript-boundaries/`。应用继续使用第1章既有`main.ts`；`App.vue`依次render Chapters 01–05。
+本章讨论 Vue + TypeScript 的 static contract 到 runtime value 的断点。`contracts/productContract.ts` 定义 `Product`、filter 和 form type；`components/TypedProps.vue`、`TypedEmits.vue`、`PropsWithDefaults.vue`、`TypedVModel.vue`、`TypedSlots.vue`、`GenericSelect.vue` 展示 compiler macro 与 template checking；`contracts/apiContract.ts`、`TypeRuntimeBoundaryDemo.vue` 和 `useTypedProducts.ts` 把 unknown response、type guard 和 `Result` state 放到运行时边界；`VueTscBoundaryDemo.vue` 强调 Vite transform 不等于 `vue-tsc --noEmit`。
 
-依赖审计显示：当前仅有`vue` runtime dependency，没有`pinia`或`vue-router`。因此：
+实际 owner 分三层：TypeScript language service / `vue-tsc` 读取 source graph 做静态诊断；Vue SFC compiler 处理 `defineProps`、`defineEmits`、`defineModel`、`defineSlots`、`defineExpose` 等 macro 并生成 runtime code；浏览器只执行擦除类型后的 JavaScript。TypeScript 可以检查 prop/emit/model/slot/injection/composable/store/route meta 的源码关系，但不能验证 network JSON、`localStorage`、用户输入、backend response，也不能在运行时保留 generic `T`。
 
-- `storeContract.ts` 是pure TypeScript state/getter/action contract，不import Pinia。
-- `routeMetaContract.ts` 是pure TypeScript route meta preparation，不import Vue Router。
-- 真正`declare module "vue-router"`仅作为`Snippet:`解释。
-- Chapter 06实现Router；Chapter 07实现Pinia；Chapter 09实现完整API runtime validation。
-
-路线图映射：
-
-| Roadmap | Actual file |
-| --- | --- |
-| `typed-props.vue` | `components/TypedProps.vue` |
-| `typed-emits.vue` | `components/TypedEmits.vue` |
-| `props-with-defaults.vue` | `components/PropsWithDefaults.vue` |
-| `typed-v-model.vue` | `components/TypedVModel.vue` |
-| `typed-slots.vue` | `components/TypedSlots.vue` |
-| `generic-select.vue` | `components/GenericSelect.vue` |
-| `injection-key.ts` | `contracts/injectionKey.ts` |
-| `typed-composable.ts` | `composables/useTypedProducts.ts` |
-| `api-contract.ts` | `contracts/apiContract.ts` |
+跨边界的值包括 type-only `Product`、runtime props option、emit payload、model ref、slot props、`InjectionKey` Symbol、template ref public instance、generic component items、unknown payload 和 guard 后的 domain value。它纠正的误解是“类型声明就是运行时验证”或“Vite dev server 已经做了完整类型检查”。本章不实现真实 Router、Pinia store、API client 或 test pipeline；它只建立这些后续章节要使用的 contract 语言和 trust boundary。
 
 ## 1. 本章解决的问题
 
@@ -181,16 +164,19 @@
 - 能解释Vite transpilation-only与`vue-tsc --noEmit`的差别。
 - 能避免`any`、unsafe external assertions和premature Router/Pinia imports。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-1. 先看`TypeRuntimeBoundaryDemo.vue`，把type erased与runtime unknown分开。
-2. 顺序运行TypedProps、Defaults、Emits、VModel、Slots。
-3. 运行InjectionProvider与DefineExposeDemo，观察cross-component type sync。
-4. 运行GenericSelect，确认generic parameter影响caller inference但runtime只收到items/model。
-5. 读取useProductForm/useTypedProducts，追踪key-safe mutation与unknown response。
-6. 读取pure store/route contracts，理解它们只是future framework adapters的shape。
-7. 执行`npm run typecheck`再执行build，不把dev display当typecheck。
-8. 最后审查VueTsContractLab的type boundary map。
+| Source artifact | Static check | Runtime remains | Failure to watch |
+| --- | --- | --- | --- |
+| `contracts/productContract.ts` | `Product` 字段改动会影响 form、filter、composable 和 final lab imports | browser 只看到 plain object | API 返回缺字段但被 `as Product` 强行通过 |
+| `TypedProps.vue` | `defineProps<Props>()` 检查 parent 传参 shape | compiler 尝试生成 props runtime option | type-based declaration 无法表达完整 deep runtime validation |
+| `PropsWithDefaults.vue` | `withDefaults` 移除 optional flag 并检查 default type | mutable default 仍要 factory 才能 per instance | 多个 instance 共享 array/object default |
+| `TypedEmits.vue` | named tuple 限制 event name 与 payload | `emit()` 仍是调用 parent listener | event literal 拼错时 parent 不响应或 payload contract 漂移 |
+| `TypedVModel.vue` | `defineModel<T>` 返回 typed model ref | default + parent omitted 可能造成 parent/child 初值不同步 | child 看似有值，parent state 仍是 `undefined` |
+| `InjectionProvider.vue` / `InjectionConsumer.vue` | `InjectionKey<T>` 同步 provider 与 consumer type | `inject(key)` 仍可能返回 `undefined` | missing provider 未处理导致 runtime branch 崩溃 |
+| `GenericSelect.vue` | `<script setup generic>` 按 items/model 推断 T | runtime 没有 T，只接收 objects | 以为 generic 能验证后端选项数据 |
+| `apiContract.ts` + `TypeRuntimeBoundaryDemo.vue` | guard 成功后缩小 unknown | guard 前 payload 仍是不可信值 | interface 通过但 UI 访问不存在字段 |
+| `VueTscBoundaryDemo.vue` | `vue-tsc --noEmit` 检查 SFC graph | Vite dev/build transform 阶段不等于完整检查 | dev server 能跑但 CI typecheck 失败 |
 
 ## 5. 核心术语表
 
@@ -2748,41 +2734,15 @@ function selectItem(): void {
 
 </div>
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| 实际路径 | 作用 | 状态 |
-| --- | --- | --- |
-| `docs/vue/chapter-05-vue-typescript-boundaries/vue-chapter-05-learning-guide.md` | 本章完整中文学习指南 | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/VueTypeScriptChapterApp.vue` | Chapter 05 组合入口 | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/contracts/productContract.ts` | 产品领域/表单/筛选契约 | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/contracts/apiContract.ts` | API、guard 与 Result | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/contracts/storeContract.ts` | 纯 TS store contract | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/contracts/routeMetaContract.ts` | 纯 TS route meta contract | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/contracts/injectionKey.ts` | typed injection key | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/composables/useTypedProducts.ts` | typed product loading/filtering | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/composables/useProductForm.ts` | key-safe typed form state | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/TypedProps.vue` | type-based props | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/TypedEmits.vue` | named tuple emits | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/PropsWithDefaults.vue` | withDefaults | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/TypedVModel.vue` | typed default/named model | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/TypedSlots.vue` | typed slots | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/GenericSelect.vue` | generic SFC | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/InjectionProvider.vue` | typed context owner | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/InjectionConsumer.vue` | safe optional inject | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/ExposedProductEditor.vue` | minimal exposed child API | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/DefineExposeDemo.vue` | typed component ref consumer | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/TypedTemplateRefDemo.vue` | nullable DOM template ref | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/TypeRuntimeBoundaryDemo.vue` | unknown/guard runtime proof | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/components/VueTscBoundaryDemo.vue` | tooling boundary UI | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/ts-contract-lab/VueTsContractLab.vue` | 最终组合实验 | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/ts-contract-lab/ProductCardTyped.vue` | typed product props/emits | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/ts-contract-lab/ProductFormTyped.vue` | typed ProductForm model | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/ts-contract-lab/ProductFilterTyped.vue` | typed ProductFilter model | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/ts-contract-lab/ProductTableTyped.vue` | readonly list/typed slots | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/ts-contract-lab/ProductStoreContractDemo.vue` | local store contract consumer | 新建 |
-| `src/learning/vue/chapter-05-vue-typescript-boundaries/ts-contract-lab/ProductApiContractDemo.vue` | unknown-to-Result demo | 新建 |
-| `src/learning/vue/chapter-01-application-boundary/App.vue` | 保留前四章并挂载 Chapter 05 | 更新 |
-| `README.md` | 增加 Chapter 05 状态与入口 | 更新 |
+| 场景 | 使用 TypeScript 的方式 | 不能依赖 TypeScript 的部分 | 证明方式 | 后续 owner |
+| --- | --- | --- | --- | --- |
+| Component API | `defineProps`、`defineEmits`、`defineModel`、`defineSlots` 明确源码 contract | 外部运行时数据、slot 内容业务语义 | IDE / `vue-tsc` 对错误调用报诊断 | Chapter 03 负责 component ownership |
+| Domain model | `Product`、form/filter type 集中定义，type-only import | backend response 是否真符合 model | unknown guard 或 parser 后才进入 domain | Chapter 09 API validation |
+| Injection / refs | `InjectionKey<T>`、`InstanceType`、`ComponentPublicInstance` | provider 是否存在、ref mount timing | undefined branch、`onMounted` 后访问 | Chapter 03 lifecycle/ref boundary |
+| Store / route preparation | pure TS store contract、RouteMeta concept | store mutation、guard execution、URL input | 当前仅作为 contract，不声称 runtime 行为 | Chapter 06 Router、Chapter 07 Pinia |
+| Tooling gate | `vue-tsc --noEmit` 独立运行 | Vite dev server 的可见页面结果 | 命令输出而不是页面肉眼判断 | Chapter 10 CI / quality gates |
 
 ## 15. 如何转换成个人笔记
 

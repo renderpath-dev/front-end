@@ -56,11 +56,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -87,7 +87,7 @@
   - [12.5 执行流程、状态所有权与 template 数据流](#125-执行流程状态所有权与-template-数据流)
   - [12.6 常见错误与扩展任务](#126-常见错误与扩展任务)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -109,19 +109,13 @@
 | 让 class / style 读取 JavaScript 值 | `src/learning/vue/chapter-01-application-boundary/ClassStyleBinding.vue` | 真实练习组件 | 9.10 |
 | 整合本章全部基础机制 | `src/learning/vue/chapter-01-application-boundary/TaskBoardBasic.vue` | 真实最终项目组件 | 9.11、12 |
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-本章指南位于：
+本章只处理 Vue 应用从浏览器 document 进入 Vue component tree 的第一条边界：`index.html` 提供 `#app` 和 module script，Vite 解析 `vite.config.ts` 中的 Vue plugin 并转换 `.vue` 文件，`src/learning/vue/chapter-01-application-boundary/main.ts` 调用 `createApp(App).mount("#app")`，`App.vue` 再把 `CounterBasic.vue`、`TemplateBinding.vue`、`ConditionalRendering.vue`、`ListRendering.vue`、`FormBinding.vue`、`ClassStyleBinding.vue` 与 `TaskBoardBasic.vue` 放进同一个 root component 下面。
 
-- `docs/vue/chapter-01-application-boundary/vue-chapter-01-learning-guide.md`
+真正执行行为的 owner 分层很窄：浏览器执行 HTML、ES module 和 DOM event；Vite dev server 负责开发期 module transform 与 HMR；Vue runtime 创建 application instance、component instance、render effect 和 DOM patch。TypeScript 能检查 `main.ts` import、SFC script、event handler 和局部 state 的类型，但不能证明 `#app` 一定存在、CSS selector 一定命中、用户在表单里输入的值符合业务规则，也不能把 `v-if`、`v-for` 或 `v-model` 变成浏览器原生 HTML。
 
-本章可运行入口位于：
-
-- `index.html`
-- `src/learning/vue/chapter-01-application-boundary/main.ts`
-- `src/learning/vue/chapter-01-application-boundary/App.vue`
-
-本章不是把所有代码塞进一个 `App.vue`。入口、root component、单概念练习和最终整合项目各自承担不同职责。阅读指南时，应同时打开代码定位索引里的真实文件，沿着 `index.html → main.ts → App.vue → child component` 追踪值和组件边界。
+跨过本章边界的值非常具体：`document.querySelector("#app")` 找到的 DOM element、`App` component definition、template expression 中读取的 `ref` / plain value、native event object、form control 的 `value` / `checked`、数组 item 的 `id` key。它纠正的错误心智模型是“Vue 文件被浏览器直接理解”或“`App.vue` 自己就是整个应用”。本章不负责 computed cache、watch timing、组件 props/emits、Router URL、Pinia store、API trust 或 production cache；这些都要在 application boundary 稳定之后再学习。
 
 ## 1. 本章解决的问题
 
@@ -162,14 +156,17 @@
 - 说明 TypeScript、`vue-tsc`、Vite dev server 和 production build 分别检查或转换什么。
 - 独立运行并扩展 `TaskBoardBasic.vue`，同时保持 local state、稳定 `key` 和清晰 event flow。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-1. 先读 `index.html`，确认浏览器实际拿到的 root container 和 module URL。
-2. 再读 `main.ts`，确认 `createApp`、`App` module binding 和 selector。
-3. 打开 `App.vue`，确认 root component 只负责页面组合。
-4. 依次运行六个单概念组件，观察每个 directive 的输入值和 DOM 结果。
-5. 最后阅读 `TaskBoardBasic.vue`，把 form、event、list、condition、class 和 local state 串成一条数据流。
-6. 用 `npm run typecheck` 检查 SFC TypeScript contract，用 `npm run build` 检查 typecheck 加 production bundle。
+1. `index.html` 先决定浏览器入口：`<script type="module">` 请求 `main.ts`，`#app` 只是 DOM mount container；如果 selector 写错，Vue 还没进入组件阶段就会失败。
+2. `vite.config.ts` 中的 Vue plugin 决定 `.vue` 如何进入 module graph；`App.vue`、`CounterBasic.vue` 和 `TaskBoardBasic.vue` 不是浏览器原生模块，而是被 Vite/SFC compiler 转换后再执行。
+3. `main.ts` 调用 `createApp(App)` 得到 application instance，`.mount("#app")` 让 Vue runtime 接管 container 内部内容；这个动作必须早于任何依赖 app context 的插件或全局组件使用。
+4. `CounterBasic.vue` 的 `ref()` 被 template 读取后，click handler 修改 `.value`，Vue render effect 重新执行并 patch 按钮文本；这说明“事件触发 JavaScript 函数”和“DOM 更新”之间有 runtime scheduler。
+5. `TemplateBinding.vue` 把 interpolation 和 `:attribute` 分开：text content 使用 `{{ }}`，HTML attribute 必须通过 `v-bind` 读取 JavaScript expression；把 mustache 写进 attribute 是 template 语法层错误。
+6. `ConditionalRendering.vue` 展示 `v-if` branch create/destroy 与 `v-show` display toggle；失败信号不是类型错误，而是 DOM 是否存在、component state 是否被销毁、频繁切换时是否产生不必要重建。
+7. `ListRendering.vue` 的 `:key="task.id"` 把数组 item identity 交给 Vue diff；用 index key 时，insert/reorder 会让 DOM 或子组件状态错误复用。
+8. `FormBinding.vue` 和 `ClassStyleBinding.vue` 把 native input value、checkbox checked、select value、class object、style object 都接回 component state；TypeScript 能检查 handler 参数，但不能保证用户输入符合后续业务约束。
+9. `TaskBoardBasic.vue` 故意不用 `computed`，用最小 refs、events、form、list、condition、class/style 串起本章边界；derived-state cache 被留给 Chapter 02。
 
 ## 5. 核心术语表
 
@@ -2335,28 +2332,15 @@ createApp(App).mount("#app");
 ```
 </div>
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| Path | Role | Status |
-| --- | --- | --- |
-| `docs/vue/chapter-01-application-boundary/vue-chapter-01-learning-guide.md` | 本章完整学习指南 | 已创建并保留 |
-| `index.html` | browser document、root container、module entry | 已创建并保留 |
-| `package.json` | dependency 与 script contract | 已创建并保留 |
-| `tsconfig.json` | TypeScript project references | 已创建并保留 |
-| `tsconfig.app.json` | app/SFC TypeScript options | 已创建并保留 |
-| `tsconfig.node.json` | Vite config TypeScript options | 已创建并保留 |
-| `vite.config.ts` | Vue SFC Vite plugin | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/main.ts` | Vue application bootstrap | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/App.vue` | root component 与 learning-page composition | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/CounterBasic.vue` | minimal ref 与 click update | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/TemplateBinding.vue` | interpolation 与 attribute binding | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/ConditionalRendering.vue` | `v-if` / `v-show` | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/ListRendering.vue` | `v-for` 与 stable key | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/FormBinding.vue` | native controls 与 submit binding | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/ClassStyleBinding.vue` | dynamic class/style | 已创建并保留 |
-| `src/learning/vue/chapter-01-application-boundary/TaskBoardBasic.vue` | 本章最终整合项目 | 已创建并保留 |
-
-`Snippet:` 和 `Template:` code-window 内容只用于机制解释，不是额外需要创建的真实文件。
+| 判断对象 | 适合放在 Chapter 01 边界内 | 不应放在 Chapter 01 | 需要的证据 | 后续 owner |
+| --- | --- | --- | --- | --- |
+| App startup | `index.html`、`main.ts`、`createApp`、`mount("#app")`、root `App.vue` | 多个 root app 共享业务状态、在 root 里塞页面业务逻辑 | 页面能挂载、console 无 mount/import error、root component 可渲染学习入口 | Router / layout chapters |
+| SFC basics | template、`<script setup>`、`<style scoped>` 的最小边界 | 把 scoped style 当 Shadow DOM，或把 SFC 当浏览器原生文件 | Vite 能转换 SFC，template expression 能读取 script binding | SFC compiler / TypeScript chapters |
+| Local interaction | button click、form `v-model`、dynamic class/style、list key | 跨页面状态、server data、权限状态 | 事件后 DOM 变化可解释，list reorder 不丢 identity | Reactivity / Pinia / API chapters |
+| Conditional UI | `v-if`、`v-show` 的存在性与可见性选择 | 复杂权限、后端授权、route-level access | DOM existence、display toggle、state lifecycle 可观察 | Router guards / backend authorization |
+| Risk signal | `App.vue` 变成所有章节和业务规则的堆积点 | 继续往 root 塞 store、router、API、auth 逻辑 | root component 只负责组合，不拥有不相关 state | Chapter 02–09 分层接管 |
 
 ## 15. 如何转换成个人笔记
 

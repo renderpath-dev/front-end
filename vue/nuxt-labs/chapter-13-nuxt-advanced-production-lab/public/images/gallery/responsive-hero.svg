@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Responsive hero image</title>
+  <desc id="desc">A responsive hero placeholder for Nuxt Image.</desc>
+  <rect width="1280" height="720" fill="#edf7f1"/>
+  <path d="M0 540 L320 300 L600 500 L900 240 L1280 520 L1280 720 L0 720 Z" fill="#42b883"/>
+  <rect x="120" y="100" width="420" height="140" rx="24" fill="#18794e"/>
+  <text x="150" y="185" fill="#ffffff" font-family="Arial, sans-serif" font-size="48">Responsive output</text>
+</svg>

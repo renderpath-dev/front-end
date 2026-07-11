@@ -17,14 +17,22 @@
 
 ## 结构与导航
 
-- [ ] `## 目录` 位于 H1 与 style block 之后、`## 0. 文件定位` 之前。
+- [ ] `## 目录` 位于 H1 与 style block 之后、`## 0. 本章机制边界` 之前。
+- [ ] 存在 `## 0. 本章机制边界`，并说明 technical owner、included mechanisms、excluded mechanisms 和 roadmap reason。
+- [ ] 存在 `## 4. 核心机制证据链总览`，并追踪 trigger、owner、JavaScript value、Vue/runtime/tooling behavior、TypeScript boundary、result 和 failure signal。
+- [ ] 存在 `## 14. 真实项目判断模型`，并说明 when to use、when not to use、risk signal、failure recognition 和 required evidence。
+- [ ] 三个替换章节包含当前章节专属的 named APIs、files、components、routes、stores、configs、commands 或 concepts。
+- [ ] 三个替换章节没有在多个章节中共享同一张 table skeleton 或同一组 generic wording。
+- [ ] 不存在跨多个 guide 文件重复出现的 generic boilerplate phrase。
+- [ ] `## 14. 真实项目判断模型` 是 decision model，不是 file list。
 - [ ] TOC 包含实际存在的全部编号顶层章节。
 - [ ] TOC 包含每个核心 `9.x` 小节。
 - [ ] 每个 `9.x` TOC entry 使用稳定的 `#section-9-x` target。
 - [ ] 每个核心 heading 前有匹配且唯一的显式 anchor。
 - [ ] anchor 与 heading 之间最多一个空行。
 - [ ] 有真实练习文件时存在 `## 本章代码定位索引`。
-- [ ] 代码定位索引、目录结构、真实代码窗口 title bar 和最终文件清单中的路径一致。
+- [ ] 代码定位索引是 concept-to-code evidence index，不是交付文件列表。
+- [ ] 代码定位索引、目录结构和真实代码窗口 title bar 中的路径一致。
 - [ ] 所有标为真实文件的路径都能在本地解析。
 - [ ] 概念示例使用 `Snippet:` / `Template:`，不伪装成真实文件。
 
@@ -36,7 +44,7 @@
 - [ ] 核心概念没有只在最终项目中出现。
 - [ ] 存在额外 cheatsheet。
 - [ ] 存在 official docs reading list。
-- [ ] 最终文件清单只包含本次文档和真实项目文件，并包含 path、role、status。
+- [ ] 真实项目判断模型给出可执行的项目决策 criteria，而不是交付文件 inventory。
 
 ## 语言与代码窗口
 
@@ -58,7 +66,8 @@
 - [ ] 已先检查本地文件，再核对版本敏感官方文档。
 - [ ] 无法核对的行为标为 `Verification Needed`。
 - [ ] 没有把未运行的 validation command 声称为通过。
-- [ ] 最终响应列出文件、来源、实际命令、限制和人工验证项。
+- [ ] 最终响应列出更新文件、来源、实际命令、限制和人工验证项。
+- [ ] 最终响应包含更新文件列表和 evidence-based validation table。
 - [ ] 最终响应包含 `检查项`、`结果`、`证据` 三列的 evidence-based self-check。
 - [ ] 每个 `PASS` 都引用 path、heading、anchor、selector、command result 或 exact count。
 
@@ -72,9 +81,12 @@
 4. 机制解释可以原样复制到另一个章节。
 5. 最终小项目替代或明显压过分节教学。
 6. 任一标为真实文件的路径在本地不存在。
-7. 真实 title bar 路径与最终文件清单不一致。
+7. 真实 title bar 路径与代码定位索引或最终项目结构不一致。
 8. `Snippet:` / `Template:` 被列为真实最终文件。
 9. 源码块包含中文字符。
 10. self-check 只有“已检查”等无法复现的结论。
 11. 未运行 lint、build 或 typecheck，却在最终响应声称通过。
 12. `9.x` TOC target、显式 anchor 与 heading 编号不匹配，或 anchor id 重复。
+13. 缺少本章机制边界、核心机制证据链总览或真实项目判断模型。
+14. 两个或更多章节的 `## 4. 核心机制证据链总览` 使用实质相同的 table structure 和 generic wording。
+15. `本章机制边界`、`核心机制证据链总览` 或 `真实项目判断模型` 只替换主题名就能复制到另一章。

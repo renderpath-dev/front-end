@@ -1,0 +1,31 @@
+{
+  "name": "chapter-13-nuxt-advanced-production-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --port 3040",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "set PORT=3041&& nuxt preview --port 3041",
+    "typecheck": "nuxt typecheck",
+    "prepare": "nuxt prepare",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@nuxt/content": "latest",
+    "@nuxt/image": "latest",
+    "nuxt": "latest",
+    "nuxt-auth-utils": "latest",
+    "vue": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@nuxt/test-utils": "latest",
+    "jsdom": "latest",
+    "typescript": "^6.0.3",
+    "vitest": "latest",
+    "vue-tsc": "latest"
+  }
+}

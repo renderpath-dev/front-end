@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640" role="img" aria-labelledby="title desc">
+  <title id="title">Stable card image</title>
+  <desc id="desc">A green geometric image with stable dimensions.</desc>
+  <rect width="960" height="640" fill="#e7f4ec"/>
+  <circle cx="270" cy="270" r="150" fill="#42b883"/>
+  <rect x="420" y="190" width="300" height="210" rx="32" fill="#18794e"/>
+  <text x="80" y="560" fill="#213547" font-family="Arial, sans-serif" font-size="44">Stable dimensions</text>
+</svg>

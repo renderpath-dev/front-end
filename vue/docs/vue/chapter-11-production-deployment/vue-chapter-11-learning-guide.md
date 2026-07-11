@@ -56,11 +56,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -95,7 +95,7 @@
   - [12.5 运行方式与预期行为](#125-运行方式与预期行为)
   - [12.6 常见错误与扩展任务](#126-常见错误与扩展任务)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -125,11 +125,13 @@
 | 复用 Chapter 10 gate          | `production/deploymentChecklist.ts`                                                    | typed checklist      | 9.18     |
 | 形成最终 lab                  | `production-lab/VueProductionDeploymentLab.vue`                                        | final lab            | 9.19     |
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-本章指南位于 `docs/vue/chapter-11-production-deployment/vue-chapter-11-learning-guide.md`。可运行练习与 production 模型位于 `src/learning/vue/chapter-11-production-deployment/`。根配置新增 `vite.config.ts` analyze mode、`.env.example`、`.env.production.example`、`Dockerfile`、`.dockerignore` 与 `nginx/vue-spa.conf`，全部仍在当前 `vue/` 工作区内。
+本章覆盖 Vue SPA 从 source graph 到可回滚 static artifact 的 production boundary。`productionBuildModel.ts`、`distOutputMap.ts`、`VitePreviewPanel.vue` 解释 source → `vue-tsc` → `vite build` → `dist` → preview；`.env.example`、`.env.production.example`、`verifyEnvExposure.mjs`、`runtimeConfigBoundary.ts` 处理 public env 与 secret boundary；`vite.config.ts`、`basePathModel.ts`、`assetPipelineModel.ts`、`routeLazyLoadingMap.ts`、`analyzeBundle.mjs`、performance/cache/fallback/Nginx/Docker/CDN model files 说明 asset URL、chunk graph、cache header、SPA fallback、static hosting、rollback。
 
-本章没有创建第二个 Vue app，没有把 `/` 改成 Router-only 页面，也没有加入远程部署平台配置。Chapter 11 只把现有 Chapters 01–10 的本地学习 shell 推进到可构建、可预览、可分析、可用 Nginx/Docker 本地静态托管的 production 边界。
+执行 owner 是 build tool、static server/CDN 和 browser cache 的组合。Vite 读取 `index.html` 和 module graph，按 mode/base/env 输出 hashed assets；`vue-tsc --noEmit` 只有在 build script 串联时才执行 SFC typecheck；Nginx/static host 决定 direct refresh fallback、cache headers 和 security headers；browser 决定 preload、chunk request、history navigation 和 cached asset reuse。TypeScript 能检查 source 类型，但不能证明 base path 正确、cache header 安全、Lighthouse score 可信、Docker image 只含 runtime artifact，也不能在 build 后读取新的 private env。
+
+跨边界的值包括 `import.meta.env.VITE_*` string、Vite `base`、Router history base、dynamic import chunk URL、`dist/index.html`、hashed asset filename、cache-control header、Nginx `try_files` result、Docker stage artifact、CDN invalidation target、rollback bundle。它纠正的误解是“`npm run dev` 可见就等于能上线”或“build 成功就等于 production safe”。本章不设计 SSR、database migration、真实 monitoring SaaS、CI vendor workflow 或 backend proxy；Nuxt/server rendering 属 Chapter 12，质量 gates 来自 Chapter 10。
 
 ## 1. 本章解决的问题
 
@@ -161,15 +163,20 @@ Chapter 11 的核心不是“把项目发布到某个平台”，而是把 sourc
 - 能配置并解释 `VITE_PUBLIC_BASE_PATH`、`import.meta.env`、`dist/assets`、`try_files`、cache headers 与 Docker multi-stage build。
 - 能识别部署前常见错误：错误 base、缺少 fallback、缓存 `index.html`、把 secrets 放进 `VITE_*`、声称未运行的 gate 已通过。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-1. 先跑 Chapter 10 的质量 gate：`lint`、`typecheck`、`test:unit`。
-2. 再学习 `npm run build` 如何读取 `vite.config.ts` 与 env mode。
-3. 用 `npm run verify:dist` 查看 `dist/index.html` 与 `dist/assets`。
-4. 用 `npm run preview` 验证 built files，而不是 dev server。
-5. 读 Nginx fallback 与 cache policy，理解 direct refresh 404 的 server owner。
-6. 再看 bundle analysis、performance budget、Web Vitals、Lighthouse 与 rollback。
-7. 最后用 `VueProductionDeploymentLab.vue` 把所有检查项组成上线前 checklist。
+| Release checkpoint | File / command evidence | What must be true | Bad signal |
+| --- | --- | --- | --- |
+| Type gate | `package.json` build script + `vue-tsc --noEmit` model | SFC type graph checked before bundling | Vite build succeeds while `vue-tsc` would fail |
+| Bundle creation | `vite build`, `vite.config.ts`, `distOutputMap.ts` | `index.html` and source graph produce hashed JS/CSS/assets | asset URL contains wrong base for subpath deploy |
+| Env exposure | `.env.production.example`, `verifyEnvExposure.mjs` | only `VITE_*` public strings enter bundle | secret-like value appears in client code |
+| Preview check | `VitePreviewPanel.vue` / `vite preview` | built `dist` is served, not dev transform | bug appears only after build/minification/base path |
+| Asset pipeline | `assetPipelineModel.ts`, `public/` vs imported assets | imported assets hashed, public assets copied as-is | long cache applied to mutable public filename |
+| Lazy chunks | `routeLazyLoadingMap.ts` dynamic import routes | route chunks load on first visit and recover from preload errors | `ChunkLoadError` after deploy/cache mismatch |
+| Cache policy | `cachePolicyModel.ts`, `cdn-cache-notes.md` | `index.html` revalidates, hashed assets can be immutable | rollback serves new HTML with old chunks or inverse |
+| SPA fallback | `nginx/vue-spa.conf`, `spa-fallback-notes.md` | direct `/admin/users` refresh returns `index.html` | server 404 before Vue Router sees URL |
+| Runtime config | `runtimeConfigBoundary.ts` | static bundle only sees build-time/public config | expecting server env change to affect existing bundle |
+| Rollback | `deploymentChecklist.ts` | matching HTML/assets/config can be restored together | rollback plan names no artifact or cache invalidation target |
 
 ## 5. 核心术语表
 
@@ -1817,28 +1824,17 @@ npm run verify:dist
 
 </div>
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| Path                                                                                   | Role                                            | Status  |
-| -------------------------------------------------------------------------------------- | ----------------------------------------------- | ------- |
-| `docs/vue/chapter-11-production-deployment/vue-chapter-11-learning-guide.md`           | 完整学习指南                                    | created |
-| `src/learning/vue/chapter-11-production-deployment/ProductionDeploymentChapterApp.vue` | Chapter 11 shell entry                          | created |
-| `src/learning/vue/chapter-11-production-deployment/production/*.ts`                    | production typed models and checklists          | created |
-| `src/learning/vue/chapter-11-production-deployment/performance/*.ts`                   | performance typed models                        | created |
-| `src/learning/vue/chapter-11-production-deployment/components/*.vue`                   | teaching panels                                 | created |
-| `src/learning/vue/chapter-11-production-deployment/production-lab/*.vue`               | final lab panels                                | created |
-| `src/learning/vue/chapter-11-production-deployment/deployment/*.md`                    | static hosting, CDN, fallback and preview notes | created |
-| `src/learning/vue/chapter-11-production-deployment/deployment/nginx.conf`              | chapter-local Nginx reference                   | created |
-| `src/learning/vue/chapter-11-production-deployment/scripts/*.mjs`                      | Node verification scripts                       | created |
-| `src/learning/vue/chapter-01-application-boundary/App.vue`                             | single-page shell integration                   | updated |
-| `vite.config.ts`                                                                       | base and analyze mode config                    | updated |
-| `package.json`                                                                         | Chapter 11 scripts and visualizer dependency    | updated |
-| `package-lock.json`                                                                    | dependency lockfile                             | updated |
-| `.env.example`                                                                         | safe public env example                         | created |
-| `.env.production.example`                                                              | safe production env example                     | created |
-| `nginx/vue-spa.conf`                                                                   | real Nginx SPA config used by Docker            | created |
-| `Dockerfile`                                                                           | local multi-stage static deployment example     | created |
-| `.dockerignore`                                                                        | Docker context exclusions                       | created |
+| Decision | Use Chapter 11 technique when | Do not treat it as | Evidence | Future / external owner |
+| --- | --- | --- | --- | --- |
+| Production build | Any app needs a reproducible `dist` artifact | Proof that runtime config/cache/router fallback work | build output, artifact map, preview smoke | CI/CD system automates but does not redefine evidence |
+| Base path + Router base | Deploying under subpath or CDN prefix | A CSS/link fix after deploy | direct refresh and asset URLs both work | Hosting provider config |
+| Cache strategy | Hashed assets and HTML have different lifetimes | “Set max-age everywhere” | response headers and rollback drill | CDN/vendor operations |
+| Bundle/performance review | Dependency or route chunk size affects UX | Lighthouse score as the only truth | bundle report + Web Vitals/Lighthouse context | Field monitoring / product perf budget |
+| Static hosting | Vue SPA served by Nginx/static host | Backend proxy/security solution | `try_files` fallback, security/cache headers | Backend/API gateway owns server logic |
+| Runtime config | Public values must vary by environment | Secret management inside client bundle | no secret in built JS, public config documented | Server/Nuxt runtime owns private config |
+| Rollback | Release can fail after cache/chunk changes | Re-upload one JS file manually | versioned artifact and invalidation target | Release engineering process |
 
 ## 15. 如何转换成个人笔记
 

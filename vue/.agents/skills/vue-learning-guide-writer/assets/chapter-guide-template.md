@@ -56,11 +56,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -76,7 +76,7 @@
   - [12.4 运行方式与预期结果](#124-运行方式与预期结果)
   - [12.5 常见错误与扩展方向](#125-常见错误与扩展方向)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -84,15 +84,17 @@
 
 ## 本章代码定位索引
 
-没有真实练习文件时，保留概念片段并明确说明无需创建；存在真实文件时，用准确路径替换模板行。
+没有真实练习文件时，保留概念片段并明确说明无需创建；存在真实文件时，用准确路径替换模板行。本索引用来连接机制与可观察代码，不是交付文件列表。
 
 | 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
 | --- | --- | --- | --- |
 | {{learning-goal}} | `Snippet: reactive value flow` | 概念 snippet | 9.1 |
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-说明本章文档路径、已有真实练习路径和仅用于解释的 snippet。不要把计划文件写成已创建文件。
+先读取本章代码定位索引、`9.x` headings 和最终小项目，再写这一节。正文必须点名本章真实文件、API、组件、route、store、config 或 command，说明哪个 runtime/tooling owner 执行行为，TypeScript 能检查什么、不能检查什么，哪些值跨过边界，本章纠正哪个错误心智模型，以及哪些 concern 必须交给未来章节或外部系统。
+
+不要使用可复制的 owner / includes / excludes / roadmap 四句模板。如果删掉文件名和 API 后仍能放进另一章，这一节不合格。
 
 ## 1. 本章解决的问题
 
@@ -109,9 +111,11 @@
 - 能识别并修正 {{error-goal}}。
 - 能在真实项目中判断 {{project-boundary-goal}}。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-按“JavaScript 值与运行时 → Vue runtime / compiler → TypeScript 与 tooling → 真实项目”的顺序组织。
+使用当前章节专属格式：编号机制链、cause/effect map，或包含至少 6 个 chapter-specific rows 的紧凑表。每一行必须包含本章真实 API、文件、组件、route、store、config、command 或 runtime object，并说明可观察结果和具体 failure signal。
+
+不要复用跨章节 table skeleton。不要写前一次低质量更新中那类无文件、无 API、无具体 runtime object、无可定位 failure signal 的泛化句。
 
 ## 5. 核心术语表
 
@@ -318,13 +322,13 @@ Count: 1
 
 嵌入 `cheatsheet-template.md` 的结构，并使用本章真实概念替换占位内容。
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| Path | Role | Status |
-| --- | --- | --- |
-| `{{guide-path}}` | 本章指南 | 已创建并保留 |
+| {{chapter-specific-choice}} | When to use | When not to use | Evidence that proves it works | Excluded concern owner |
+| --- | --- | --- | --- | --- |
+| {{named-api-or-pattern}} | {{specific-use-case}} | {{specific-avoid-case}} | {{observable-evidence}} | {{future-chapter-or-external-owner}} |
 
-概念 snippet 不进入真实文件清单。
+这个表必须比较本章真实技术选择，而不是列文件。每行需要说明什么时候使用、什么时候不用、需要什么证据、滥用信号是什么，以及被排除的 concern 由哪个未来章节、server/backend、deployment layer、test layer 或外部平台拥有。创建或更新的文件列表只放在最终响应中。
 
 ## 15. 如何转换成个人笔记
 

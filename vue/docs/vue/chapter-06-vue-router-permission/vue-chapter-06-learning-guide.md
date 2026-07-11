@@ -48,11 +48,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -87,7 +87,7 @@
   - [12.5 关键 View 与最终 Lab 完整代码](#125-关键-view-与最终-lab-完整代码)
   - [12.6 运行、预期行为、安全边界与扩展](#126-运行预期行为安全边界与扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -114,26 +114,13 @@
 
 未带完整前缀的 `router/` 路径均相对 `src/learning/vue/chapter-06-vue-router-permission/`。
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-本章指南位于 `docs/vue/chapter-06-vue-router-permission/vue-chapter-06-learning-guide.md`。可运行代码位于 `src/learning/vue/chapter-06-vue-router-permission/`。
+本章的边界是 Vue Router 如何把 browser URL 解析成 route records，再驱动 component rendering 和 client-side permission UX。`router/index.ts` 用 `createRouter`、`createWebHistory` 创建 router instance；`routes.ts` 保存 path/name/component/children/redirect/alias；`routeMeta.ts` 为 auth、menu、breadcrumb 建 typed meta；`authGuard.ts`、`permissionGuard.ts`、`guardPipeline.ts` 控制 navigation；`dynamicMenu.ts` 从同一 records/meta tree 派生菜单；`AdminRouterLayout.vue`、`UserDetailView.vue`、lazy route views 和 `VueAdminRouterLab.vue` 展示 `RouterView`、params、query、lazy component 与 trace。
 
-规格中提到 `src/main.ts`，但本项目真实 Vite entry 是 `src/learning/vue/chapter-01-application-boundary/main.ts`，并由根目录 `index.html` 直接引用。本章在这个既有 entry 上执行 `app.use(router)`，没有创建第二个 entry 或第二个 Vue application instance。
+执行 owner 是 Router runtime 与 browser history：URL 先进入 history adapter，matcher 产出 matched route records，guards 决定 allow/redirect/cancel，confirmed route 更新 reactive `route` object，`RouterView` 按 depth 渲染对应 component。TypeScript 能约束 route names、部分 params helper、RouteMeta shape 和 guard function return，但不能验证用户手输 URL 的语义，不能证明 query 是合法业务值，更不能替代 backend authorization。
 
-`vue-router@5.1.0` 已作为 runtime dependency 安装。Pinia、API client、UI library、validation library 和 test framework 均未添加。
-
-路线图映射：
-
-| Roadmap file | Actual file |
-| --- | --- |
-| `router.ts` | `router/index.ts` |
-| `routes.ts` | `router/routes.ts` |
-| `auth-guard.ts` | `router/authGuard.ts` |
-| `permission-guard.ts` | `router/permissionGuard.ts` |
-| `dynamic-menu.ts` | `router/dynamicMenu.ts` |
-| `route-meta.ts` | `router/routeMeta.ts` |
-| `lazy-routes.ts` | `router/lazyRoutes.ts` |
-| `scroll-behavior.ts` | `router/scrollBehavior.ts` |
+跨边界的值包括 URL path/search/hash、history state、route params/query、route record meta、guard return value、lazy import Promise、current route object、menu item、breadcrumb 和 component instance reuse signal。它纠正的误解是“Router guard 就是安全权限”或“URL 只是显示文本”。本章必须把后端授权、token/session 真实性、server route protection 和持久 auth 放在外部；Chapter 07 可接管 client auth state，真实 security 仍由 backend/server API 判断。
 
 ## 1. 本章解决的问题
 
@@ -167,15 +154,19 @@
 - 能区分 frontend navigation control 与 backend authorization。
 - 能说明 `createWebHistory()` 的 production fallback 边界。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-1. 从 `router/index.ts` 和真实 `main.ts` 建立 plugin / initial resolution 边界。
-2. 读取 `routes.ts`，对照 URL、parent/child records 与两个 `RouterView`。
-3. 用 signed-out、operator、manager、admin 四种 session 观察 guard 结果。
-4. 在 user detail 中切换 `userId` 和 `tab`，区分 params、query 与 component reuse。
-5. 读取 `dynamicMenu.ts`，确认菜单直接来自 route records/meta。
-6. 检查 lazy import、scroll behavior、typed routes 和 navigation failures。
-7. 最后使用 `VueAdminRouterLab.vue` 串联完整机制。
+| Route mechanism | Chapter evidence | Runtime trace | Concrete failure |
+| --- | --- | --- | --- |
+| URL entry | `/admin/users/42?tab=orders` in `VueAdminRouterLab.vue` | `createWebHistory` 接收 path/search/hash | server refresh 未 fallback 时连 Router 都无法启动 |
+| Matcher | `routes.ts` records with `children` and `name` | matcher 生成 `route.matched` 与 params strings | record order 错误导致 catch-all 抢先匹配 |
+| View rendering | `AdminRouterLayout.vue` + nested `RouterView` | top view 渲染 layout，nested view 渲染 child record component | child route 有 record 但 layout 缺 outlet，页面空白 |
+| URL-owned state | `UserDetailView.vue` reads params and query | param change may reuse same component instance; query push/replace changes history | 没有处理 `onBeforeRouteUpdate` 时显示旧 user |
+| Meta contract | `routeMeta.ts` augments `RouteMeta` | records carry `requiresAuth`、roles、menu、breadcrumb | meta 字段拼写漂移，menu/guard/breadcrumb 读不同约定 |
+| Guard pipeline | `beforeEach` in `authGuard.ts` / `permissionGuard.ts` | auth check then permission check returns allow/redirect/cancel | redirect loop、afterEach 误做阻止、403 route 丢失 |
+| Dynamic menu | `dynamicMenu.ts` consumes route records + session access | menu visibility is derived navigation UI | 菜单隐藏被误当授权，直接输入 URL 仍要 guard/backend |
+| Lazy component | `lazyRoutes.ts` `component: () => import(...)` | confirmed navigation loads chunk then `RouterView` renders | chunk load error 被误诊为 guard failure |
+| Backend boundary | permission routing section + final lab | client guard only changes navigation UX | API 仍返回 200 给无权用户说明真正授权缺失 |
 
 ## 5. 核心术语表
 
@@ -2988,50 +2979,16 @@ export const router = createRouter({
 
 </div>
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| Path | Role | Status |
-| --- | --- | --- |
-| `docs/vue/chapter-06-vue-router-permission/vue-chapter-06-learning-guide.md` | Chapter06指南 | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/VueRouterChapterApp.vue` | Chapter host | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/index.ts` | Router instance | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/routes.ts` | route records | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/routeNames.ts` | route name literals | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/routeMeta.ts` | typed meta augmentation | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/typedRoutes.ts` | RouteNamedMap augmentation | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/authSession.ts` | temporary session state | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/authGuard.ts` | auth redirect | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/permissionGuard.ts` | role/permission redirect | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/guardPipeline.ts` | global hooks | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/dynamicMenu.ts` | route-derived menu | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/lazyRoutes.ts` | lazy component loaders | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/scrollBehavior.ts` | scroll policy | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router/navigationTrace.ts` | learning trace | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/layouts/AdminRouterLayout.vue` | nested admin outlet | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/views/LoginView.vue` | login/session route | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/views/DashboardView.vue` | dashboard route | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/views/UserListView.vue` | users route | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/views/UserDetailView.vue` | dynamic user route | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/views/RoleListView.vue` | roles route | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/views/OrderListView.vue` | orders/query route | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/views/ForbiddenView.vue` | 403 route | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/views/NotFoundView.vue` | catch-all 404 route | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/components/RouterConceptPanel.vue` | current route evidence | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/components/RouterLinkVsAnchor.vue` | navigation comparison | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/components/ParamsQueryPanel.vue` | params/query controls | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/components/DynamicMenuPanel.vue` | visible dynamic menu | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/components/GuardTracePanel.vue` | guard trace UI | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/components/RouteMetaPanel.vue` | meta/access UI | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/components/BreadcrumbTrail.vue` | matched breadcrumb | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/components/PermissionBadge.vue` | access result display | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router-lab/VueAdminRouterLab.vue` | final integration | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router-lab/RouterLabHomePanel.vue` | route links | 已创建 |
-| `src/learning/vue/chapter-06-vue-router-permission/router-lab/RouterLabScenarioPanel.vue` | role/failure scenarios | 已创建 |
-| `src/learning/vue/chapter-01-application-boundary/main.ts` | install Router on existing app | 已更新 |
-| `src/learning/vue/chapter-01-application-boundary/App.vue` | render Chapter06 | 已更新 |
-| `package.json` | add vue-router dependency | 已更新 |
-| `package-lock.json` | npm dependency lock | 已更新 |
-| `README.md` | Chapter06 index/status | 已更新 |
+| 决策点 | 使用方式 | 不要这样用 | 工作证据 | 排除 concern 的 owner |
+| --- | --- | --- | --- | --- |
+| route params | 表示 path identity，如 `userId`，由 named route 生成 path | 存放 tab/filter/page 等可选 UI state | refresh 同一路径能恢复同一资源视图 | API/service 验证资源是否存在 |
+| route query | 保存 tab、filter、page、sort 等 URL-owned UI state | 保存 secret、large object、不可分享 draft | copy URL 后 UI state 可恢复，back/forward 合理 | Component/form state 负责未提交 draft |
+| route meta | 声明 auth/menu/breadcrumb/layout hints | 存放实时用户权限或后端策略 | guard、menu、breadcrumb 读同一 records/meta | Pinia 保存 client session；backend 保存真实 policy |
+| global guard | 登录态和页面级 permission UX redirect | 当作 API 安全边界或复杂业务 validator | trace 显示 allow/redirect/cancel 原因 | Server API / backend authorization |
+| dynamic menu | 从 `routes.ts` + `route.meta` 派生可见导航 | 手写第二套路由菜单导致漂移 | menu item 与 route record name/path 对齐 | Design system 只负责展示样式 |
+| lazy route | 大页面按 route chunk 拆分 | 用 lazy import 解决数据权限或 API loading | 首次进入加载 chunk，后续缓存/错误可观察 | Chapter 11 bundle/performance 分析 |
 
 ## 15. 如何转换成个人笔记
 

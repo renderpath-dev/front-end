@@ -16,6 +16,8 @@ import AdminUiChapterApp from "../chapter-08-admin-ui-forms/AdminUiChapterApp.vu
 import ApiRuntimeChapterApp from "../chapter-09-api-runtime-boundary/ApiRuntimeChapterApp.vue";
 import TestingQualityChapterApp from "../chapter-10-testing-quality/TestingQualityChapterApp.vue";
 import ProductionDeploymentChapterApp from "../chapter-11-production-deployment/ProductionDeploymentChapterApp.vue";
+import NuxtSsrBoundaryChapterApp from "../chapter-12-nuxt-ssr-boundary/NuxtSsrBoundaryChapterApp.vue";
+import NuxtAdvancedProductionChapterApp from "../chapter-13-nuxt-advanced-production/NuxtAdvancedProductionChapterApp.vue";
 </script>
 
 <template>
@@ -86,6 +88,14 @@ import ProductionDeploymentChapterApp from "../chapter-11-production-deployment/
     <div class="chapter-divider" role="separator"></div>
 
     <ProductionDeploymentChapterApp />
+
+    <div class="chapter-divider" role="separator"></div>
+
+    <NuxtSsrBoundaryChapterApp />
+
+    <div class="chapter-divider" role="separator"></div>
+
+    <NuxtAdvancedProductionChapterApp />
   </main>
 </template>
 

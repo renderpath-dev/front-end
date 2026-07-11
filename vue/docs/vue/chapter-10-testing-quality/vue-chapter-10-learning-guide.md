@@ -48,11 +48,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -81,7 +81,7 @@
 - [11. 常见错误表](#11-常见错误表)
 - [12. 最终小项目](#12-最终小项目)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -104,9 +104,13 @@
 
 表中省略的路径均相对 `src/learning/vue/chapter-10-testing-quality/`。
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-本指南位于 `docs/vue/chapter-10-testing-quality/vue-chapter-10-learning-guide.md`。测试与教学面板位于 `src/learning/vue/chapter-10-testing-quality/`。根配置仍由一个 Vue 应用共享；`App.vue` 只追加 `TestingQualityChapterApp`，`main.ts`、Router、Pinia、Element Plus 和 Chapters 01–09 的 owner 不变。
+本章的机制边界是把前面章节的行为变成可重复失败信号。`vitest.config.ts`、`vitest/setupTests.ts` 决定 runner、jsdom、setupFiles 和 cleanup；`vitest/testFactories.ts`、`mountWithPlugins.ts`、`flushAsync.ts` 建立 test harness；`unit/*.test.ts`、`component/*.test.ts`、`integration/*.integration.test.ts`、`e2e/*.spec.ts` 分别覆盖 utility/composable/store、Vue Test Utils component、Router+Pinia+MSW integration 和 Playwright browser flow；`msw/*.ts` 保留 HTTP boundary；`eslint.config.js`、`.prettierrc.json`、`package.json`、quality model files 和 final lab 说明 lint/typecheck/unit/E2E/build gates 的职责差异。
+
+执行 owner 是 test runner / harness，而不是生产应用本身。Vitest 在 Node/jsdom 里执行 transformed modules；Vue Test Utils `mount` 创建 component instance 和 DOM wrapper；MSW intercepts HTTP request boundary；Playwright 从应用外驱动 Chromium；`vue-tsc`、ESLint、Prettier、coverage 和 CI pipeline 产生不同类型的 quality signal。TypeScript 能检查 test helper 与 component props，但不能证明 assertion 有意义，不能等待 Vue DOM patch，也不能说明 coverage 命中的代码真的被正确验证。
+
+跨边界的值包括 test fixture、props、emitted payload、slot content、wrapper DOM、Pinia test instance、Router location、MSW scenario、Playwright locator、trace、coverage counter、lint diagnostic、typecheck diagnostic。它纠正的误解是“测试越高级越好”或“coverage 数字等于质量”。本章不负责真实 backend persistence、production monitoring、deployment rollback 或选择 CI vendor；它只定义每层失败信号应该指向哪个 owner。
 
 ## 1. 本章解决的问题
 
@@ -126,9 +130,16 @@
 
 完成本章后，应能按风险选择 unit、component、integration 或 E2E；能解释 Vitest 与 Playwright 的运行环境差异；能用 Vue Test Utils 通过 DOM、props、slots 与 emits 验证组件；能用 fresh Pinia、memory history 和 MSW 建立可清理的 integration harness；能解释 lint、format、typecheck、coverage、tests 与 build 各自证明什么。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-先建立 test layer 与 failure meaning，再运行 Vitest setup；随后依次练习 composable/store、component、async、MSW/integration；最后进入 Playwright 与本地质量流水线。遇到失败时先判断 owner layer，再看 setup、action、await、assertion 与 cleanup，不要先增加 retry。
+1. `unit/*.test.ts` 直接调用 utility、composable、store action 或 validator：失败应指向 pure logic、state transition 或 parser rule，而不是 DOM。
+2. `setActivePinia(createPinia())` 和 `piniaStoreTest.ts` 为每个 store test 创建 fresh store instance；如果一个 case 影响另一个 case，信号指向 store root 没隔离。
+3. `mountWithPlugins.ts` 用 Vue Test Utils mount component，传 props、slots、global plugins，再通过 wrapper DOM 和 emitted events 观察 public interface；测试内部 method name 是 brittle signal。
+4. `flushAsync.ts` 区分 `nextTick` 和 Promise queue：DOM patch 未完成用 `nextTick`，MSW/API Promise 未 resolve 用 `flushPromises`；错用时表现为偶发断言失败。
+5. `msw/*.ts` 在 HTTP boundary 拦截请求，service、client、Zod parser 仍走真实路径；直接 mock Axios 会跳过 Chapter 09 的 contract evidence。
+6. `integration/*.integration.test.ts` 组合 route、store、API mock，证明跨层协作；如果失败输出不能定位 route/store/API 哪层坏了，集成范围过大。
+7. `e2e/*.spec.ts` 用 Playwright `page`、`locator`、auto-waiting 和 trace 驱动 login/form/CRUD flow；它证明 browser-visible workflow，不证明真实 authentication。
+8. `vue-tsc`、ESLint、Prettier、coverage 和 CI pipeline 依次产生 type、static rule、format、execution coverage、command-order signals；任意一个 signal 都不能替代其他 owner。
 
 ## 5. 核心术语表
 
@@ -1650,20 +1661,16 @@ npm run ci:local
 | CI                                          | Repeatable ordered gate execution                 |
 | quality gate                                | Command whose failure blocks progression          |
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| Path                                                                                                  | Role                                 | Status  |
-| ----------------------------------------------------------------------------------------------------- | ------------------------------------ | ------- |
-| `docs/vue/chapter-10-testing-quality/vue-chapter-10-learning-guide.md`                                | 完整学习指南                         | created |
-| `vitest.config.ts`、`playwright.config.ts`、`eslint.config.js`、`.prettierrc.json`、`.prettierignore` | root quality configs                 | created |
-| `package.json`、`package-lock.json`                                                                   | scripts、lint-staged 与 dependencies | updated |
-| `src/learning/vue/chapter-10-testing-quality/TestingQualityChapterApp.vue`                            | Chapter entry                        | created |
-| `quality/*.ts`、`quality/preCommitSetupNote.md`                                                       | policy、failure map、local hook note | created |
-| `vitest/*.ts`、`msw/*.ts`                                                                             | test harness 与 HTTP mock lifecycle  | created |
-| `unit/*.test.ts`、`component/*.test.ts`                                                               | focused behavior tests               | created |
-| `integration/*.integration.test.ts`、`e2e/*.spec.ts`                                                  | cross-boundary 与 browser tests      | created |
-| `components/*.vue`、`testing-quality-lab/*.vue`                                                       | teaching panels 与 final lab         | created |
-| `src/learning/vue/chapter-01-application-boundary/App.vue`                                            | single-shell Chapter 10 integration  | updated |
+| 目标 | 选择的检查层 | 不要选择 | 证明它有效 | 风险信号 / 外部 owner |
+| --- | --- | --- | --- | --- |
+| Pure function/composable/store behavior | Vitest unit test | 为纯逻辑 mount 整个页面 | 输入、输出、state mutation 可直接断言 | 需要 DOM/browser 时升级 component/E2E |
+| Component public contract | Vue Test Utils component test | 断言 private ref 或 method 名 | props、slots、DOM、emits 覆盖用户可见接口 | Visual regression / design QA 不由 unit test 负责 |
+| Router+Pinia+API collaboration | Small integration test + MSW | mock 掉 service 后声称 API contract 被测 | route/store/request/error path 都有真实边界 | 过大失败不可诊断时拆回 unit/component |
+| User journey | Playwright E2E | 用 E2E 覆盖所有 edge case | locator、trace、network/mock evidence 指向真实 flow | Real backend/auth/payment 需要 dedicated environment |
+| Static gates | `vue-tsc`、ESLint、Prettier | 用 dev server 可见结果代替 type/lint/format | command output 明确 fail owner | CI platform/release gate 属 Chapter 11 |
+| Coverage | threshold + meaningful assertions | 把 coverage 当正确性 | uncovered critical path 可解释，assertion 有业务语义 | Mutation testing / production monitoring 属未来技术 |
 
 ## 15. 如何转换成个人笔记
 
@@ -1688,14 +1695,14 @@ npm run ci:local
 
 先问风险属于谁，再选择最小充分层：
 
-`static shape → vue-tsc`
-`source pattern → ESLint`
-`text format → Prettier`
-`pure/reaction logic → Vitest unit`
-`Vue public interface → VTU component`
-`route/store/network cooperation → Vitest + memory Router + Pinia + MSW`
-`real user workflow → Playwright Chromium`
-`executed paths → coverage`
+`static shape → vue-tsc`  
+`source pattern → ESLint`  
+`text format → Prettier`  
+`pure/reaction logic → Vitest unit`  
+`Vue public interface → VTU component`  
+`route/store/network cooperation → Vitest + memory Router + Pinia + MSW`  
+`real user workflow → Playwright Chromium`  
+`executed paths → coverage`  
 `bundle graph → Vite build`
 
 每个行为测试都沿同一条证据链：subject → setup → fixture/mock → action → await → public assertion → cleanup → failure meaning。

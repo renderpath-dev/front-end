@@ -56,11 +56,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -91,7 +91,7 @@
   - [12.7 watch、watchEffect 与 nextTick 边界](#127-watchwatcheffect-与-nexttick-边界)
   - [12.8 常见错误与扩展任务](#128-常见错误与扩展任务)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -116,17 +116,13 @@
 | 保留第 1 章并挂载第 2 章 | `src/learning/vue/chapter-01-application-boundary/App.vue` | 真实 root component | 7、9.12 |
 | 对照普通过滤函数 | `src/learning/vue/chapter-01-application-boundary/TaskBoardBasic.vue` | 第 1 章既有组件 | 9.13 |
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-本章指南位于：
+本章聚焦 Vue reactivity runtime 如何把 JavaScript value 的读取与后续更新连接起来。`RefVsReactive.vue` 让 `ref` container、`reactive` Proxy 和 object replacement 对比可见；`ComputedVsMethod.vue` 把 cached computed ref 与每次 render 都调用的 method 分开；`WatchBasic.vue`、`WatchEffectDemo.vue` 和 `NextTickDom.vue` 把 explicit source、automatic dependency collection 与 DOM patch timing 拆开观察；`VueReactivityLab.vue` 再用 cart、coupon、summary、measurement 串联这些机制。
 
-- `docs/vue/chapter-02-reactivity-system/vue-chapter-02-learning-guide.md`
+运行时 owner 不是 TypeScript，也不是 Vite。真正建立关系的是 Vue 的 dependency tracking：render effect、computed getter、watch source 或 watchEffect 在执行时读取 `ref.value` / reactive property，mutation 后由 scheduler 安排重新执行，再 patch DOM。TypeScript 能提示 `Ref<number>`、`ComputedRef<T>`、`readonly` surface 和 nullable DOM ref，但它不能检测一次解构是否切断 Proxy read，也不能保证 async watchEffect 在 `await` 之后仍收集依赖。
 
-可运行练习位于：
-
-- `src/learning/vue/chapter-02-reactivity-system/`
-
-应用仍从第 1 章已有的 `main.ts` 启动。`src/learning/vue/chapter-01-application-boundary/App.vue` 保留第 1 章全部组件，并在清晰分隔线后 render `ReactivityChapterApp.vue`。这意味着本章没有创建第二个 application instance，也没有改变 `createApp(...).mount(...)` 边界。
+跨边界的值包括 ref object identity、inner `.value`、reactive Proxy、raw object、computed cached value、watch callback 的 old/new value、DOM element ref、microtask 后可读取的 layout measurement。它纠正的主要误解是“变量变了 Vue 就一定更新”或“computed 只是 method 的另一种写法”。本章不处理组件 contract、store ownership、URL state、API schema 或 SSR request isolation；它只证明单个 Vue runtime graph 内谁读取了什么、谁被触发、什么时候更新。
 
 ## 1. 本章解决的问题
 
@@ -171,15 +167,16 @@
 - 用简化 Proxy demo 解释 `get → track`、`set → trigger`，并明确它不是 Vue source code。
 - 区分 JavaScript runtime、Vue runtime、TypeScript、SFC compiler、Vite tooling 与 browser DOM 的职责。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-1. 先运行 `RefVsReactive.vue`，确认 script `.value`、template unwrapping 和 Proxy property mutation。
-2. 再运行 `ComputedVsMethod.vue`，观察 unrelated render 只增加 method call，不使 cached computed getter重新求值。
-3. 分别运行 `WatchBasic.vue` 与 `WatchEffectDemo.vue`，比较 explicit source 和 implicit synchronous dependencies。
-4. 运行 `NextTickDom.vue`，把 mutation time 与 DOM patch time 分开。
-5. 运行 destructuring、toRef/toRefs、readonly/unref、shallowRef 三组边界练习。
-6. 用 `ProxyTrackTriggerMentalModel.vue` 补齐 JavaScript interception vocabulary，但始终回到 Vue reactive effect。
-7. 最后运行 `VueReactivityLab.vue`，从一次 cart quantity click 追踪到 computed、watchEffect、render effect 和 DOM measurement。
+- `RefVsReactive.vue`：click handler 写 `count.value`，template render effect 之前读过 `count`，因此按钮文本更新；如果在 script 忘记 `.value`，错误发生在 JavaScript value container 层。
+- `RefVsReactive.vue`：`reactive(profile)` 返回 Proxy，template 读取 `profile.name` 记录 property-level dependency；把 `profile.name` 解构成 primitive local 后，后续读取绕开 Proxy，`ReactiveDestructureMistake.vue` 显示 stale value。
+- `ComputedVsMethod.vue`：`computed(() => expensiveTotal.value)` 只有 dependency dirty 时重算；template method 每次 render 调用。失败信号是 unrelated state 变化导致昂贵 filter 重跑。
+- `WatchBasic.vue`：`watch(selectedFilter, (newValue, oldValue) => ...)` 把 source 与 side effect 分开；错误不是 UI 不更新，而是把可派生 UI 写进 watcher 造成重复 state。
+- `WatchEffectDemo.vue`：effect 同步阶段读到的 refs 才成为 dependencies；`await` 后首次读取的值不会自动纳入同一轮收集，容易产生“为什么不 rerun”的调试信号。
+- `NextTickDom.vue`：mutation 后立即读 DOM height 得到旧布局，`await nextTick()` 后读到 patch 后结果；证据是同一 state write 前后 measurement 不同。
+- `ShallowRefDemo.vue`：nested mutation 不触发 shallow ref update，root `.value` replacement 才触发；适合 large object 边界，不适合深层表单字段。
+- `VueReactivityLab.vue`：cart rows、coupon watch、computed totals、summary watchEffect 和 height measurement 都读同一个 component-owned state，但每种 effect 的职责不同；混在一个 watcher 里会让依赖和副作用难以定位。
 
 ## 5. 核心术语表
 
@@ -2559,26 +2556,15 @@ const total = computed(() => quantity.value * unitPrice.value);
 ```
 </div>
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| Path | Role | Status |
-| --- | --- | --- |
-| `docs/vue/chapter-02-reactivity-system/vue-chapter-02-learning-guide.md` | 第2章完整学习指南 | 已创建 |
-| `src/learning/vue/chapter-01-application-boundary/App.vue` | 保留第1章并render第2章 | 已更新 |
-| `src/learning/vue/chapter-02-reactivity-system/ReactivityChapterApp.vue` | 第2章组件组合 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/RefVsReactive.vue` | ref/reactive/replacement练习 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/ComputedVsMethod.vue` | computed/method与TaskBoard bridge | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/WatchBasic.vue` | explicit watch source练习 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/WatchEffectDemo.vue` | automatic effect dependency练习 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/NextTickDom.vue` | DOM patch timing练习 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/ReactiveDestructureMistake.vue` | destructuring boundary练习 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/ShallowRefDemo.vue` | shallow root replacement练习 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/ToRefToRefsDemo.vue` | connected property refs练习 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/ReadonlyUnrefDemo.vue` | readonly/unref边界练习 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/ProxyTrackTriggerMentalModel.vue` | 简化Proxy/Reflect日志模型 | 已创建 |
-| `src/learning/vue/chapter-02-reactivity-system/VueReactivityLab.vue` | 第2章最终整合项目 | 已创建 |
-
-`Snippet:` 与 `Template:` code windows只用于机制解释，不是额外真实文件。
+| 技术选择 | 什么时候用 | 什么时候不用 | 有效证据 | 滥用信号 / 后续 owner |
+| --- | --- | --- | --- | --- |
+| `ref` | primitive、可整体替换的 object/array、需要 `.value` 明确 container | 多字段 object 频繁 property mutation 且不需要整体 replacement | mutation 后 template/computed/watch 读同一个 ref | 到处 `.value` 传递导致 API 粗糙时，考虑 composable return 设计 |
+| `reactive` | 稳定 object identity、property-level mutation、表单 draft 或局部 object state | 需要频繁替换整个 object binding，或会解构 primitive property | 读取经过 Proxy，`toRef/toRefs` 保持连接 | 解构后 stale UI；Chapter 04 处理 composable 输入输出约定 |
+| `computed` | pure derived state，如 cart total、filtered tasks、pagination flags | 需要 async side effect、DOM access、写入外部 resource | unrelated render 不重算，dependency 变化后值更新 | 在 computed 里写 state；watch/composable 负责副作用 |
+| `watch` / `watchEffect` | 同步外部 effect、storage、request trigger、logging、DOM-independent side effect | 只为了显示派生文本或 class | old/new value、cleanup、rerun 条件可复现 | watcher 互相写回形成 loop；Chapter 04 负责封装 cleanup |
+| `nextTick` | state mutation 后必须读取 patched DOM | 只是等待任意 Promise 或掩盖 timing bug | DOM measurement 在 tick 后稳定 | 大量 nextTick 串联说明 component 边界或 effect owner 不清 |
 
 ## 15. 如何转换成个人笔记
 

@@ -48,11 +48,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -85,7 +85,7 @@
   - [12.3 核心完整代码](#123-核心完整代码)
   - [12.4 运行、预期行为、常见错误与扩展](#124-运行预期行为常见错误与扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -112,9 +112,13 @@
 
 表中省略的路径均相对 `src/learning/vue/chapter-09-api-runtime-boundary/`。
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-指南位于 `docs/vue/chapter-09-api-runtime-boundary/vue-chapter-09-learning-guide.md`。可运行代码位于 `src/learning/vue/chapter-09-api-runtime-boundary/`。Chapter 09 只追加 `ApiRuntimeChapterApp` 到既有 `App.vue`；`main.ts`、Router、Pinia、Element Plus、Vue I18n 和 Chapters 01–08 保持原有 owner。
+本章处理的是 API boundary：从 component intent 到 unknown transport result，再到 validated domain state。`api/httpClient.ts` 创建唯一 Axios gateway；`requestInterceptors.ts` / `responseInterceptors.ts` 添加 request id、duration、demo session header 和 normalized transport metadata；`httpTypes.ts`、`apiErrors.ts`、`contracts/*.ts` 定义 request/result/error/DTO/domain；`validators/*.ts` 使用 Zod 解析 response 和 payload；`services/*.ts` 拥有 endpoint contract；`composables/*.ts` 管 loading/success/error/cancel/stale result；`mockAxiosAdapter.ts`、`mockBackendRoutes.ts`、`mockBackendScenarios.ts` 提供本地 fake backend，但不把 mock data 当可信 response。
+
+执行 owner 不是组件，也不是 TypeScript interface。组件只发出 user intent；request composable 拥有一次请求的状态机；service 函数拥有 method/path/query/body/schema；Axios instance 和 adapter 处理 transport；Zod parser 把 `unknown` 缩小为 DTO；mapper 才生成 domain model。TypeScript 能在 parser 成功后使用 inferred type，能检查 service return 和 composable state union，但不能证明 response.data 可信，不能验证 401/403 的真实身份语义，也不能决定 retry idempotency。
+
+跨边界的值包括 Axios request config、query params、form payload、raw `unknown` JSON、Zod parse result、normalized `ApiError`、AbortSignal、timeout/retry attempt、demo session header、pagination envelope、server-state result。它纠正的误解是“后端说返回 Product 就可以 `as Product`”或“一个 loading boolean 就代表请求模型”。本章不实现真实后端、真实 auth token persistence、Pinia global server cache、MSW test harness 或 deployment monitoring；这些分别属于 backend、Chapter 07/13、future cache strategy、Chapter 10 和 Chapter 11。
 
 ## 1. 本章解决的问题
 
@@ -136,9 +140,20 @@
 - 能实现取消、超时、只对安全读取进行 retry，以及 stale-result protection。
 - 能判断 Router、Pinia、request composable、future cache 与 backend 的 owner。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-先沿 9.1–9.5 建立 client/transport/validator 链；再用 9.6–9.11 处理 errors、status、pagination 与 payload；随后用 9.12–9.17 处理 request state、cancel、timeout、retry、session 和 mock adapter；最后用 9.18–9.19 把 Chapter 08 local UI seam 映射到 service/composable seam。
+| Boundary step | File / API evidence | Runtime consequence | Failure signal |
+| --- | --- | --- | --- |
+| UI intent | `VueApiContractLab.vue` / focused `components/*.vue` call composables | component 不知道 Axios、Zod 或 fake backend internals | component 直接 `axios.get` 导致 parsing/error policy 分散 |
+| Request state | `composables/useApiResource.ts` owns loading/error/data/sequence | newer request wins; stale result is ignored | 快速切换 scenario 后旧 response 覆盖新 UI |
+| Endpoint contract | `services/*.ts` declares method/path/query/body/schema | service returns domain result or normalized error | UI 猜测 status/body shape，pagination meta 漂移 |
+| Transport gateway | `api/httpClient.ts` + `requestUnknown/requestValidated` | all calls pass through one Axios instance and adapter | 多个 Axios instances headers/retry/error 不一致 |
+| Interceptors | `requestInterceptors.ts` / `responseInterceptors.ts` | request id、duration、demo session header、transport errors centralized | interceptor 做 domain parsing，导致 endpoint ownership 混乱 |
+| Runtime trust | `validators/*.ts` Zod `safeParse` | raw JSON remains unknown until schema success | `as Product` 让 malformed scenario 进入 UI |
+| Error model | `apiErrors.ts` maps network/timeout/cancel/status/validation | UI receives `NormalizedApiError` instead of arbitrary thrown value | catch block 只能显示 `[object Object]` 或吞掉 422 fields |
+| Cancellation | `AbortController` signal crosses composable/service/client/adapter | cancel becomes `canceled` error, not timeout | cancel 后仍显示 success，说明旧 Promise 未隔离 |
+| Retry policy | `retryPolicy.ts` checks method/status/idempotency | GET timeout/5xx may retry, unsafe mutation does not | POST 被自动重试造成重复 mutation risk |
+| Backend authority | `apiSession.ts` sends demo session header only | 401/403 comes from fake backend route decision | 把 Pinia role 当真实 authentication |
 
 ## 5. 核心术语表
 
@@ -2137,22 +2152,16 @@ header p {
 
 最小安全模板是：component event调用composable；service构造config；raw response保持unknown；schema safeParse；service返回`ApiResult<T>`；composable写loading/data/error；UI不读取Axios/Zod internals。
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| Path | Role | Status |
-| --- | --- | --- |
-| `docs/vue/chapter-09-api-runtime-boundary/vue-chapter-09-learning-guide.md` | 完整Chapter 09指南 | 已创建 |
-| `src/learning/vue/chapter-09-api-runtime-boundary/ApiRuntimeChapterApp.vue` | 章节入口 | 已创建 |
-| `src/learning/vue/chapter-09-api-runtime-boundary/api/` | client、interceptors、adapter、mock backend、policy | 已创建，12 files |
-| `src/learning/vue/chapter-09-api-runtime-boundary/contracts/` | DTO/domain/payload/envelope/pagination contracts | 已创建，6 files |
-| `src/learning/vue/chapter-09-api-runtime-boundary/validators/` | Zod schemas、results、error formatting | 已创建，8 files |
-| `src/learning/vue/chapter-09-api-runtime-boundary/services/` | product/user/order/upload/auth endpoints | 已创建，5 files |
-| `src/learning/vue/chapter-09-api-runtime-boundary/composables/` | resource/pagination/form/cancel/retry/error/server-state logic | 已创建，10 files |
-| `src/learning/vue/chapter-09-api-runtime-boundary/components/` | focused mechanism panels | 已创建，13 files |
-| `src/learning/vue/chapter-09-api-runtime-boundary/api-contract-lab/` | final project与panels | 已创建，8 files |
-| `src/learning/vue/chapter-01-application-boundary/App.vue` | 保留Chapters 01–08并追加Chapter 09 | 已更新 |
-| `package.json`、`package-lock.json` | Axios/Zod dependencies | 已更新 |
-| `README.md` | workspace Chapter 09 status/index | 已更新 |
+| 决策 | 采用本章方式 | 不采用本章方式 | 工作证据 | 后续 / 外部 owner |
+| --- | --- | --- | --- | --- |
+| Response handling | raw data starts as `unknown` and passes Zod schema | 用 `as DomainType` 直接进入 UI | malformed mock scenario 被 validation error 捕获 | Backend schema / contract testing |
+| Error handling | Normalize AxiosError/status/Zod/cancel/timeout | 每个 component 自己 catch unknown error | UI 能区分 401、403、422、timeout、cancel | Product error UX / auth recovery |
+| Request state | composable owns loading/success/error/stale/cancel | 全局 store 保存每个临时 loading | stale response 不覆盖最新请求 | Future server cache layer if shared freshness needed |
+| Pagination/form payload | service owns query/body/response schema | UI 独立猜 total 或直接提交 draft object | list envelope 和 422 fields 可验证 | Backend validation and persistence |
+| Retry/timeout | policy checks idempotency and status | 对所有 method 自动 retry | attempt timeline 可解释，不重复 mutation | SRE / API reliability policy |
+| Mock backend | custom adapter tests boundary without remote URL | 把 mock data 当 trusted production data | scenario exposes unknown payload and status paths | Chapter 10 MSW/tests, real backend later |
 
 ## 15. 如何转换成个人笔记
 

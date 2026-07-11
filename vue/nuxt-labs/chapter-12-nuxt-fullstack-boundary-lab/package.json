@@ -1,0 +1,22 @@
+{
+  "name": "chapter-12-nuxt-fullstack-boundary-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --port 3030",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "set PORT=3031&& nuxt preview --port 3031",
+    "typecheck": "nuxt typecheck",
+    "prepare": "nuxt prepare"
+  },
+  "dependencies": {
+    "nuxt": "latest",
+    "vue": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vue-tsc": "latest"
+  }
+}

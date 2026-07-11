@@ -48,11 +48,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -86,7 +86,7 @@
   - [12.7 Cleanup、async、shared state 与 resource lifecycle maps](#127-cleanupasyncshared-state-与-resource-lifecycle-maps)
   - [12.8 常见错误与扩展任务](#128-常见错误与扩展任务)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -117,23 +117,13 @@
 
 上表中未带完整前缀的 `composables/` 和 `demos/` 路径均相对 `src/learning/vue/chapter-04-composables-architecture/`。
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-本指南位于 `docs/vue/chapter-04-composables-architecture/vue-chapter-04-learning-guide.md`。可运行代码位于 `src/learning/vue/chapter-04-composables-architecture/`。应用继续由第 1 章既有 `main.ts` 创建唯一 Vue application instance；`App.vue` 在前三章之后 render `ComposablesChapterApp.vue`。
+本章研究的是 Composition API logic extraction，不是创建“工具函数文件夹”。`useCounter.ts`、`useToggle.ts` 展示每次调用创建独立 refs；`usePagination.ts` 把 current page owner、computed indexes 和 guard actions 放在同一个 composable；`useLocalStorage.ts`、`useEventListener.ts`、`useClickOutside.ts` 把 browser resource 绑定到 component/effect scope；`useAsyncState.ts` 用 request id 处理 stale Promise；`useDebouncedRef.ts` 借 `customRef` 控制 `track` / `trigger`；`useScopedTicker.ts` 展示 manual `effectScope().stop()`。
 
-路线图采用 kebab-case，Vue 官方约定 composable function 使用 camelCase 且以 `use` 开头；本项目因此采用以下显式映射：
+执行 owner 分两层：JavaScript function closure 决定每次 call 拥有哪份 refs、timers、AbortController 或 listener handle；Vue runtime 提供当前 component instance / effect scope，使 `onMounted`、`onUnmounted`、`onScopeDispose`、watcher 与 computed 能在正确生命周期里注册和清理。TypeScript 能描述 `MaybeRefOrGetter<T>`、return refs/functions、generic pagination input 和 form state shape，但不能清理 timer、移除 DOM listener、取消旧 Promise，也不能防止 module-scope ref 被无意共享。
 
-| Roadmap | Actual file / export |
-| --- | --- |
-| `use-counter.ts` | `useCounter.ts` / `useCounter` |
-| `use-toggle.ts` | `useToggle.ts` / `useToggle` |
-| `use-pagination.ts` | `usePagination.ts` / `usePagination` |
-| `use-local-storage.ts` | `useLocalStorage.ts` / `useLocalStorage` |
-| `use-async-state.ts` | `useAsyncState.ts` / `useAsyncState` |
-| `use-debounced-search.ts` | `useDebouncedSearch.ts` / `useDebouncedSearch` |
-| `use-click-outside.ts` | `useClickOutside.ts` / `useClickOutside` |
-
-`useDebouncedRef`、`useModal`、`usePermission`、`useFormState`、`useQueryState` 来自路线图 final project；`useEventListener` 来自官方 composables 中的 resource extraction pattern；`useScopedTicker` 用于隔离路线图必学的 `effectScope` / `onScopeDispose`。
+跨边界的值包括 caller 传入的 ref/getter/plain value、composable closure 中创建的 reactive source、returned refs/functions、DOM element ref、storage key、serialized JSON、request sequence number、scope stop handle。它纠正的误解是“composable 等于公共函数”或“抽出去就自动复用安全”。本章不处理全局 store、Router URL、API schema、UI library form contract 或 SSR request state；如果一个 concern 需要跨页面唯一 owner，它应该进入 Pinia 或后续 server/cache 边界。
 
 ## 1. 本章解决的问题
 
@@ -173,16 +163,16 @@
 - 能识别 browser runtime、JSON parse、user input 与 TypeScript 静态检查之间的缺口。
 - 能判断重复代码是否真的形成 stateful reusable concern，避免过度抽象。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-1. `useCounter` / `useToggle`：先建立“每次函数调用创建一组 refs”的模型。
-2. `usePagination`：把 computed derived state 与 guarded mutations移入 composable。
-3. `useLocalStorage` / `useAsyncState`：加入 browser side effect 与 Promise lifetime。
-4. `useDebouncedRef` / `useDebouncedSearch`：观察 delayed trigger 与 watcher timing。
-5. `useEventListener` / `useClickOutside`：追踪 element input、document event 与 scope cleanup。
-6. `SharedVsPerInstanceDemo` / `useScopedTicker`：明确 module binding与effect scope。
-7. `usePermission` / `useQueryState`：练习 `MaybeRefOrGetter` 与 `toValue`。
-8. `ComposablesKitDemo`：最后审查每个 logic owner、resource owner 与 component rendering boundary。
+1. `CounterComposableDemo.vue` 调用两次 `useCounter()`：每次进入 function body 都创建新的 `ref` 和 closures，所以两个 counter 不共享 state；如果把 ref 提到 module scope，就变成 `SharedVsPerInstanceDemo.vue` 的隐藏全局状态。
+2. `usePagination.ts` 只让 `currentPage` 可写，`totalPages`、`startIndex`、`endIndex` 和 `canGoNext` 都是 computed；越界 guard 写在 action 中，而不是散落在 caller template。
+3. `useLocalStorage.ts` 在 browser boundary 内 parse `localStorage`，把 JSON result 当 unknown-like value 处理，watch state 后再 serialize；parse 失败回 fallback，不能把 storage 当可信数据库。
+4. `useAsyncState.ts` 每次 `execute()` 增加 request id；旧 Promise resolve 时如果 id 不等于 latest id，就不能覆盖 `data` / `error`。失败信号是快速切换查询后旧结果闪回。
+5. `useDebouncedRef.ts` 的 `customRef` getter 调 `track()`，setter 延迟后调 `trigger()`；如果漏掉 track，computed/template 不订阅；如果立刻 trigger，就失去 debounce 意义。
+6. `useEventListener.ts` 和 `useClickOutside.ts` 接收 element ref/getter，mounted 后注册 listener，scope dispose 时用同一 target/listener/options 移除；失败信号是组件卸载后点击仍触发 handler。
+7. `useScopedTicker.ts` 用 `effectScope().run()` 捕获 computed/watch/watchEffect，再用 `scope.stop()` 一次停止；适合非组件级 effect bundle，不适合替代普通 component lifecycle。
+8. `ComposablesKitDemo.vue` 把 `useModal`、`usePermission`、`useFormState`、`useQueryState` 等组合到一个页面，但每个 composable 仍只拥有自己的 source、side effect 和 cleanup policy。
 
 ## 5. 核心术语表
 
@@ -2692,38 +2682,15 @@ export function useFeature(initialValue = 0): FeatureState {
 
 复制前先判断是否真的有stateful concern、复用或独立lifecycle收益。
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-| Path | Role | Status |
-| --- | --- | --- |
-| `docs/vue/chapter-04-composables-architecture/vue-chapter-04-learning-guide.md` | Chapter 04指南 | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/ComposablesChapterApp.vue` | Chapter 04入口 | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useCounter.ts` | per-instance counter | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useToggle.ts` | boolean transitions | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/usePagination.ts` | pagination derivation/guards | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useLocalStorage.ts` | storage lifecycle | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useAsyncState.ts` | async state/stale guard | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useDebouncedSearch.ts` | local debounced search | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useClickOutside.ts` | outside predicate | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useDebouncedRef.ts` | customRef debounce | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useModal.ts` | modal transitions | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/usePermission.ts` | permission predicates | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useFormState.ts` | form state | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useQueryState.ts` | local query serialization | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useEventListener.ts` | event resource lifecycle | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/composables/useScopedTicker.ts` | manual effect scope | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/CounterComposableDemo.vue` | independent call demo | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/ToggleComposableDemo.vue` | toggle API demo | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/PaginationComposableDemo.vue` | pagination demo | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/LocalStorageComposableDemo.vue` | storage demo | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/AsyncStateComposableDemo.vue` | async/stale demo | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/DebouncedSearchComposableDemo.vue` | delayed search demo | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/ClickOutsideComposableDemo.vue` | DOM listener demo | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/SharedVsPerInstanceDemo.vue` | ownership contrast | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/EffectScopeDemo.vue` | manual scope demo | 已创建 |
-| `src/learning/vue/chapter-04-composables-architecture/demos/ComposablesKitDemo.vue` | final kit | 已创建 |
-| `src/learning/vue/chapter-01-application-boundary/App.vue` | 挂载Chapter 04，保留前三章 | 已更新 |
-| `README.md` | 当前章节状态/入口 | 已更新 |
+| 要抽取的逻辑 | 应使用 composable | 不应使用 composable | 工作证据 | 风险信号 / 后续 owner |
+| --- | --- | --- | --- | --- |
+| 多组件复用的局部 state transition | `useCounter`、`useToggle`、`usePagination` 这类 per-call factory | 只有一个组件使用且抽取后更难读 | 每次调用 state 隔离，return surface 小而稳定 | 到处传入大对象 config；考虑保留在 component |
+| Browser resource | `useEventListener`、`useClickOutside`、`useLocalStorage` | 没有 cleanup 策略或运行环境不一定有 `window` | unmount 后 listener/timer/storage watch 停止 | resource 泄漏；SSR/client-only 边界交给 Nuxt chapters |
+| Async request orchestration | `useAsyncState` 处理 loading/error/stale result | 需要跨页面 server cache、dedupe、revalidation policy | 旧 Promise 不能覆盖新结果，cancel/error 可观察 | 变成 API cache；Chapter 09 或未来 cache layer 接管 |
+| 输入兼容性 | `MaybeRefOrGetter` + `toValue` 在 tracking callback 内读取 | 只为炫技接受所有输入形态 | plain/ref/getter 都能触发预期更新 | caller 不知道何时被追踪，API 过宽 |
+| Global client state | 仅抽取无全局 owner 的行为 | auth/theme/cart/sidebar 等跨页面唯一状态 | 无需跨页面共享或持久化 | module-scope shared ref 出现；Chapter 07 Pinia 接管 |
 
 ## 15. 如何转换成个人笔记
 

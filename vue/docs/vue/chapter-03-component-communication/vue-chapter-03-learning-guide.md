@@ -48,11 +48,11 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [0. 本章机制边界](#0-本章机制边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 核心机制证据链总览](#4-核心机制证据链总览)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -76,7 +76,7 @@
 - [11. 常见错误表](#11-常见错误表)
 - [12. 最终小项目](#12-最终小项目)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 真实项目判断模型](#14-真实项目判断模型)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
@@ -99,24 +99,13 @@
 | 最终组件库实验室 | `component-library-lab/ComponentLibraryLab.vue` | 综合 API 设计 |
 | 保留前两章并挂载第 3 章 | `src/learning/vue/chapter-01-application-boundary/App.vue` | application shell |
 
-## 0. 文件定位
+## 0. 本章机制边界
 
-指南位于 `docs/vue/chapter-03-component-communication/vue-chapter-03-learning-guide.md`，可运行练习位于 `src/learning/vue/chapter-03-component-communication/`。应用仍使用第 1 章的 `main.ts` 创建唯一 application instance；`App.vue` 依次 render 第 1、2、3 章，未改变已有入口。
+本章的边界是 Vue component public contract，而不是“把一个页面拆成多个文件”。`ProductList.vue` 拥有 products、filter、selected product 等决策状态；`ProductCard.vue` 通过 props 读取 product，通过 `defineEmits` 把 select / favorite intent 交回 parent；`EditableTitle.vue` 使用 `defineModel<string>()` 展开 component `v-model`；`ModalWithSlots.vue` 和 `ScopedSlotTable.vue` 把内容 ownership 留给 parent；`ProvideInjectTheme.vue`、`ThemeProviderPanel.vue`、`ThemeConsumerPanel.vue` 用 `InjectionKey` 表示 ancestor context；`TemplateRefFocus.vue`、`AsyncComponentDemo.vue` 和 `AsyncLoadedPanel.vue` 分别展示 imperative ref 与 lazy component 边界。
 
-路线图目录名采用 kebab-case，当前项目既有 SFC 采用 PascalCase，因此执行以下透明映射：
+真正执行这些行为的是 Vue component runtime：parent render effect 创建 child vnode，props 作为 child input，child `emit()` 同步调用 parent listener，slot 是 parent scope 中的 render function，provide/inject 通过 ancestor chain 查找，template ref 在 mount 后填入 DOM element 或 exposed component public surface。TypeScript 能检查 `defineProps<Props>()`、emit payload、`defineSlots` props、`InjectionKey<T>` 和 `defineExpose` 的 public shape，但不能阻止 parent 传入运行时非法外部数据，也不能保证 slot content 的业务语义。
 
-| 路线图文件 | 实际文件 |
-| --- | --- |
-| `product-card.vue` | `ProductCard.vue` |
-| `product-list.vue` | `ProductList.vue` |
-| `filter-panel.vue` | `FilterPanel.vue` |
-| `editable-title.vue` | `EditableTitle.vue` |
-| `modal-with-slots.vue` | `ModalWithSlots.vue` |
-| `scoped-slot-table.vue` | `ScopedSlotTable.vue` |
-| `provide-inject-theme.vue` | `ProvideInjectTheme.vue` |
-| `template-ref-focus.vue` | `TemplateRefFocus.vue` |
-
-额外的 provider/consumer、fallthrough、lifecycle、async 文件分别把官方文档要求拆成可观察边界；`component-library-lab/` 对应路线图最终项目，不是额外章节。
+跨过边界的值包括 `Product` prop、event payload、`modelValue` / `update:modelValue`、slot props、provided readonly theme state、template ref 的 nullable element/component instance、async component loader Promise。它纠正的误解是“子组件可以直接拥有父级业务状态”或“slot/provide/ref 都只是传值的同义词”。本章不把远距离共享状态升级为 Pinia，不处理 Router URL，不做 API validation，也不把 component ref 当常规数据通道。
 
 ## 1. 本章解决的问题
 
@@ -146,15 +135,18 @@
 - 能识别 fallthrough、DOM/component refs、lifecycle cleanup 和 async wrapper 的边界。
 - 能从 props、emits、slots、model、injection 五张 API 图审查一个可复用组件。
 
-## 4. 推荐学习顺序
+## 4. 核心机制证据链总览
 
-1. 先运行 `ProductList.vue`，追踪 source owner、prop value、event payload。
-2. 再运行 `EditableTitle.vue`，从显式 prop/event contract 推导 `defineModel`。
-3. 对照 `ModalWithSlots.vue` 与 `ScopedSlotTable.vue`，分清普通 slot 与 slot props。
-4. 运行 theme provider/consumer，检查 InjectionKey、readonly ref 与 mutation action。
-5. 观察 fallthrough、template ref 和 lifecycle，它们都是更靠近组件外部环境的边界。
-6. 点击异步组件，确认 dynamic import 发生在 wrapper 被 render 时。
-7. 最后审查 `ComponentLibraryLab.vue` 中每个 API 的 owner、input、output 与 render extension point。
+| 机制点 | 具体证据 | Vue runtime 发生什么 | 失败信号 |
+| --- | --- | --- | --- |
+| Parent state owner | `ProductList.vue` 持有 products/filter/selection | parent render 把 product slice 传给 `ProductCard` | child 内复制 product 后 parent filter 改变但 card 不同步 |
+| Props down | `ProductCard.vue` 使用 `defineProps<Props>()` | child instance 接收 readonly prop，template 读取 prop 建立 render dependency | child 直接给 top-level prop 赋值触发 readonly warning |
+| Events up | `ProductCard` `emit("select", product.id)` | emit 同步调用 `ProductList` listener，parent mutation 再触发 render | event name 或 payload 不匹配时 parent 完全不响应 |
+| Component model | `EditableTitle.vue` `defineModel<string>()` | model ref 读写映射到 `modelValue` 和 `update:modelValue` | parent omitted 且 child default 造成初始值不同步 |
+| Slot ownership | `ModalWithSlots.vue` / `ScopedSlotTable.vue` | child 决定 outlet，parent slot function 读取 parent scope 或接收 row slot props | slot 内访问 child local variable 失败，或 row rendering owner 混乱 |
+| Ancestor context | `ProvideInjectTheme.vue` + `InjectionKey` | provider 写入 context，descendant inject 同一 Symbol key | missing provider 得到 `undefined`，或用 string key 丢失 type sync |
+| Imperative escape | `TemplateRefFocus.vue` / `defineExpose` | mount 后 ref 才指向 element 或 exposed public surface | setup 同步阶段读 ref 得到 `null`，或访问未 expose 的 child method |
+| Async boundary | `AsyncComponentDemo.vue` dynamic import `AsyncLoadedPanel.vue` | wrapper 延迟加载 component definition，resolved 后渲染真实 child | 把 async component 当 data fetching，导致 loading/error owner 错位 |
 
 ## 5. 核心术语表
 
@@ -1792,47 +1784,16 @@ reusable logic extraction 和 composables 留到 Chapter 04。
 | `defineAsyncComponent` | `defineAsyncComponent(loader)` | lazy wrapper |
 | dynamic import | `import("./Panel.vue")` | Promise + Vite split point |
 
-## 14. 最终文件清单
+## 14. 真实项目判断模型
 
-**新增指南**
-
-- `docs/vue/chapter-03-component-communication/vue-chapter-03-learning-guide.md`
-
-**新增章节练习**
-
-- `src/learning/vue/chapter-03-component-communication/ComponentsChapterApp.vue`
-- `ProductCard.vue`
-- `ProductList.vue`
-- `FilterPanel.vue`
-- `EditableTitle.vue`
-- `ModalWithSlots.vue`
-- `ScopedSlotTable.vue`
-- `ProvideInjectTheme.vue`
-- `ThemeProviderPanel.vue`
-- `ThemeConsumerPanel.vue`
-- `TemplateRefFocus.vue`
-- `FallthroughAttributeButton.vue`
-- `LifecycleHookPanel.vue`
-- `AsyncComponentDemo.vue`
-- `AsyncLoadedPanel.vue`
-
-**新增最终项目**
-
-- `component-library-lab/ComponentLibraryLab.vue`
-- `component-library-lab/BaseButton.vue`
-- `component-library-lab/BaseModal.vue`
-- `component-library-lab/BaseTabs.vue`
-- `component-library-lab/DataTable.vue`
-- `component-library-lab/FormField.vue`
-- `component-library-lab/BaseSelect.vue`
-- `component-library-lab/ToastProvider.vue`
-- `component-library-lab/ToastViewport.vue`
-- `component-library-lab/theme-key.ts`
-
-以上后两组路径均相对 `src/learning/vue/chapter-03-component-communication/`。另更新：
-
-- `src/learning/vue/chapter-01-application-boundary/App.vue`
-- `README.md`
+| 需求 | 首选边界 | 不应选择 | 证明它工作 | 风险信号 / 未来 owner |
+| --- | --- | --- | --- | --- |
+| 父级拥有列表，子级只展示一行 | props down + emits up：`ProductList` / `ProductCard` | child 直接改 parent array 或复制完整列表 | parent mutation 后所有 cards 与 filter 同步 | props drilling 超过两三层时，评估 provide/inject 或 Pinia |
+| 单个输入组件需要双向协议 | component `v-model` / `defineModel`：`EditableTitle` | 额外传 `value` + 自定义 event 且命名不统一 | parent 和 child 的 title 同步，event payload 可检查 | default desync；复杂表单 owner 交给 Chapter 08 |
+| 组件需要可替换内容区域 | slots / scoped slots：`ModalWithSlots`、`ScopedSlotTable` | 用 props 传一堆 HTML-like config | parent scope 可读，child row data 通过 slot props 暴露 | slot 变成业务状态通道；跨页面状态交给 Pinia |
+| 深层稳定上下文 | provide/inject + `InjectionKey`：theme service | 任意业务数据都塞进 inject | missing provider 有 fallback/错误，readonly + action surface 清楚 | 权限/auth/global client state 应进入 Chapter 07 Pinia |
+| 聚焦、测量、调用公开方法 | template ref + `defineExpose` | 用 ref 读写 child private state | `onMounted` 后 ref 非空，只能看到 exposed surface | ref 调用链变成隐藏 API；回到 props/emits/slots 设计 |
+| 延迟加载重组件 | `defineAsyncComponent` / dynamic import | 用它加载 API data 或控制权限 | chunk 加载状态可观察，resolved component contract 不变 | route-level lazy loading 归 Chapter 06 Router |
 
 ## 15. 如何转换成个人笔记
 

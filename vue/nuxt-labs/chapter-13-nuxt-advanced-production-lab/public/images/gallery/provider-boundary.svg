@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640" role="img" aria-labelledby="title desc">
+  <title id="title">Provider boundary image</title>
+  <desc id="desc">A geometric placeholder for image provider boundaries.</desc>
+  <rect width="960" height="640" fill="#f3f7f5"/>
+  <rect x="120" y="120" width="720" height="400" rx="48" fill="#d8e4de"/>
+  <circle cx="360" cy="320" r="120" fill="#42b883"/>
+  <circle cx="600" cy="320" r="120" fill="#18794e"/>
+  <text x="210" y="570" fill="#213547" font-family="Arial, sans-serif" font-size="42">Provider boundary</text>
+</svg>
