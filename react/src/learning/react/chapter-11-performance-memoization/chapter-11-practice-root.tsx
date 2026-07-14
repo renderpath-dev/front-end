@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Navigate, Route, Routes } from 'react-router'
+import { Link, Navigate, Route, Routes } from 'react-router'
 import { RenderCommitBoundary } from './01-render-commit-boundary/render-commit-boundary'
 import { ParentChildRenderBoundary } from './02-parent-child-render/parent-child-render-boundary'
 import { ReconciliationKeyIdentity } from './03-reconciliation-key-identity/reconciliation-key-identity'
@@ -37,7 +37,7 @@ function Chapter11PracticeOverview() {
           <p>Mechanism practice</p>
           <h2 id="performance-practice-title">Measure work before adding optimization</h2>
         </div>
-        <Link to="/performance/catalog">Open SellerHub workspace</Link>
+        <Link to="/react/chapter-11/catalog">Open SellerHub workspace</Link>
       </div>
       <div className="performance-practice-grid">{practiceComponents}</div>
     </section>
@@ -57,24 +57,20 @@ function Chapter11Router() {
           </p>
         </div>
         <nav aria-label="Chapter views" className="chapter-eleven-nav">
-          <Link to="/performance/practice">Mechanism practice</Link>
-          <Link to="/performance/catalog">SellerHub workspace</Link>
+          <Link to="/react/chapter-11/practice">Mechanism practice</Link>
+          <Link to="/react/chapter-11/catalog">SellerHub workspace</Link>
         </nav>
       </header>
       <Routes>
-        <Route element={<Navigate replace to="/performance/catalog" />} path="/" />
-        <Route element={<Chapter11PracticeOverview />} path="/performance/practice" />
-        <Route element={<SellerHubPerformanceWorkspace />} path="/performance/*" />
-        <Route element={<Navigate replace to="/performance/catalog" />} path="*" />
+        <Route element={<Navigate replace to="/react/chapter-11/catalog" />} path="/react/chapter-11" />
+        <Route element={<Chapter11PracticeOverview />} path="/react/chapter-11/practice" />
+        <Route element={<SellerHubPerformanceWorkspace />} path="/react/chapter-11/*" />
+        <Route element={<Navigate replace to="/react/chapter-11/catalog" />} path="*" />
       </Routes>
     </main>
   )
 }
 
 export function Chapter11PracticeRoot() {
-  return (
-    <BrowserRouter>
-      <Chapter11Router />
-    </BrowserRouter>
-  )
+  return <Chapter11Router />
 }

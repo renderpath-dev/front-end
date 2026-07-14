@@ -54,12 +54,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -92,58 +92,28 @@
   - [12.7 运行方式与预期结果](#127-运行方式与预期结果)
   - [12.8 常见错误与可选扩展](#128-常见错误与可选扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 建立生产架构边界图 | `src/learning/react/chapter-15-production-frontend-architecture/01-production-architecture-map/production-architecture-map.tsx` | 核心机制真实文件 | 9.1 |
-| 建立 token 与 primitive 边界 | `src/learning/react/chapter-15-production-frontend-architecture/02-design-tokens-primitive-ui/design-token-primitive-boundary.tsx` | 核心机制真实文件 | 9.2 |
-| 实现 compound tabs accessibility contract | `src/learning/react/chapter-15-production-frontend-architecture/03-compound-accessibility-contract/accessible-compound-tabs.tsx` | 核心机制真实文件 | 9.3 |
-| 定义 feature public API | `src/learning/react/chapter-15-production-frontend-architecture/04-feature-module-public-api/catalog-feature-public-api.ts` | 核心机制真实文件 | 9.4 |
-| 通过 public API 渲染 feature panel | `src/learning/react/chapter-15-production-frontend-architecture/04-feature-module-public-api/feature-public-api-boundary.tsx` | 核心机制真实文件 | 9.4 |
-| 审计 shared / feature dependency direction | `src/learning/react/chapter-15-production-frontend-architecture/05-shared-feature-boundary/dependency-direction-audit.tsx` | 核心机制真实文件 | 9.5 |
-| 追踪 DTO 到 view model | `src/learning/react/chapter-15-production-frontend-architecture/06-api-contract-adapter/api-contract-adapter-panel.tsx` | 核心机制真实文件 | 9.6 |
-| 归一化 generated client error | `src/learning/react/chapter-15-production-frontend-architecture/07-error-normalization-client-boundary/error-normalization-panel.tsx` | 核心机制真实文件 | 9.7 |
-| 组合 flag、RBAC UI 与 release metadata | `src/learning/react/chapter-15-production-frontend-architecture/08-feature-flags-rbac-release/feature-flag-permission-panel.tsx` | 核心机制真实文件 | 9.8 |
-| 分离 message 与 locale formatter | `src/learning/react/chapter-15-production-frontend-architecture/09-i18n-locale-formatting/locale-formatting-panel.tsx` | 核心机制真实文件 | 9.9 |
-| 建立 frontend error event | `src/learning/react/chapter-15-production-frontend-architecture/10-observability-error-reporting/observability-event-panel.tsx` | 核心机制真实文件 | 9.10 |
-| 评估 route performance budget | `src/learning/react/chapter-15-production-frontend-architecture/11-performance-budget-web-vitals/performance-budget-panel.tsx` | 核心机制真实文件 | 9.11 |
-| 检查 browser security boundaries | `src/learning/react/chapter-15-production-frontend-architecture/12-security-boundary-checks/security-boundary-panel.tsx` | 核心机制真实文件 | 9.12 |
-| 组织可回滚 migration phases | `src/learning/react/chapter-15-production-frontend-architecture/13-migration-strategy/migration-strategy-panel.tsx` | 核心机制真实文件 | 9.13 |
-| 建立 ADR、review 与 release gates | `src/learning/react/chapter-15-production-frontend-architecture/14-adr-review-governance/governance-evidence-panel.tsx` | 核心机制真实文件 | 9.14 |
-| 映射 SellerHub 架构证据 | `src/learning/react/chapter-15-production-frontend-architecture/15-sellerhub-production-map/sellerhub-production-map.tsx` | 核心机制真实文件 | 9.15 |
-| 定义 design tokens | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/design-system/tokens.ts` | 最终小项目 | 12.5 |
-| 定义 primitive button | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/design-system/primitive-button.tsx` | 最终小项目 | 12.5 |
-| 定义 compound tabs | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/design-system/compound-tabs.tsx` | 最终小项目 | 12.5 |
-| 发布 catalog public API | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/features/catalog/catalog-public-api.ts` | 最终小项目 | 12.5 |
-| 发布 orders public API | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/features/orders/orders-public-api.ts` | 最终小项目 | 12.5 |
-| 声明并验证 API DTO | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/api/sellerhub-api-contract.ts` | 最终小项目 | 12.5 |
-| 执行 DTO / domain / view model adaptation | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/api/sellerhub-api-adapter.ts` | 最终小项目 | 12.5 |
-| 定义 feature flag lifecycle 与 permission decision | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/flags/feature-flags.ts` | 最终小项目 | 12.5 |
-| 定义 message catalog | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/i18n/messages.ts` | 最终小项目 | 12.5 |
-| 定义 locale formatters | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/i18n/formatters.ts` | 最终小项目 | 12.5 |
-| 建立 mock error reporter | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/observability/error-reporter.ts` | 最终小项目 | 12.5 |
-| 定义 performance budget | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/performance/performance-budget.ts` | 最终小项目 | 12.5 |
-| 定义 security helpers | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/security/security-boundaries.ts` | 最终小项目 | 12.5 |
-| 记录 architecture decision | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/governance/architecture-decision-record.md` | 最终小项目工程文档 | 12.5 |
-| 记录 code review gate | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/governance/code-review-checklist.md` | 最终小项目工程文档 | 12.5 |
-| 记录 migration 与 rollback | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/governance/migration-plan.md` | 最终小项目工程文档 | 12.5 |
-| 组合 architecture dashboard | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/sellerhub-production-dashboard.tsx` | 最终小项目 | 12.5 |
-| 导出最终项目入口 | `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/sellerhub-production-architecture-kit.tsx` | 最终小项目 | 12.5 |
-| 挂载全部核心练习与最终项目 | `src/learning/react/chapter-15-production-frontend-architecture/chapter-15-practice-root.tsx` | Adapter / shell | 7、8、14 |
-| 提供章节通用样式 | `src/learning/react/chapter-15-production-frontend-architecture/chapter-15-practice.css` | Adapter / shell CSS | 7、14 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Architecture map | The app separates product features, shared infrastructure, and governance artifacts. | Frontend architecture boundary | SellerHub production kit shows where code should live. | `src/learning/react/chapter-15-production-frontend-architecture/01-production-architecture-map/production-architecture-map.tsx` |
+| Design token and primitive UI | Shared UI owns visual contracts without importing feature logic. | Design system layer | Buttons, tabs, and tokens stay reusable across features. | `src/learning/react/chapter-15-production-frontend-architecture/02-design-tokens-primitive-ui/design-token-primitive-boundary.tsx` |
+| API adapter | The boundary converts external DTOs into internal view models. | Client API contract layer | SellerHub features do not render raw transport data. | `src/learning/react/chapter-15-production-frontend-architecture/06-api-contract-adapter/api-contract-adapter-panel.tsx` |
+| Governance evidence | Architecture decisions and review checklists record why a boundary exists. | Team process and code review layer | Migration plans and ADRs make production changes auditable. | `src/learning/react/chapter-15-production-frontend-architecture/14-adr-review-governance/governance-evidence-panel.tsx` |
 
-本章是 `D:\vite_ts` React 主线第 15 章，也是 Phase 12 的生产架构收束章。它承接第 11 章的性能证据、第 12 章的质量门禁、第 13 章的 server/client boundary 和第 14 章的 React 19 migration gate，把“会实现功能”提升为“能定义边界、证明质量、控制变更”。
+## 0. 本章工程问题与边界
 
-本章不创建 monorepo、后端或 Next.js 根项目，不安装 Storybook、OpenAPI generator、Sentry、i18n library、feature flag SaaS 或 UI library。所有生产工具只解释其位置；当前 Vite app 用 TypeScript models、React panels、纯函数和 Markdown governance artifacts 模拟机制。
+本章解决的工程问题是：当 React 项目从练习走向团队协作时，文件夹不是装饰，边界、依赖方向、API adapter、design system、feature flags、i18n、observability、security 和 governance 都会影响可维护性。
+
+本章不新增真实后端、认证系统、监控平台或企业级框架。边界是用当前 learning app 展示 production-style frontend architecture 的可审查模型。
 
 ## 1. 本章解决的问题
 
@@ -179,9 +149,16 @@
 8. 制定有 inventory、compatibility layer、quality gate 与 rollback 的 migration。
 9. 用可运行 dashboard 展示 SellerHub 的架构证据。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-先学习 dependency 与 component contract（9.1–9.5），再学习 network / release / locale 数据边界（9.6–9.9），然后建立 production feedback loops（9.10–9.12），最后学习 change governance 与 SellerHub 证据映射（9.13–9.15）。这个顺序从“当前代码如何被组织”走到“未来变化如何被约束”，避免先背工具名再猜边界。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Dependency direction | Feature module public API | 先约束谁能 import 谁，public API 才有意义。 | feature 之间会互相穿透内部文件。 |
+| Design token | Primitive component | primitive UI 应消费 token，而不是散落 magic values。 | 视觉规则无法统一修改。 |
+| External DTO | Internal view model | 先在 adapter 收窄外部契约，feature 才能稳定渲染。 | 后端字段变化会扩散到所有组件。 |
+| Risk category | Governance evidence | 生产架构决策需要记录取舍和验证。 | 迁移后没人知道边界为什么存在。 |
 
 ## 5. 核心术语表
 
@@ -317,7 +294,7 @@ src/learning/react/chapter-15-production-frontend-architecture/
 
 ### 概念示例结构
 
-下面这些名称只用于错误对比，不代表需要创建文件，也不会进入最终文件清单。
+下面这些名称只用于错误对比，不代表需要创建文件，也不用于交付验证记录。
 
 <div class="macos-code-window">
   <div class="macos-code-titlebar">
@@ -3682,64 +3659,25 @@ type BoundaryRecord<Input, Output> = {
 
 这个 template 只用于笔记，不是需要创建的真实文件。它提醒你任何 boundary 都要连接 owner、transformation、evidence 和 rollback。
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-### 本次创建的学习指导文件
+### Code review questions
 
-- `docs/react/chapter-15-production-frontend-architecture/react-chapter-15-learning-guide.md`
+- feature 是否只暴露 public API，而不是被其他模块 import 内部文件？
+- shared 层是否真的与业务无关，还是偷偷依赖 feature？
+- API adapter、error normalization、observability 和 security 边界是否可测试？
 
-### 本章核心机制真实文件
+### Migration checks
 
-- `src/learning/react/chapter-15-production-frontend-architecture/01-production-architecture-map/production-architecture-map.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/02-design-tokens-primitive-ui/design-token-primitive-boundary.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/03-compound-accessibility-contract/accessible-compound-tabs.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/04-feature-module-public-api/catalog-feature-public-api.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/04-feature-module-public-api/feature-public-api-boundary.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/05-shared-feature-boundary/dependency-direction-audit.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/06-api-contract-adapter/api-contract-adapter-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/07-error-normalization-client-boundary/error-normalization-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/08-feature-flags-rbac-release/feature-flag-permission-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/09-i18n-locale-formatting/locale-formatting-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/10-observability-error-reporting/observability-event-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/11-performance-budget-web-vitals/performance-budget-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/12-security-boundary-checks/security-boundary-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/13-migration-strategy/migration-strategy-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/14-adr-review-governance/governance-evidence-panel.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/15-sellerhub-production-map/sellerhub-production-map.tsx`
+- 先画依赖方向，再移动文件；不要只按文件夹名字重排。
+- 把 raw DTO 渲染迁移为 adapter 输出的 view model。
+- 为高风险边界补 ADR、review checklist 和迁移计划。
 
-### 最终小项目真实文件
+### Production risk signals
 
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/design-system/tokens.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/design-system/primitive-button.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/design-system/compound-tabs.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/features/catalog/catalog-public-api.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/features/orders/orders-public-api.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/api/sellerhub-api-contract.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/api/sellerhub-api-adapter.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/flags/feature-flags.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/i18n/messages.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/i18n/formatters.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/observability/error-reporter.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/performance/performance-budget.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/shared/security/security-boundaries.ts`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/governance/architecture-decision-record.md`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/governance/code-review-checklist.md`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/governance/migration-plan.md`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/sellerhub-production-dashboard.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/sellerhub-production-architecture-kit/sellerhub-production-architecture-kit.tsx`
-
-### Adapter / shell 文件
-
-- `src/learning/react/chapter-15-production-frontend-architecture/chapter-15-practice-root.tsx`
-- `src/learning/react/chapter-15-production-frontend-architecture/chapter-15-practice.css`
-
-不需要创建这些概念 snippet：
-
-- `Snippet: deep feature import`
-- `Snippet: DTO rendered directly`
-- `Snippet: UI permission mistaken for authorization`
-- `Snippet: sensitive error report`
-- `Template: boundary record`
+- 改一个 DTO 影响十几个组件，说明 adapter 缺失。
+- shared 反向 import feature，说明层级边界破裂。
+- 线上错误无法定位，检查 observability event 和 normalized error。
 
 ## 15. 如何转换成个人笔记
 

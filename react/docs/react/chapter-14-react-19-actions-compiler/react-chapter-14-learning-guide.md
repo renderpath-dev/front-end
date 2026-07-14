@@ -14,12 +14,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -48,43 +48,28 @@
   - [12.5 Runtime、类型与工具链边界](#125-runtime类型与工具链边界)
   - [12.6 验证步骤](#126-验证步骤)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| Action、transition、pending 与 result state | `src/learning/react/chapter-14-react-19-actions-compiler/01-action-boundary/action-transition-result.tsx` | 核心机制真实文件 | 9.1 |
-| `useActionState` 与 sequential queue | `src/learning/react/chapter-14-react-19-actions-compiler/02-use-action-state-queue/sequential-action-queue.tsx` | 核心机制真实文件 | 9.2 |
-| `useActionState` 与 `useReducer` 边界 | `src/learning/react/chapter-14-react-19-actions-compiler/03-action-state-vs-reducer/action-reducer-boundary.tsx` | 核心机制真实文件 | 9.3 |
-| function form action 与 progressive enhancement | `src/learning/react/chapter-14-react-19-actions-compiler/04-form-action-progressive-model/form-action-progressive-boundary.tsx` | 核心机制真实文件 | 9.4 |
-| `useFormStatus` 最近 form boundary | `src/learning/react/chapter-14-react-19-actions-compiler/05-use-form-status-submit-button/form-status-submit-button.tsx` | 核心机制真实文件 | 9.5 |
-| `useOptimistic` rollback 与 reconciliation | `src/learning/react/chapter-14-react-19-actions-compiler/06-use-optimistic-rollback/optimistic-review-reconciliation.tsx` | 核心机制真实文件 | 9.6 |
-| `use(context)` 与 cached Promise 边界 | `src/learning/react/chapter-14-react-19-actions-compiler/07-use-api-suspense-promise/use-api-resource-boundary.tsx` | 核心机制真实文件 | 9.7 |
-| Server Function framework boundary | `src/learning/react/chapter-14-react-19-actions-compiler/08-server-functions-boundary/server-function-boundary-map.tsx` | 核心机制真实文件 | 9.8 |
-| ref、metadata 与 static API owner | `src/learning/react/chapter-14-react-19-actions-compiler/09-ref-metadata-static-apis/react-19-platform-boundaries.tsx` | 核心机制真实文件 | 9.9 |
-| React Compiler automatic memoization 目标 | `src/learning/react/chapter-14-react-19-actions-compiler/10-react-compiler-goal/compiler-optimization-model.tsx` | 核心机制真实文件 | 9.10 |
-| Compiler rules、directives 与 lint evidence | `src/learning/react/chapter-14-react-19-actions-compiler/11-compiler-rules-lints/compiler-rule-evidence.tsx` | 核心机制真实文件 | 9.11 |
-| React 19 / Compiler migration gates | `src/learning/react/chapter-14-react-19-actions-compiler/12-migration-strategy/react-19-migration-gates.tsx` | 核心机制真实文件 | 9.12 |
-| SellerHub React 19 架构映射 | `src/learning/react/chapter-14-react-19-actions-compiler/13-sellerhub-architecture-mapping/sellerhub-react-19-boundary-map.tsx` | 核心机制真实文件 | 9.13 |
-| 最终小项目 domain types | `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-action-types.ts` | 最终小项目真实文件 | 12.3 |
-| 最终小项目 Action model | `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-action-model.ts` | 最终小项目真实文件 | 12.3 |
-| 最终小项目 Action workspace | `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-action-workspace.tsx` | 最终小项目真实文件 | 12.3 |
-| 最终小项目 Compiler boundary map | `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-compiler-boundary-map.tsx` | 最终小项目真实文件 | 12.3 |
-| 最终小项目组合入口 | `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-react-19-actions-lab.tsx` | 最终小项目真实文件 | 12.3 |
-| 章节挂载入口 | `src/learning/react/chapter-14-react-19-actions-compiler/chapter-14-practice-root.tsx` | adapter / shell | 8 |
-| 章节共享样式 | `src/learning/react/chapter-14-react-19-actions-compiler/chapter-14-practice.css` | adapter / shell | 8 |
-| Vite 根挂载 | `src/App.tsx` | adapter / shell | 8 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Action transition | Action functions model async mutations and pending UI. | React 19 client/form action boundary | SellerHub action lab models save flows without hiding state transitions. | `src/learning/react/chapter-14-react-19-actions-compiler/01-action-boundary/action-transition-result.tsx` |
+| useActionState | The action owner keeps previous result, pending state, and next submission together. | React 19 hook runtime | Sequential action results are represented as a queue of UI states. | `src/learning/react/chapter-14-react-19-actions-compiler/02-use-action-state-queue/sequential-action-queue.tsx` |
+| useFormStatus | A submit control reads nearest form submission status. | React DOM form boundary | Buttons reflect form pending state without prop drilling. | `src/learning/react/chapter-14-react-19-actions-compiler/05-use-form-status-submit-button/form-status-submit-button.tsx` |
+| Compiler-friendly code | Components must keep pure render and stable rule compliance. | React Compiler static analysis boundary | SellerHub code maps which patterns are safe before opting in. | `src/learning/react/chapter-14-react-19-actions-compiler/11-compiler-rules-lints/compiler-rule-evidence.tsx` |
 
-本章是 `D:/vite_ts` React + TypeScript + Vite 学习路线的第 14 章，承接第 12 章的质量门禁和第 13 章的 server/client framework boundary。学习指导文件是 `docs/react/chapter-14-react-19-actions-compiler/react-chapter-14-learning-guide.md`，真实练习根目录是 `src/learning/react/chapter-14-react-19-actions-compiler/`。
+## 0. 本章工程问题与边界
 
-当前 lockfile 实际安装 `react@19.2.4`、`react-dom@19.2.4`、`@types/react@19.2.10` 和 `eslint-plugin-react-hooks@7.0.1`，所以客户端 `useActionState`、`useFormStatus`、`useOptimistic`、`use(context)`、function form action、ref as prop 与 document metadata 可以在当前项目讨论或运行。项目没有安装 React Compiler，也没有 React Server Components / Server Functions framework runtime；相关内容必须作为 build/framework boundary 学习，不能伪造执行结果。
+本章解决的工程问题是：React 19 新能力分布在 client runtime、React DOM form、framework/server 边界和 compiler 静态分析中，不能把它们都当成普通 client hook。
+
+本章不把 Vite 项目改成 Server Components 应用，不伪造 framework-only API 的生产运行。边界是 Actions、useActionState、useFormStatus、useOptimistic、use API、ref as prop、metadata/static API 和 Compiler readiness。
 
 ## 1. 本章解决的问题
 
@@ -114,9 +99,16 @@
 6. 解释 React Compiler 的自动 memoization、bailout、directives、lints 和渐进迁移策略。
 7. 把 checkout、cart、review、seller order、login、ProductCard 和 dashboard resource 映射到 SellerHub owner。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-先从 Action 与 transition 的运行语义开始，再进入 `useActionState` queue 和 `useReducer` 对比；随后学习 React DOM form action、最近 form status 和 optimistic reconciliation。理解这些 mutation 机制后，再学习 `use` 的 resource identity、Server Function transport、React 19 platform output，最后进入 Compiler static analysis、lint evidence、migration gates 和 SellerHub architecture mapping。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Async mutation intent | Action result state | 先理解 mutation 是一次提交意图，才能设计 result/pending/error。 | 会把 action 当成普通 click handler。 |
+| Form ownership | useFormStatus | submit status 来自最近 form 边界。 | 会在错误层级读取不到 pending 状态。 |
+| Optimistic assumption | Rollback evidence | 乐观 UI 必须有失败回滚路径。 | 失败后 UI 和真实数据会分裂。 |
+| Pure component rules | Compiler readiness | Compiler 依赖可分析的纯组件和 hook 规则。 | 不安全代码可能无法优化或行为不可靠。 |
 
 ## 5. 核心术语表
 
@@ -2620,51 +2612,25 @@ async function submitAction(
 | ProductCard | pure compiler candidate | Compiler 不修 unstable key。 |
 | Dashboard | cached Promise + Suspense model | `use` 不创建 cache。 |
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-### 本次创建的学习指导文件
+### Code review questions
 
-- `docs/react/chapter-14-react-19-actions-compiler/react-chapter-14-learning-guide.md`
+- 这个 API 在纯 client React、React DOM form、framework server，还是 compiler 边界？
+- pending、success、error 和 rollback 是否都有可见路径？
+- 组件是否满足 compiler-friendly 的纯 render 和 hook 规则？
 
-### 本章创建的核心机制真实文件
+### Migration checks
 
-- `src/learning/react/chapter-14-react-19-actions-compiler/01-action-boundary/action-transition-result.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/02-use-action-state-queue/sequential-action-queue.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/03-action-state-vs-reducer/action-reducer-boundary.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/04-form-action-progressive-model/form-action-progressive-boundary.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/05-use-form-status-submit-button/form-status-submit-button.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/06-use-optimistic-rollback/optimistic-review-reconciliation.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/07-use-api-suspense-promise/use-api-resource-boundary.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/08-server-functions-boundary/server-function-boundary-map.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/09-ref-metadata-static-apis/react-19-platform-boundaries.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/10-react-compiler-goal/compiler-optimization-model.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/11-compiler-rules-lints/compiler-rule-evidence.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/12-migration-strategy/react-19-migration-gates.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/13-sellerhub-architecture-mapping/sellerhub-react-19-boundary-map.tsx`
+- React 19 迁移前先列出版本、framework 支持、测试覆盖和 fallback gate。
+- 把 framework/server-only 能力标为边界，不在 Vite client 示例中伪造。
+- 采用 Compiler 前先修 lint 规则和 impure render 证据。
 
-### 本章创建的最终小项目真实文件
+### Production risk signals
 
-- `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-action-types.ts`
-- `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-action-model.ts`
-- `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-action-workspace.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-compiler-boundary-map.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/sellerhub-react-19-actions-lab/sellerhub-react-19-actions-lab.tsx`
-
-### Adapter / shell 文件
-
-- `src/learning/react/chapter-14-react-19-actions-compiler/chapter-14-practice-root.tsx`
-- `src/learning/react/chapter-14-react-19-actions-compiler/chapter-14-practice.css`
-- `src/App.tsx`
-- `README.md`
-
-### 不需要创建的概念 snippet
-
-- `Snippet: dispatcher outside Action scope`
-- `Snippet: useFormStatus outside parent form`
-- `Snippet: Promise created during render`
-- `Snippet: fake Server Function in Vite`
-- `Snippet: compiler cannot repair mutation`
-- `Template: typed Action result`
+- 提交状态读取不到，检查 form/status 层级。
+- 乐观 UI 失败后不回滚，检查 reconciliation 规则。
+- Compiler 无法优化或 lint 报错，检查 mutation、hook 条件调用和不纯 render。
 
 ## 15. 如何转换成个人笔记
 

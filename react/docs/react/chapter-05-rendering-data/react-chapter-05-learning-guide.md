@@ -54,11 +54,12 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -87,39 +88,28 @@
   - [常见错误](#常见错误)
   - [可选扩展](#可选扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 理解 `map()` 如何返回 React nodes | `src/learning/react/chapter-05-rendering-data/01-array-rendering/array-rendering-with-map.tsx` | 真实练习文件 | 9.1 |
-| 用 JavaScript expression 选择 JSX | `src/learning/react/chapter-05-rendering-data/02-conditional-rendering/conditional-rendering-branches.tsx` | 真实练习文件 | 9.2 |
-| 分离四种 UI 状态 | `src/learning/react/chapter-05-rendering-data/03-ui-state-branches/ui-state-branches.tsx` | 真实练习文件 | 9.3 |
-| 观察 stable key 与组件身份 | `src/learning/react/chapter-05-rendering-data/04-key-identity/key-identity-stable-id.tsx` | 真实练习文件 | 9.4 |
-| 理解 `key` 与普通 props 的边界 | `src/learning/react/chapter-05-rendering-data/05-key-is-not-prop/key-is-not-prop.tsx` | 真实练习文件 | 9.5 |
-| 复现 index key 的身份错乱 | `src/learning/react/chapter-05-rendering-data/06-index-key-mistake/index-key-mistake.tsx` | 真实练习文件 | 9.6 |
-| 保持 filter、sort、map 的不可变边界 | `src/learning/react/chapter-05-rendering-data/07-filter-sort-map-boundary/filter-sort-map-boundary.tsx` | 真实练习文件 | 9.7 |
-| 为列表元素和 props 建模 | `src/learning/react/chapter-05-rendering-data/08-typed-list-rendering/typed-list-rendering.tsx` | 真实练习文件 | 9.8 |
-| 汇总所有练习 | `src/learning/react/chapter-05-rendering-data/chapter-05-practice-root.tsx` | 真实练习入口 | 8、9 |
-| 构建 Product List Panel | `src/learning/react/chapter-05-rendering-data/product-list-mini-project/` | 最终小项目 | 12 |
-| 对比 `key`、element 与 DOM | `Snippet: element identity layers` | 概念 snippet | 6 |
-| 识别 JSX 内非法 `if` | `Snippet: statement inside JSX expression` | 概念 snippet | 9.2、11 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Array rendering | The component maps data records to React elements. | JavaScript array methods plus React rendering | Product cards are generated from product records. | `src/learning/react/chapter-05-rendering-data/01-array-rendering/array-rendering-with-map.tsx` |
+| Key identity | React uses keys to match sibling elements across renders. | React reconciliation | Product rows keep stable identity when filters or sorts change. | `src/learning/react/chapter-05-rendering-data/04-key-identity/key-identity-stable-id.tsx` |
+| Conditional branch | The component selects which UI branch represents current state. | JavaScript control flow in render | Empty, loading, error, and success views remain explicit. | `src/learning/react/chapter-05-rendering-data/02-conditional-rendering/conditional-rendering-branches.tsx` |
+| Derived collection | Filtering and sorting create render data without mutating source data. | JavaScript runtime | Product list controls produce a visible subset safely. | `src/learning/react/chapter-05-rendering-data/07-filter-sort-map-boundary/filter-sort-map-boundary.tsx` |
 
-本章位于 React 学习路径第五章，承接第四章已经建立的 event handler、`useState`、state snapshot、batching、functional update 和不可变数组更新基础。
+## 0. 本章工程问题与边界
 
-- 学习指导：`docs/react/chapter-05-rendering-data/react-chapter-05-learning-guide.md`
-- 练习入口：`src/learning/react/chapter-05-rendering-data/chapter-05-practice-root.tsx`
-- 最终小项目：`src/learning/react/chapter-05-rendering-data/product-list-mini-project/`
-- 前置章节：`docs/react/chapter-04-state-and-events/react-chapter-04-learning-guide.md`
+本章解决的工程问题是：真实 UI 往往来自集合数据，而不是手写重复 JSX。学习重点是把数据数组、条件分支、key identity 和派生列表分开理解。
 
-本章只讨论“数据如何变成列表 UI、React 如何识别同级元素、不同 UI 状态如何分支”。不引入后端、router、TanStack Query、React Hook Form、Prisma、数据请求缓存或真实 SellerHub 架构。
+本章不负责远程请求、缓存、分页 API 或虚拟列表性能优化。它只处理已经在组件内可用的数据如何安全、稳定、可审查地渲染。
 
 ## 1. 本章解决的问题
 
@@ -160,17 +150,16 @@
 - 用 TypeScript 为 `Product[]`、`ReadonlyArray<Order>`、list props 和 discriminated union state 建模。
 - 把同一套机制迁移到 SellerHub 的 products、cart items、orders 和 admin review lists。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-1. 先把 `map()` 看成普通 JavaScript transformation。
-2. 再理解 conditional rendering 只是决定本次 render 返回哪个 description。
-3. 建立 loading、error、empty、success 的互斥状态模型。
-4. 分清 element description、component identity 和 DOM commit。
-5. 在这个模型上理解 key，而不是死记 warning 修复。
-6. 用 index key 错误练习观察身份错位。
-7. 最后组合 filter、sort、map、TypeScript 和 Product List Panel。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
 
-这个顺序先解决“生成什么”，再解决“React 如何匹配”，最后解决“怎样在项目中建模”。
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Array item shape | Map to elements | 先知道每条数据的结构，才能把它映射成稳定 UI。 | 会在 JSX 中混入不清楚的数据访问。 |
+| Stable record id | React key | key 必须表达兄弟节点身份，而不是展示顺序。 | 过滤或排序后组件状态可能错位。 |
+| State branch | Conditional rendering | 条件 UI 依赖清晰的状态枚举或布尔判断。 | 会出现空状态、错误状态和成功状态互相覆盖。 |
+| Source data | Derived filtered data | 派生列表应来自原始数据计算，而不是破坏原数组。 | 切换筛选条件后无法恢复完整数据。 |
 
 ## 5. 核心术语表
 
@@ -1700,39 +1689,25 @@ const visibleItems = items
 ```
 </div>
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-| File | Role | Status |
-| --- | --- | --- |
-| `docs/react/chapter-05-rendering-data/react-chapter-05-learning-guide.md` | 第五章完整学习指导。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/chapter-05-practice-root.tsx` | 汇总八个练习与最终小项目。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/chapter-05-practice.css` | 第五章共享练习样式。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/01-array-rendering/array-rendering-with-map.tsx` | `map()` 到 React nodes。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/02-conditional-rendering/conditional-rendering-branches.tsx` | conditional expression 分支。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/03-ui-state-branches/ui-state-branches.tsx` | 四种 UI state。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/04-key-identity/key-identity-stable-id.tsx` | stable ID identity。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/05-key-is-not-prop/key-is-not-prop.tsx` | special prop boundary。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/06-index-key-mistake/index-key-mistake.tsx` | index key 错位对照。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/07-filter-sort-map-boundary/filter-sort-map-boundary.tsx` | immutable derivation。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/08-typed-list-rendering/typed-list-rendering.tsx` | typed list props。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/product-list-mini-project/product-list-types.ts` | Product 和 filter types。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/product-list-mini-project/product-list-seed-data.ts` | 商品与 category seed data。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/product-list-mini-project/product-filter-controls.tsx` | category controls。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/product-list-mini-project/product-card.tsx` | product card 与 stock branch。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/product-list-mini-project/product-grid.tsx` | grid、empty state 与 keyed map。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/product-list-mini-project/product-list-summary.tsx` | derived count summary。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/product-list-mini-project/product-list-mini-project.tsx` | 最终小项目 state owner。 | 已创建并保留。 |
-| `src/learning/react/chapter-05-rendering-data/product-list-mini-project/product-list-mini-project.css` | 最终小项目样式。 | 已创建并保留。 |
-| `README.md` | 第五章状态与文件位置。 | 已更新。 |
-| `src/App.tsx` | 按学习入口约定挂载第五章 root。 | 已更新。 |
+### Code review questions
 
-不需要创建这些概念示例文件：
+- 列表 key 是否来自稳定业务 id，而不是 array index？
+- 条件分支是否覆盖空、错误、加载和成功场景？
+- 过滤和排序是否保持源数据不可变？
 
-- `Snippet: element identity layers`
-- `Snippet: statement inside JSX expression`
-- `Snippet: direct sort mutation`
-- `Template: discriminated list state`
-- `Template: typed keyed list`
+### Migration checks
+
+- 把重复 JSX 迁移为 map 前，先定义 item type 和稳定 id。
+- 把多个 `&&` 条件迁移为更清楚的分支模型，避免互相遮挡。
+- 把派生数据放在 render 计算或 memo 边界，而不是写回原 state。
+
+### Production risk signals
+
+- 筛选后输入框状态跑到其他行，检查 key 是否不稳定。
+- 空列表没有反馈，说明 conditional branch 设计缺失。
+- 排序后数据永久改变，说明派生逻辑污染了源数据。
 
 ## 15. 如何转换成个人笔记
 

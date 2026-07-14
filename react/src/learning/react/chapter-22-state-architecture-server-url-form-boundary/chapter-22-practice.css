@@ -1,0 +1,228 @@
+.chapter-twenty-two-shell {
+  min-height: 100vh;
+  padding: 32px;
+  color: #172033;
+  background:
+    radial-gradient(circle at top left, rgba(79, 70, 229, 0.16), transparent 34rem),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.chapter-twenty-two-hero,
+.chapter-twenty-two-section,
+.state-lab,
+.state-card,
+.state-lab-card {
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+}
+
+.chapter-twenty-two-hero {
+  display: grid;
+  gap: 16px;
+  margin: 0 auto 24px;
+  max-width: 1180px;
+  padding: 36px;
+}
+
+.chapter-twenty-two-eyebrow,
+.state-card-kicker {
+  margin: 0;
+  color: #4338ca;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chapter-twenty-two-hero h1 {
+  margin: 0;
+  max-width: 980px;
+  color: #0f172a;
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 1;
+}
+
+.chapter-twenty-two-hero p,
+.chapter-twenty-two-section p,
+.state-lab p,
+.state-card p,
+.state-lab-card p {
+  color: #475569;
+}
+
+.chapter-twenty-two-layout,
+.chapter-twenty-two-section,
+.state-lab,
+.state-card,
+.state-lab-card,
+.state-form,
+.state-field {
+  display: grid;
+  gap: 16px;
+}
+
+.chapter-twenty-two-layout {
+  margin: 0 auto;
+  max-width: 1180px;
+}
+
+.chapter-twenty-two-section,
+.state-lab {
+  padding: 24px;
+}
+
+.chapter-twenty-two-section h2,
+.state-lab h2,
+.state-card h3,
+.state-lab-card h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.chapter-twenty-two-grid,
+.state-lab-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.state-card,
+.state-lab-card {
+  align-content: start;
+  padding: 18px;
+}
+
+.state-card-wide,
+.state-lab-card-wide {
+  grid-column: 1 / -1;
+}
+
+.state-field {
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.state-field input,
+.state-field select {
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: #0f172a;
+  background: #ffffff;
+  font: inherit;
+}
+
+.state-checkbox,
+.state-button-row,
+.state-pill-row,
+.state-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.state-checkbox {
+  align-items: center;
+  color: #334155;
+  font-weight: 700;
+}
+
+.state-card button,
+.state-lab-card button {
+  justify-self: start;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: #ffffff;
+  background: #4f46e5;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.state-card button[aria-pressed='true'],
+.state-lab-card button[aria-selected='true'] {
+  background: #0f766e;
+}
+
+.state-card :focus-visible,
+.state-lab-card :focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 3px;
+}
+
+.state-pill {
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #3730a3;
+  background: #e0e7ff;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.state-pill-success {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.state-pill-warning {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.state-owner-list,
+.state-review-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.state-owner-list li,
+.state-review-list li {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 10px;
+  background: #f8fafc;
+}
+
+.state-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 16px;
+  font-size: 0.9rem;
+}
+
+.state-table th,
+.state-table td {
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.state-table th {
+  color: #312e81;
+  background: #eef2ff;
+}
+
+.state-error {
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: #991b1b;
+  background: #fee2e2;
+  font-weight: 700;
+}
+
+.chapter-twenty-two-shell code {
+  border-radius: 6px;
+  padding: 2px 5px;
+  color: #312e81;
+  background: #eef2ff;
+}

@@ -54,12 +54,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -87,49 +87,28 @@
   - [12.4 完整执行过程](#124-完整执行过程)
   - [12.5 机制边界与错误识别](#125-机制边界与错误识别)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 真实文件路径 | 代码性质 | 所在章节 |
-| --- | --- | --- | --- |
-| 挂载全部练习 | `src/learning/react/chapter-08-state-architecture/chapter-08-practice-root.tsx` | 本章入口 | 8 |
-| 本章共享样式 | `src/learning/react/chapter-08-state-architecture/chapter-08-practice.css` | 本章入口样式 | 8 |
-| 最小 state 与 derived data | `src/learning/react/chapter-08-state-architecture/01-minimal-state/minimal-cart-state.tsx` | 真实练习 | 9.1 |
-| 避免 redundant、duplicate、contradictory state | `src/learning/react/chapter-08-state-architecture/02-state-shape-boundaries/state-shape-boundaries.tsx` | 真实练习 | 9.2 |
-| state owner 与 lifting state up | `src/learning/react/chapter-08-state-architecture/03-state-owner-lifting/shared-filter-owner.tsx` | 真实练习 | 9.3 |
-| callback props 与 dispatch intent | `src/learning/react/chapter-08-state-architecture/04-callback-dispatch-intent/callback-intent-boundary.tsx` | 真实练习 | 9.4 |
-| UI tree position 与 `key` reset | `src/learning/react/chapter-08-state-architecture/05-preserving-resetting-state/keyed-checkout-draft.tsx` | 真实练习 | 9.5 |
-| `useReducer` 心智模型 | `src/learning/react/chapter-08-state-architecture/06-reducer-mental-model/cart-reducer-transition.tsx` | 真实练习 | 9.6 |
-| pure reducer 与 immutable transition | `src/learning/react/chapter-08-state-architecture/07-pure-reducer-immutability/pure-reducer-immutability.tsx` | 真实练习 | 9.7 |
-| typed discriminated action union | `src/learning/react/chapter-08-state-architecture/08-typed-action-union/typed-action-union.tsx` | 真实练习 | 9.8 |
-| Context provider / consumer boundary | `src/learning/react/chapter-08-state-architecture/09-context-boundary/context-provider-boundary.tsx` | 真实练习 | 9.9 |
-| reducer 与 Context 组合 | `src/learning/react/chapter-08-state-architecture/10-reducer-context/reducer-context-boundary.tsx` | 真实练习 | 9.10 |
-| custom hook 提取 | `src/learning/react/chapter-08-state-architecture/11-custom-hook-extraction/custom-hook-extraction.tsx` | 真实练习 | 9.11 |
-| 每次 hook call 的独立 state | `src/learning/react/chapter-08-state-architecture/12-independent-hook-state/independent-hook-state.tsx` | 真实练习 | 9.12 |
-| Cart State Workspace | `src/learning/react/chapter-08-state-architecture/cart-state-workspace/` | 最终小项目 | 12 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Minimal state | The nearest owner stores only data that cannot be derived. | React state model | Cart totals are derived instead of duplicated. | `src/learning/react/chapter-08-state-architecture/01-minimal-state/minimal-cart-state.tsx` |
+| State owner lifting | The common parent owns state needed by multiple children. | React component tree | Shared filters update multiple cart or checkout views consistently. | `src/learning/react/chapter-08-state-architecture/03-state-owner-lifting/shared-filter-owner.tsx` |
+| Reducer transition | Events become explicit actions and pure transitions. | React reducer hook plus JavaScript pure function | Cart changes are auditable as action records. | `src/learning/react/chapter-08-state-architecture/06-reducer-mental-model/cart-reducer-transition.tsx` |
+| Context delivery | Context distributes state access without making all state global. | React Context runtime | Cart state is provided to the workspace while keeping reducer ownership clear. | `src/learning/react/chapter-08-state-architecture/10-reducer-context/reducer-context-boundary.tsx` |
 
-**学习指导文件：**
+## 0. 本章工程问题与边界
 
-`docs/react/chapter-08-state-architecture/react-chapter-08-learning-guide.md`
+本章解决的工程问题是：状态应该放在哪里、怎样变化、如何传递。随着组件变多，随手加 state 会制造重复来源、错位 owner 和难以测试的更新逻辑。
 
-**源码根目录：**
-
-`src/learning/react/chapter-08-state-architecture/`
-
-**当前项目结构：**
-
-本项目根目录是 `D:\vite_ts`。Vite 负责开发服务器与构建，TypeScript 负责 TS/TSX 静态检查，React 负责 component、state、render 与 Context 运行时语义。`src/App.tsx` 只是当前章节的薄挂载层，不承载本章机制代码。
-
-**本章文档结构：**
-
-本文先建立状态架构模型，再逐节连接可运行文件，最后用 Cart State Workspace 组合机制。概念错误对比使用 `Snippet:`，不会冒充应创建的文件。
+本章不引入外部状态管理库、服务端缓存或持久化方案。边界是 React 内部的 state shape、owner、reducer、Context 和 custom hook 提取。
 
 ## 1. 本章解决的问题
 
@@ -162,16 +141,16 @@
 - 用 custom hook 复用 stateful logic，同时解释为什么 hook call 不自动共享 state。
 - 把这些判断映射到 SellerHub 的 cart、checkout、filter、selection 与 auth 边界。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-1. 先删掉不必要的 state，只保留 source state。
-2. 再设计 state shape，排除重复事实和互相矛盾的布尔值。
-3. 找到最近公共 owner，通过 props 向下传值、callback 向上传意图。
-4. 用 UI tree position 与 `key` 理解 identity，而不是把 reset 当成偶然行为。
-5. 当 transition 规则集中且增多时，将更新逻辑提取为 reducer。
-6. 用 action union 描述“发生了什么”，用 pure reducer 计算 next state。
-7. 只有跨层传递确实变得笨重时，再引入 Context。
-8. 最后提取 custom hook 复用逻辑，并验证每次调用仍有独立 hook state。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Derived data | Minimal state shape | 先识别可计算值，才能避免重复存储。 | 两个 state 来源会互相矛盾。 |
+| Common consumer | Lifted state owner | 多个子组件共享数据时，需要上移到共同 owner。 | 兄弟组件会各自维护不一致副本。 |
+| Event intent | Reducer action | 复杂更新需要先表达发生了什么，再计算新状态。 | setter 分散导致业务规则难审查。 |
+| Stable provider boundary | Context delivery | Context 负责传递，不应该隐藏 reducer 规则。 | 所有组件都会变成隐式依赖全局状态。 |
 
 ## 5. 核心术语表
 
@@ -272,7 +251,7 @@ src/learning/react/chapter-08-state-architecture/
 
 **概念 snippet：**
 
-本文中的错误写法与短机制片段只用 `Snippet:` 标题，不需要在项目中创建，也不会进入最终文件清单。
+本文中的错误写法与短机制片段只用 `Snippet:` 标题，不需要在项目中创建，也不用于交付验证记录。
 
 ## 8. 示例运行方式
 
@@ -3053,60 +3032,25 @@ function reducer(state: State, action: Action): State {
 ```
 </div>
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-**本次修订的学习指导文件：**
+### Code review questions
 
-| 文件路径 | 职责 | 状态 |
-| --- | --- | --- |
-| `docs/react/chapter-08-state-architecture/react-chapter-08-learning-guide.md` | 第 8 章机制讲解、练习索引与最终项目说明 | 已修订并保留 |
+- 当前 state 是否有重复或可派生字段？
+- state owner 是否是所有读写方的最近共同边界？
+- reducer action 是否表达业务意图，而不是 UI 细节？
 
-**本章真实练习与入口文件：**
+### Migration checks
 
-| 文件路径 | 职责 | 状态 |
-| --- | --- | --- |
-| `src/learning/react/chapter-08-state-architecture/chapter-08-practice-root.tsx` | 挂载本章全部练习与最终项目 | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/chapter-08-practice.css` | 本章练习共享样式 | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/01-minimal-state/minimal-cart-state.tsx` | Minimal state 与 derived cart totals | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/02-state-shape-boundaries/state-shape-boundaries.tsx` | State shape 与 single source of truth | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/03-state-owner-lifting/shared-filter-owner.tsx` | 最近公共 owner 与 lifting state | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/04-callback-dispatch-intent/callback-intent-boundary.tsx` | Child intent 与 callback prop | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/05-preserving-resetting-state/keyed-checkout-draft.tsx` | Tree identity 与 key reset | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/06-reducer-mental-model/cart-reducer-transition.tsx` | Reducer queue 与 dispatch snapshot | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/07-pure-reducer-immutability/pure-reducer-immutability.tsx` | Pure reducer 与 immutable references | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/08-typed-action-union/typed-action-union.tsx` | Discriminated union 与 exhaustive reducer | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/09-context-boundary/context-provider-boundary.tsx` | Provider / consumer boundary | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/10-reducer-context/reducer-context-boundary.tsx` | Reducer 与双 Context 组合 | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/11-custom-hook-extraction/custom-hook-extraction.tsx` | Stateful logic 提取 | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/12-independent-hook-state/independent-hook-state.tsx` | 每次 custom hook call 的独立 state | 已存在，本次未修改 |
+- 先删除重复派生 state，再考虑 lifting 或 reducer。
+- 把多个相关 setter 合并为 reducer 前，先定义 action union。
+- Context 迁移时保持 provider 范围最小，避免全应用依赖。
 
-**最终小项目真实文件：**
+### Production risk signals
 
-| 文件路径 | 职责 | 状态 |
-| --- | --- | --- |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/cart-state-model.ts` | Cart state、action union 与初始值 | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/cart-state-reducer.ts` | Pure cart transitions | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/cart-state-context.ts` | Typed state/dispatch Context | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/cart-state-provider.tsx` | Reducer owner 与 provider boundary | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/use-cart-state.ts` | Context consumer hooks 与 runtime guard | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/cart-item-row.tsx` | Child dispatch controls | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/cart-summary.tsx` | Derived count 与 subtotal | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/checkout-draft.tsx` | Keyed local checkout draft | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/cart-state-workspace.tsx` | 最终项目 composition root | 已存在，本次未修改 |
-| `src/learning/react/chapter-08-state-architecture/cart-state-workspace/cart-state-workspace.css` | 最终项目局部样式 | 已存在，本次未修改 |
-
-**关联集成文件：**
-
-| 文件路径 | 职责 | 状态 |
-| --- | --- | --- |
-| `README.md` | 第 8 章学习路线与完成状态 | 已核验，本次未修改 |
-| `src/App.tsx` | 挂载 `Chapter08PracticeRoot` | 已核验，本次未修改 |
-
-**不需要创建的概念片段：**
-
-- `Snippet: redundant cart totals`
-- `Snippet: SellerHub owner map`
-- `Template: typed reducer action`
+- 同一数据显示多个版本，检查 state source of truth。
+- 多个 handler 复制同一业务规则，适合提取 reducer。
+- 任意组件都能改全局状态时，Context owner 已经过宽。
 
 ## 15. 如何转换成个人笔记
 

@@ -14,12 +14,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -48,46 +48,28 @@
   - [12.5 Runtime、类型与工具链边界](#125-runtime类型与工具链边界)
   - [12.6 验证步骤](#126-验证步骤)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| Next.js framework boundary：为什么它不只是 router | `src/learning/react/chapter-13-nextjs-ssr-rsc/01-framework-boundary/framework-boundary-map.tsx` | 真实练习文件 | 9.1  |
-| App Router file-system routing：segment、page、layout | `src/learning/react/chapter-13-nextjs-ssr-rsc/02-app-router-segments/app-router-segment-tree.ts` | 真实练习文件 | 9.2  |
-| App Router file-system routing：segment、page、layout | `src/learning/react/chapter-13-nextjs-ssr-rsc/02-app-router-segments/app-router-segment-tree-panel.tsx` | 真实练习文件 | 9.2  |
-| loading.tsx、error.tsx、not-found.tsx 的 route boundary | `src/learning/react/chapter-13-nextjs-ssr-rsc/03-route-special-files/route-special-file-boundaries.tsx` | 真实练习文件 | 9.3  |
-| Server Component 默认行为与禁止事项 | `src/learning/react/chapter-13-nextjs-ssr-rsc/04-server-component-boundary/server-component-rule-model.ts` | 真实练习文件 | 9.4  |
-| Server Component 默认行为与禁止事项 | `src/learning/react/chapter-13-nextjs-ssr-rsc/04-server-component-boundary/server-component-rule-panel.tsx` | 真实练习文件 | 9.4  |
-| Client Component 与 "use client" module boundary | `src/learning/react/chapter-13-nextjs-ssr-rsc/05-client-component-boundary/client-component-boundary-panel.tsx` | 真实练习文件 | 9.5  |
-| Server -> Client props serialization boundary | `src/learning/react/chapter-13-nextjs-ssr-rsc/06-serialization-boundary/serializable-props-boundary.ts` | 真实练习文件 | 9.6  |
-| Server -> Client props serialization boundary | `src/learning/react/chapter-13-nextjs-ssr-rsc/06-serialization-boundary/serializable-props-panel.tsx` | 真实练习文件 | 9.6  |
-| SSR、CSR、SSG、ISR 与 dynamic rendering | `src/learning/react/chapter-13-nextjs-ssr-rsc/07-rendering-strategies/rendering-strategy-matrix.ts` | 真实练习文件 | 9.7  |
-| SSR、CSR、SSG、ISR 与 dynamic rendering | `src/learning/react/chapter-13-nextjs-ssr-rsc/07-rendering-strategies/rendering-strategy-panel.tsx` | 真实练习文件 | 9.7  |
-| Hydration 与 hydration mismatch | `src/learning/react/chapter-13-nextjs-ssr-rsc/08-hydration-mismatch/hydration-mismatch-lab.ts` | 真实练习文件 | 9.8  |
-| Hydration 与 hydration mismatch | `src/learning/react/chapter-13-nextjs-ssr-rsc/08-hydration-mismatch/hydration-mismatch-panel.tsx` | 真实练习文件 | 9.8  |
-| Browser-only API guard：window、localStorage、time、random | `src/learning/react/chapter-13-nextjs-ssr-rsc/09-browser-api-guard/browser-api-guard-model.ts` | 真实练习文件 | 9.9  |
-| Browser-only API guard：window、localStorage、time、random | `src/learning/react/chapter-13-nextjs-ssr-rsc/09-browser-api-guard/browser-api-guard-panel.tsx` | 真实练习文件 | 9.9  |
-|  Suspense streaming 与 segment-level pending UI | `src/learning/react/chapter-13-nextjs-ssr-rsc/10-suspense-streaming-boundary/streaming-boundary-model.tsx` | 真实练习文件 | 9.10 |
-|  Server fetch、cache、revalidate 与 client fetch 的区别 | `src/learning/react/chapter-13-nextjs-ssr-rsc/11-server-fetch-cache/server-fetch-cache-model.ts` | 真实练习文件 | 9.11 |
-|  Server fetch、cache、revalidate 与 client fetch 的区别 | `src/learning/react/chapter-13-nextjs-ssr-rsc/11-server-fetch-cache/server-fetch-cache-panel.tsx` | 真实练习文件 | 9.11 |
-|  Route Handlers、Proxy / Middleware、Metadata 与 deployment runtime | `src/learning/react/chapter-13-nextjs-ssr-rsc/12-route-runtime-boundaries/route-runtime-boundary-map.tsx` | 真实练习文件 | 9.12 |
-|  SellerHub Next.js architecture mapping | `src/learning/react/chapter-13-nextjs-ssr-rsc/sellerhub-nextjs-architecture-lab/sellerhub-nextjs-boundary-map.ts` | 真实练习文件 | 9.13 |
-| SellerHub Next.js Architecture Lab | `src/learning/react/chapter-13-nextjs-ssr-rsc/sellerhub-nextjs-architecture-lab/sellerhub-nextjs-route-tree.ts` | 最终小项目真实文件 | 12.3 |
-| SellerHub Next.js Architecture Lab | `src/learning/react/chapter-13-nextjs-ssr-rsc/sellerhub-nextjs-architecture-lab/sellerhub-nextjs-boundary-map.ts` | 最终小项目真实文件 | 12.3 |
-| SellerHub Next.js Architecture Lab | `src/learning/react/chapter-13-nextjs-ssr-rsc/sellerhub-nextjs-architecture-lab/sellerhub-nextjs-architecture-lab.tsx` | 最终小项目真实文件 | 12.3 |
-| adapter / shell | `src/learning/react/chapter-13-nextjs-ssr-rsc/chapter-13-practice-root.tsx` | adapter / shell | 8 |
-| adapter / shell | `src/learning/react/chapter-13-nextjs-ssr-rsc/chapter-13-practice.css` | adapter / shell | 8 |
-| Vite app mounting adapter | `src/App.tsx` | adapter / shell | 8 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Framework boundary | Next.js owns routing, server rendering, and file conventions beyond client React. | Framework runtime | The Vite learning app models the concepts without becoming a Next.js app. | `src/learning/react/chapter-13-nextjs-ssr-rsc/01-framework-boundary/framework-boundary-map.tsx` |
+| Server component rule | Server components cannot use client-only hooks or browser APIs. | React Server Components boundary | SellerHub architecture separates server-readable data from client interaction. | `src/learning/react/chapter-13-nextjs-ssr-rsc/04-server-component-boundary/server-component-rule-panel.tsx` |
+| Serialization boundary | Data crossing server-to-client must be serializable. | React/Next.js transport boundary | Props sent to client components must avoid functions and browser objects. | `src/learning/react/chapter-13-nextjs-ssr-rsc/06-serialization-boundary/serializable-props-panel.tsx` |
+| Hydration mismatch | Client markup must match the server-rendered HTML at hydration. | Browser hydration runtime | Time, random values, and browser-only reads need explicit guards. | `src/learning/react/chapter-13-nextjs-ssr-rsc/08-hydration-mismatch/hydration-mismatch-panel.tsx` |
 
-本章位于 `D:/vite_ts` 的 React 学习路线第 13 章。学习指导文件是 `docs/react/chapter-13-nextjs-ssr-rsc/react-chapter-13-learning-guide.md`，练习源码根目录是 `src/learning/react/chapter-13-nextjs-ssr-rsc/`。当前项目仍是 React + TypeScript + Vite 学习项目，不是 Next.js app。
+## 0. 本章工程问题与边界
+
+本章解决的工程问题是：React 本身和 Next.js framework boundary 不是一回事。SSR、RSC、App Router、special files、streaming、cache 和 runtime placement 都属于框架语义，需要诚实标注边界。
+
+本章不把当前 Vite 项目迁移为 Next.js，也不伪造 server component 真运行。边界是用可运行的模型解释 Next.js/React Server Components 的工程约束。
 
 ## 1. 本章解决的问题
 
@@ -101,9 +83,16 @@
 
 完成本章后，你应能解释 Next.js 为什么不是 React Router 的简单替代；能读懂 App Router fixed files；能区分 Server Component 和 Client Component；能判断 serializable props；能诊断 hydration mismatch；能把 SellerHub catalog、orders、checkout、login 和 API 映射到 server/client/runtime owner。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-先学 framework boundary，再学 App Router segment 和 fixed route files；随后学习 Server/Client Component、`"use client"` 和 serialization；再学习 rendering strategies、hydration、browser API guard 和 streaming；最后学习 server cache、Route Handler、Proxy/Middleware、Metadata、runtime 和 SellerHub architecture。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Client React app | Framework-owned routing | 先知道普通 client React 的边界，才能理解 Next.js 接管了哪些层。 | 会把 Vite route 写法套到 App Router。 |
+| Server-only code | Client component boundary | 必须先区分运行位置，才能判断 hook 和 browser API 是否可用。 | 会在 server component 中使用 client-only API。 |
+| Serializable data | Server-to-client props | 跨边界传输要求可序列化。 | 会把函数、class instance 或 DOM 对象传给 client component。 |
+| Server HTML | Hydration | 浏览器接管前必须匹配初始 markup。 | 会产生 hydration mismatch。 |
 
 ## 5. 核心术语表
 
@@ -2350,54 +2339,25 @@ JavaScript runtime 执行数组映射和 component function；React 渲染当前
 | Route Handler 是否返回 JSX？ | 不应返回 JSX。 |
 | Proxy/Middleware 是否等于权限安全？ | 不等于，敏感数据仍要 server 校验。 |
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-### 本次创建的学习指导文件
+### Code review questions
 
-- `docs/react/chapter-13-nextjs-ssr-rsc/react-chapter-13-learning-guide.md`
+- 这段代码运行在 server、client、edge，还是 build-time？
+- 跨 server/client 边界的数据是否可序列化？
+- browser API 是否被 client boundary 或 effect guard 包住？
 
-### 本章创建的真实练习文件
+### Migration checks
 
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/01-framework-boundary/framework-boundary-map.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/02-app-router-segments/app-router-segment-tree.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/02-app-router-segments/app-router-segment-tree-panel.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/03-route-special-files/route-special-file-boundaries.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/04-server-component-boundary/server-component-rule-model.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/04-server-component-boundary/server-component-rule-panel.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/05-client-component-boundary/client-component-boundary-panel.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/06-serialization-boundary/serializable-props-boundary.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/06-serialization-boundary/serializable-props-panel.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/07-rendering-strategies/rendering-strategy-matrix.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/07-rendering-strategies/rendering-strategy-panel.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/08-hydration-mismatch/hydration-mismatch-lab.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/08-hydration-mismatch/hydration-mismatch-panel.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/09-browser-api-guard/browser-api-guard-model.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/09-browser-api-guard/browser-api-guard-panel.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/10-suspense-streaming-boundary/streaming-boundary-model.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/11-server-fetch-cache/server-fetch-cache-model.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/11-server-fetch-cache/server-fetch-cache-panel.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/12-route-runtime-boundaries/route-runtime-boundary-map.tsx`
+- 从 Vite 迁移到 Next.js 前，先画出 route segment、server data 和 client interaction 边界。
+- 不要把每个组件都加 `'use client'`；先定位真正需要交互或 browser API 的叶子。
+- 把 framework-only API 标为边界知识，不在 Vite 示例里伪造运行。
 
-### 本章创建的最终小项目真实文件
+### Production risk signals
 
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/sellerhub-nextjs-architecture-lab/sellerhub-nextjs-route-tree.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/sellerhub-nextjs-architecture-lab/sellerhub-nextjs-boundary-map.ts`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/sellerhub-nextjs-architecture-lab/sellerhub-nextjs-architecture-lab.tsx`
-
-### Adapter / shell 文件
-
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/chapter-13-practice-root.tsx`
-- `src/learning/react/chapter-13-nextjs-ssr-rsc/chapter-13-practice.css`
-- `src/App.tsx`
-- `README.md`
-
-### 不需要创建的概念 snippet
-
-- `Snippet: conceptual Next.js app tree`
-- `Snippet: conceptual SellerHub App Router tree`
-- 根目录 `app/`
-- 根目录 `pages/`
-- `next.config.*`
+- hydration warning，检查时间、随机数、localStorage、window 读取。
+- server component 报 hook 错误，检查 client boundary。
+- bundle 变大，检查是否过度扩大 client component 范围。
 
 ## 15. 如何转换成个人笔记
 

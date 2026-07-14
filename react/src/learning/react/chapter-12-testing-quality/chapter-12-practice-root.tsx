@@ -1,4 +1,3 @@
-import { MemoryRouter } from 'react-router'
 import { TestingBoundaryMap } from './01-test-boundary/testing-boundary-map'
 import { VisibleSummaryPanel } from './03-component-render-screen/visible-summary-panel'
 import { AccessibleLoginForm } from './04-accessible-queries/accessible-login-form'
@@ -36,9 +35,7 @@ export function Chapter12PracticeRoot() {
       <AsyncOrderStatusPanel loadOrders={() => Promise.resolve(sampleOrders)} />
       <SellerFilterForm onApply={() => {}} />
 
-      <MemoryRouter initialEntries={['/seller/orders/1001']}>
-        <SellerRouteWorkspace isAuthenticated />
-      </MemoryRouter>
+      <SellerRouteWorkspace isAuthenticated location="/seller/orders/1001" />
 
       <SellerPreferencesProvider value={{ compactMode: true, currency: 'USD' }}>
         <SellerPreferenceSummary />

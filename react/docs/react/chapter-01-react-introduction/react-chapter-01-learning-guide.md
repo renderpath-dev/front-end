@@ -62,11 +62,12 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -93,33 +94,28 @@
   - [常见错误](#常见错误)
   - [可选扩展](#可选扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 0. 文件定位
+## 本章机制地图
 
-本文件是当前 `React + TypeScript + Vite` 学习项目的 React 第一章学习指导。它放在 `docs/react/chapter-01-react-introduction/` 下，目标是建立第一层 React 心智模型，而不是提前学习完整应用架构。
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-本章适合已经能读懂基础 HTML、CSS、JavaScript function、object、module import/export，并准备进入 React 的学习者。它解释 React 为什么存在、React app 如何在浏览器中启动、`Vite`、`React`、`TypeScript` 在当前项目里分别负责什么。
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| React root rendering | React owns the mounted UI tree; Vite only loads the entry module. | React DOM runtime | The learning app starts from one DOM container and then renders components. | `src/sudoku/main.tsx`, `src/App.tsx` |
+| Vite entry boundary | The browser requests `index.html`; Vite resolves the module graph. | Build tool and dev server | Changing an entry import changes which React tree runs, not how React itself works. | `index.html`, `src/sudoku/main.tsx` |
+| TypeScript compile-time boundary | TypeScript checks TSX before the browser executes JavaScript. | Tooling and type system | Type errors help before runtime, but they do not create React behavior. | `tsconfig.app.json` |
+| StrictMode probe | React intentionally rechecks render purity in development. | React development runtime | Starter code may appear to run twice in dev while production behavior stays different. | `src/sudoku/main.tsx` |
 
-本章不深入：
+## 0. 本章工程问题与边界
 
-- hooks、state、effect、context、reducer。
-- router、Next.js、Redux、React Native、Vue。
-- Tailwind、CSS Modules、组件库、测试框架。
-- 服务端渲染、React Server Components、数据库、鉴权、部署。
+本章解决的核心困惑是：React、Vite、TypeScript、DOM root 各自负责什么。React 负责把组件结果提交到 DOM；Vite 负责加载和打包模块；TypeScript 负责静态检查；浏览器 DOM 是最终宿主环境。
 
-本章会少量提到 `props`、`StrictMode`、`createRoot`、JSX 转换，但只用于说明运行边界，不进入后续章节的细节。
-
-当前项目证据：
-
-- `package.json` 使用 `react`、`react-dom`、`typescript`、`vite`、`@vitejs/plugin-react`。
-- `src/main.tsx` 是浏览器端 React 入口。
-- `index.html` 通过 `<script type="module" src="/src/main.tsx"></script>` 进入 Vite 模块图。
-- `tsconfig.app.json` 使用 `jsx: "react-jsx"`、`strict: true`、`noEmit: true`。
+本章边界是入门工程边界，不进入业务状态设计、复杂路由、后端接口、部署策略或大型架构。学习重点是能解释 starter 项目为什么能启动，以及修改入口、组件、类型配置时分别影响哪一层。
 
 ## 1. 本章解决的问题
 
@@ -166,18 +162,16 @@ React 是一个用于构建用户界面（user interface, UI）的 JavaScript li
 - 说明 React 与 HTML、CSS、JavaScript 的关系。
 - 说明 React 不等于 Next.js，也不等于 React Native。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-推荐顺序：
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
 
-1. 先理解浏览器原生模型：HTML 变成 DOM tree，CSS 负责样式，JavaScript 通过 DOM API 改页面。
-2. 再理解传统手写 DOM 更新的问题：状态和页面容易不同步，更新逻辑分散。
-3. 再理解 React 的核心抽象：component 是把 UI 拆成可组合单元的方式。
-4. 再理解 JSX：它是写 UI 描述的语法扩展，需要工具转换。
-5. 再理解当前项目入口：`index.html` 加载 `main.tsx`，`createRoot` 接管 `#root`。
-6. 最后理解边界：React 负责 UI runtime，TypeScript 负责类型检查，Vite 负责开发服务器与构建，浏览器负责执行最终 JavaScript 和 DOM API。
-
-这个顺序能避免一开始就陷入 hooks、状态管理或路由。第一章的重点是把边界看清楚。
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Browser DOM container | React root mounting | React 必须先拿到真实 DOM 容器，才能创建 root 并管理后续提交。 | 会把 `index.html`、Vite 和 React root 混成同一个概念。 |
+| ES module entry | Vite module graph | 入口 import 决定哪些模块进入运行图。 | 会误以为新增文件会自动参与运行。 |
+| JSX transform | Component return value | JSX 是表达 UI 结构的 JavaScript 语法扩展，最终仍要变成可执行代码。 | 会把 JSX 当成浏览器原生 HTML。 |
+| Type checking | Runtime execution | TypeScript 只在工具链阶段发现问题，浏览器运行的是编译后的 JavaScript。 | 会期待类型在运行时自动校验数据。 |
 
 ## 5. 核心术语表
 
@@ -2693,37 +2687,25 @@ export default function InfoPanel({ title, description }: InfoPanelProps) {
 
 适合演示 TypeScript 如何检查 component 输入。不要误以为 `InfoPanelProps` 会在浏览器运行时验证外部数据。
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-本次实际创建或建议最终保留的文件如下。资料来源、配置文件和概念示例不列入最终文件清单。
+### Code review questions
 
-| File | Role | Status |
-| --- | --- | --- |
-| `docs/react/chapter-01-react-introduction/react-chapter-01-learning-guide.md` | 本章学习指导文件。 | 已创建并保留。 |
-| `src/main.tsx` | 最终小项目练习的 React root 入口。 | 仅在执行第 12 节练习时替换；本次未修改。 |
-| `src/App.tsx` | 最终小项目练习的 root component。 | 仅在执行第 12 节练习时替换；本次未修改。 |
-| `src/App.css` | 最终小项目练习的 component-level 样式。 | 仅在执行第 12 节练习时替换；本次未修改。 |
-| `src/index.css` | 最终小项目练习的全局样式。 | 仅在执行第 12 节练习时替换；本次未修改。 |
+- 入口文件是否只负责挂载和全局壳层，不夹带章节业务逻辑？
+- 组件错误是 React runtime 问题、Vite module 问题，还是 TypeScript 类型问题？
+- 开发模式下的重复渲染是否来自 StrictMode 诊断，而不是业务代码重复注册？
 
-不需要创建这些概念示例文件：
+### Migration checks
 
-- `manual-dom-example.ts`
-- `wrong-model.tsx`
-- `correct-model.tsx`
-- `object-child-mistake.tsx`
-- `object-child-correct.tsx`
-- `LearningCard.tsx`
-- `lowercase-component-mistake.tsx`
-- `capitalized-component.tsx`
-- `jsx-input.tsx`
-- `html-in-jsx-mistake.tsx`
-- `html-in-jsx-correct.tsx`
-- `root-mistake.tsx`
-- `root-correct.tsx`
-- `type-error-example.ts`
-- `runtime-type-mistake.ts`
-- `runtime-type-correct.ts`
-- `InfoPanel.tsx`
+- 清理 starter template 时，先保留 root mounting，再逐步替换展示组件。
+- 迁移入口路径时，同时检查 `index.html` script 引用和实际 TSX 入口。
+- 不要把 Vite 配置项当作 React API，也不要用 React 组件承担构建工具职责。
+
+### Production risk signals
+
+- 页面空白但控制台有 module import 错误，优先检查 Vite module graph。
+- DOM root 不存在时，问题在宿主 HTML 或挂载时机，不在组件 JSX。
+- 类型检查通过但运行失败时，继续检查运行时数据和浏览器 API。
 
 ## 15. 如何转换成个人笔记
 

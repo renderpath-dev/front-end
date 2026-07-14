@@ -54,12 +54,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -88,48 +88,28 @@
   - [12.5 Runtime、类型与工具链边界](#125-runtime类型与工具链边界)
   - [12.6 验证步骤](#126-验证步骤)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 区分 render work 与 DOM commit | `src/learning/react/chapter-11-performance-memoization/01-render-commit-boundary/render-commit-boundary.tsx` | 核心机制练习 | 9.1 |
-| 理解 parent render 对 child function 的默认影响 | `src/learning/react/chapter-11-performance-memoization/02-parent-child-render/parent-child-render-boundary.tsx` | 核心机制练习 | 9.2 |
-| 观察 type、position 与 key identity | `src/learning/react/chapter-11-performance-memoization/03-reconciliation-key-identity/reconciliation-key-identity.tsx` | 核心机制练习 | 9.3 |
-| 验证 memo 的 shallow props comparison | `src/learning/react/chapter-11-performance-memoization/04-react-memo-shallow-compare/react-memo-shallow-compare.tsx` | 核心机制练习 | 9.4 |
-| 比较 object reference identity | `src/learning/react/chapter-11-performance-memoization/05-referential-equality-props/referential-equality-props.tsx` | 核心机制练习 | 9.5 |
-| 缓存昂贵纯派生结果 | `src/learning/react/chapter-11-performance-memoization/06-usememo-derived-data/usememo-expensive-derived-data.tsx` | 核心机制练习 | 9.6 |
-| 观察 callback identity dependency | `src/learning/react/chapter-11-performance-memoization/07-usecallback-identity/usecallback-function-identity.tsx` | 核心机制练习 | 9.7 |
-| 组合 memo 与稳定 callback | `src/learning/react/chapter-11-performance-memoization/08-memo-callback-composition/memo-callback-composition.tsx` | 核心机制练习 | 9.8 |
-| 用 state colocation 缩小 render owner | `src/learning/react/chapter-11-performance-memoization/09-state-colocation/state-colocation-render-scope.tsx` | 核心机制练习 | 9.9 |
-| 稳定 Context provider value | `src/learning/react/chapter-11-performance-memoization/10-context-value-boundary/context-value-identity-boundary.tsx` | 核心机制练习 | 9.10 |
-| 用 Profiler 获取 commit timing | `src/learning/react/chapter-11-performance-memoization/11-profiler-evidence/profiler-render-evidence.tsx` | 核心机制练习 | 9.11 |
-| 观察 lazy module Promise 与 Suspense | `src/learning/react/chapter-11-performance-memoization/12-lazy-suspense-code-splitting/lazy-suspense-code-splitting.tsx` | 核心机制练习 | 9.12 |
-| 提供 lazy 默认导出模块 | `src/learning/react/chapter-11-performance-memoization/12-lazy-suspense-code-splitting/lazy-dashboard-panel.tsx` | 核心机制练习 | 9.12 |
-| 挂载章节 Router、练习页和最终 workspace | `src/learning/react/chapter-11-performance-memoization/chapter-11-practice-root.tsx` | 入口 adapter | 7、8、14 |
-| 提供章节和 workspace 通用样式 | `src/learning/react/chapter-11-performance-memoization/chapter-11-practice.css` | 章节 shell CSS | 7、14 |
-| 提供 SellerHub typed mock data | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/sellerhub-performance-data.ts` | 最终小项目 | 12 |
-| 隔离昂贵产品派生计算 | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/derive-visible-products.ts` | 最终小项目 | 12 |
-| 建立产品 row memo boundary | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/memoized-product-row.tsx` | 最终小项目 | 12 |
-| 组合 catalog draft、URL 与 memoization | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/product-catalog-performance-page.tsx` | 最终小项目 | 12 |
-| 建立订单 row memo boundary | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/memoized-order-row.tsx` | 最终小项目 | 12 |
-| 对比 cheap filter 与 stable callback | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/seller-orders-performance-page.tsx` | 最终小项目 | 12 |
-| 定义 preferences Context contract | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/performance-preferences-context.ts` | 最终小项目 | 12 |
-| 稳定 Provider value identity | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/performance-preferences-provider.tsx` | 最终小项目 | 12 |
-| 展示 dashboard expensive calculation | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/dashboard-performance-page.tsx` | 最终小项目 | 12 |
-| 提供 eager route shell | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/sellerhub-performance-layout.tsx` | 最终小项目 | 12 |
-| 组合 lazy routes、Suspense 与 Profiler | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/sellerhub-performance-workspace.tsx` | 最终小项目 | 12 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Render evidence | Profiler and visible counters show whether a render problem exists. | React render and commit phases | SellerHub pages measure catalog, orders, and dashboard work before optimizing. | `src/learning/react/chapter-11-performance-memoization/11-profiler-render-evidence/profiler-render-evidence.tsx` |
+| Memo boundary | A component owner decides whether shallow prop comparison is useful. | React memoization runtime | Catalog rows only skip work when prop identity stays stable. | `src/learning/react/chapter-11-performance-memoization/04-react-memo-shallow-compare/react-memo-shallow-compare.tsx` |
+| Referential equality | Parent components own object and function identity passed to children. | JavaScript reference model | Callback and derived data identities determine whether memo can help. | `src/learning/react/chapter-11-performance-memoization/05-referential-equality-props/referential-equality-props.tsx` |
+| Lazy route splitting | Route pages own load boundaries through lazy and Suspense. | Bundler and React Suspense | Catalog, orders, and dashboard can load as separate workspace pages. | `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/sellerhub-performance-workspace.tsx` |
 
-本章位于 routing 之后。第 10 章让 Catalog、Orders 与 Dashboard 成为不同 route branches；第 11 章开始判断这些 branches 中的 work 究竟来自 component calculation、descendant render、reconciliation、DOM commit、browser layout/paint，还是首次加载的 JavaScript chunk。
+## 0. 本章工程问题与边界
 
-本章使用当前项目已有的 React 19.2、TypeScript、Vite 与 React Router，不新增依赖，也不配置 React Compiler。官方文档指出 React Compiler 可以自动应用等价 memoization，但当前项目没有 compiler setup；因此本章的手工 API 只用于理解机制与有证据的优化，不作为全局默认写法。
+本章解决的工程问题是：性能优化必须基于 render evidence，而不是先到处加 `memo`、`useMemo`、`useCallback`。React render、commit、prop identity、state colocation 和 route splitting 是不同层的问题。
+
+本章不重写业务功能、不引入状态库、不把 workspace 改成静态页面。边界是测量证据、memoization 成本、Context value identity、Profiler 和 lazy route splitting。
 
 ## 1. 本章解决的问题
 
@@ -164,11 +144,16 @@
 10. 解释 `lazy` 的 module Promise cache、Suspense fallback 和 Vite chunk output。
 11. 为 SellerHub 的 product rows、order rows、dashboard metrics 与 route pages选择不同优化层。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-先学 render/commit 与 parent-child 默认调用，避免把“re-render”直接等同于“重建 DOM”。接着学 reconciliation/key，因为 memoization 建立在 tree identity 正确之上。然后依次学习 memo shallow comparison、reference identity、useMemo、useCallback 与组合条件。最后处理更高层的 state colocation、Context boundary、Profiler evidence 和 code splitting。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
 
-推荐顺序是：`render -> reconciliation -> identity -> memo comparison -> cache dependencies -> owner boundaries -> measurement -> chunk loading`。这个顺序让优化成为推理结果，而不是 API 清单。
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Render/commit evidence | Memoization decision | 先证明 render 成本或频率，再决定是否加 memo。 | 会优化不存在的问题并增加依赖复杂度。 |
+| Referential equality | React memo shallow compare | memo 只能比较 props 引用和浅层值。 | 对象和函数每次重建会让 memo 失效。 |
+| State ownership | State colocation | 把变化状态移近使用方可缩小 render scope。 | 父级状态会让无关子树重复渲染。 |
+| Route boundary | Lazy/Suspense split | 代码拆分需要稳定的 route page 边界。 | 会拆出无意义 chunk 或造成空白路由。 |
 
 ## 5. 核心术语表
 
@@ -279,7 +264,7 @@ docs/react/chapter-11-performance-memoization/
 
 ### 概念示例结构
 
-错误对比若使用 `Snippet:`，只解释无效优化或错误 dependency，不表示需要创建真实文件，也不会进入最终文件清单。
+错误对比若使用 `Snippet:`，只解释无效优化或错误 dependency，不表示需要创建真实文件，也不用于交付验证记录。
 
 ### 最终小项目结构
 
@@ -2122,42 +2107,25 @@ export function SellerHubPerformanceWorkspace() {
 | 首屏 JS 大 | 哪些 page 并非首屏必需 | route-level `lazy`/`Suspense` |
 | 只看到 console render log | DOM/用户体验真的慢吗 | Profiler + browser Performance |
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-### 本次创建的学习指导文件
+### Code review questions
 
-- `docs/react/chapter-11-performance-memoization/react-chapter-11-learning-guide.md`
+- 优化前是否有 Profiler、render counter 或用户可感知卡顿证据？
+- memo 边界的 props identity 是否稳定到足以跳过 render？
+- 慢的是 render 计算、commit、数据派生，还是 bundle loading？
 
-### 本章真实练习与最终项目文件
+### Migration checks
 
-- `src/learning/react/chapter-11-performance-memoization/chapter-11-practice-root.tsx`
-- `src/learning/react/chapter-11-performance-memoization/chapter-11-practice.css`
-- `src/learning/react/chapter-11-performance-memoization/01-render-commit-boundary/render-commit-boundary.tsx`
-- `src/learning/react/chapter-11-performance-memoization/02-parent-child-render/parent-child-render-boundary.tsx`
-- `src/learning/react/chapter-11-performance-memoization/03-reconciliation-key-identity/reconciliation-key-identity.tsx`
-- `src/learning/react/chapter-11-performance-memoization/04-react-memo-shallow-compare/react-memo-shallow-compare.tsx`
-- `src/learning/react/chapter-11-performance-memoization/05-referential-equality-props/referential-equality-props.tsx`
-- `src/learning/react/chapter-11-performance-memoization/06-usememo-derived-data/usememo-expensive-derived-data.tsx`
-- `src/learning/react/chapter-11-performance-memoization/07-usecallback-identity/usecallback-function-identity.tsx`
-- `src/learning/react/chapter-11-performance-memoization/08-memo-callback-composition/memo-callback-composition.tsx`
-- `src/learning/react/chapter-11-performance-memoization/09-state-colocation/state-colocation-render-scope.tsx`
-- `src/learning/react/chapter-11-performance-memoization/10-context-value-boundary/context-value-identity-boundary.tsx`
-- `src/learning/react/chapter-11-performance-memoization/11-profiler-evidence/profiler-render-evidence.tsx`
-- `src/learning/react/chapter-11-performance-memoization/12-lazy-suspense-code-splitting/lazy-dashboard-panel.tsx`
-- `src/learning/react/chapter-11-performance-memoization/12-lazy-suspense-code-splitting/lazy-suspense-code-splitting.tsx`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/sellerhub-performance-data.ts`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/derive-visible-products.ts`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/memoized-product-row.tsx`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/product-catalog-performance-page.tsx`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/memoized-order-row.tsx`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/seller-orders-performance-page.tsx`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/performance-preferences-context.ts`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/performance-preferences-provider.tsx`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/dashboard-performance-page.tsx`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/sellerhub-performance-layout.tsx`
-- `src/learning/react/chapter-11-performance-memoization/sellerhub-performance-workspace/sellerhub-performance-workspace.tsx`
+- 先测量，再选择 state colocation、derived data memo、component memo 或 route split。
+- 删除没有证据的 `useMemo` 和 `useCallback`，尤其是只包轻量表达式的用法。
+- 保留 workspace 的 lazy、Suspense、Profiler 和 catalog/orders/dashboard route page 边界。
 
-`src/App.tsx` 与 `README.md` 是已有根文件的必要更新，不属于本章源码清单；文档中的 conceptual contrast 没有伪装为真实文件，也不进入清单。
+### Production risk signals
+
+- Profiler 显示无关子树频繁 commit，检查 state owner 和 Context value identity。
+- 加了 memo 仍然 render，检查对象、数组、函数引用是否每次重建。
+- 首次进入页面慢但交互正常，检查 route-level splitting 和 Suspense fallback。
 
 ## 15. 如何转换成个人笔记
 

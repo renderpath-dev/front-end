@@ -2,11 +2,15 @@ import { Link, Navigate, Route, Routes, useLocation, useParams } from 'react-rou
 
 type SellerRouteWorkspaceProps = {
   isAuthenticated?: boolean
+  location?: string
 }
 
-export function SellerRouteWorkspace({ isAuthenticated = false }: SellerRouteWorkspaceProps) {
+export function SellerRouteWorkspace({
+  isAuthenticated = false,
+  location,
+}: SellerRouteWorkspaceProps) {
   return (
-    <Routes>
+    <Routes location={location}>
       <Route element={<CatalogRoute />} path="/catalog" />
       <Route element={<SellerOrderRoute />} path="/seller/orders/:orderId" />
       <Route

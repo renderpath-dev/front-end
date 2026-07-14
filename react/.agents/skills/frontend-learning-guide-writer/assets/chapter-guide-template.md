@@ -1,6 +1,6 @@
 # React 第 6 章：Forms 与 Controlled Components
 
-生成实际章节时，必须把上面的示范标题替换为当前技术主题、章节数字和具体章节名称，并保持目录名、文件名、H1、代码定位索引和最终文件清单一致。
+生成实际章节时，必须把上面的示范标题替换为当前技术主题、章节数字和具体章节名称，并保持目录名、文件名、H1、机制地图和工程迁移与代码审查要点一致。
 
 <style>
 .macos-code-window {
@@ -56,11 +56,12 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -73,21 +74,21 @@
 - [11. 常见错误表](#11-常见错误表)
 - [12. 最终小项目](#12-最终小项目)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| Template row: replace with actual concept | `Template: replace with a verified real path or snippet label` | 模板占位 | 9.x |
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Template mechanism: replace with actual chapter concept | Replace with the owner or boundary | syntax / runtime / type system / framework convention / platform API / tooling | Replace with the real project scenario | `Template: selected source reading path` |
 
-生成实际章节时，必须根据实际标题、小节和真实文件路径更新目录和代码定位索引，不能保留 placeholder。
+生成实际章节时，必须根据当前章节替换上面的 mechanism rows。这里不是文件清单，不列出每个文件，不写文件状态；只在 source reading path 能帮助理解机制时才选择性引用。
 
-## 0. 文件定位
+## 0. 本章工程问题与边界
 
 说明本文件在学习路径中的位置、适合的学习阶段、前后章节关系，以及本章不覆盖的内容边界。
 
@@ -103,9 +104,9 @@
 
 列出学习者完成本章后应该能解释、判断、编写、调试和迁移的能力。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-给出推荐学习顺序，并说明为什么这个顺序能降低理解成本。
+用 dependency table 或短小节说明概念之间的依赖关系：先理解什么，再理解什么，为什么依赖成立，如果跳过会破坏哪条机制判断。
 
 ## 5. 核心术语表
 
@@ -463,7 +464,7 @@ Browser 提供候选值，JavaScript handler 读取它，React setter 更新 sta
 
 ### 最终小项目结构
 
-真实文件路径必须与下面结构完全一致。生成实际章节时必须替换所有 placeholder，并在本地创建或验证每个路径；不存在的示例只能标为 `Snippet:` 或 `Template:`。
+最终小项目结构用于解释文件职责和数据流。生成实际章节时必须替换 placeholder；文件存在性和交付证据放到最终回复自检中验证。
 
 <div class="macos-code-window">
   <div class="macos-code-titlebar">
@@ -537,20 +538,18 @@ npm run dev
 
 使用 `assets/cheatsheet-template.md` 的结构。
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-只列出本次实际创建的文档文件，以及最终 mini project 中建议保留或替换的真实练习文件。不要混入配置文件、资料来源、官方文档或概念 snippets。生成实际章节时必须删除下面的 placeholder rows，并用已经在本地验证存在的真实路径替换。
+不要列文件清单。这里用于帮助学习者把本章机制迁移到真实项目的 code review、refactor、migration 和架构判断中。
 
-| File | Role | Status |
-| --- | --- | --- |
-| `docs/topic/chapter-name/chapter-learning-guide.md` | 本章学习指导文件。 | 已创建并保留。 |
-| `src/concepts/concept-name/concept-practice-file.tsx` | 最终小项目真实练习文件。 | 仅在执行最终小项目练习时创建或替换。 |
+建议包含：
 
-不需要创建这些概念示例文件：
-
-- `Snippet: concept mechanism`
-- `Snippet: common mistake`
-- `Template: basic pattern`
+- code review questions；
+- migration checks；
+- common production risk signals；
+- when to keep this pattern；
+- when to refactor away from this pattern；
+- what evidence to collect before changing production code。
 
 ## 15. 如何转换成个人笔记
 

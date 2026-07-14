@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Route, Routes } from 'react-router'
+import { Link, Route, Routes } from 'react-router'
 import { ClientRoutingBoundary } from './01-client-routing-boundary/client-routing-boundary'
 import { RouteMatchingTree } from './02-route-matching-tree/route-matching-tree'
 import { LinkNavLinkIntent } from './03-link-navlink-intent/link-navlink-intent'
@@ -70,9 +70,5 @@ function Chapter10Router() {
 }
 
 export function Chapter10PracticeRoot() {
-  return (
-    <BrowserRouter>
-      <Chapter10Router />
-    </BrowserRouter>
-  )
+  return <Chapter10Router />
 }

@@ -44,7 +44,7 @@ This is an instruction-only skill. Do not add scripts or new project dependencie
 4. Write the guide.
    - The guide body must be Chinese.
    - For a full chapter guide, write a specific H1 containing the technology/topic, chapter number, and concrete chapter name. Do not use generic titles such as `React 学习指导`, `Chapter Learning Guide`, `Forms Guide`, or `React Chapter`.
-   - For a newly created chapter, keep the chapter identity consistent across the directory name, file name, H1, directory, code location index, and final file list. When revising an existing guide, do not rename an established path only to satisfy this rule; make the H1 and in-document file locations identify the specific chapter.
+   - For a newly created chapter, keep the chapter identity consistent across the directory name, file name, H1, mechanism map, engineering boundary section, dependency map, and engineering review section. When revising an existing guide, do not rename an established path only to satisfy this rule; make the H1 and in-document source reading paths identify the specific chapter.
    - Use Chinese for ordinary structural headings in the final guide. Keep important technical terms in English or Chinese with English in parentheses on first introduction.
    - Do not leave English template headings such as `File Positioning`, `What Problem This Chapter Solves`, `Clear Conclusion`, or `Technical Meaning` as final document headings.
    - Table headers do not need to be Chinese when English headers such as `Concept`, `Layer`, `Meaning`, or `Common Mistake` are clearer.
@@ -52,9 +52,9 @@ This is an instruction-only skill. Do not add scripts or new project dependencie
    - Keep code, identifiers, filenames, commands, APIs, package names, runtime UI strings, code comments, and raw error messages in English.
    - Do not put Chinese characters inside source-code blocks.
    - Explain the concept layer explicitly: syntax, runtime behavior, language mechanism, object model/prototype model, type system, framework convention, platform API, or tooling behavior.
-   - In full chapter guides, add `## 目录` near the top, after the chapter title and any local `<style>` block, and before `## 0. 文件定位`.
+   - In full chapter guides, add `## 目录` near the top, after the chapter title and any local `<style>` block, and before `## 0. 本章工程问题与边界`.
    - The directory must list all numbered top-level sections, all core `### 9.x` sections, and important `###` sections under `## 12. 最终小项目`. Do not include internal bold teaching labels such as `结论`, `技术意义`, `逐行解释`, or `最终记忆模型`.
-   - From React chapter 2 onward, if the guide contains real practice files or final mini-project files, add `## 本章代码定位索引` after the directory. Use it to connect learning goals, exact real file paths or `Snippet:` labels, file/snippet type, and section location.
+   - Add `## 本章机制地图` after the directory. Use it to connect each major concept to the problem it solves, owner or boundary, runtime/tooling/framework layer, real project scenario, and a selected source reading path when that path improves learning. This section is not a file inventory and must not include file status labels.
    - In full chapter guides, keep `## 9. 分节教学与练习` with `###` core concept headings, but use bold labels inside each concept section instead of many `####` headings.
    - Distinguish `当前项目结构`, `本章文档结构`, `概念示例结构`, and `最终小项目结构`.
    - For React chapter 1, concept snippets are acceptable because the goal is the first mental model. From React chapter 2 onward, add real practice file structures with one concept per directory and descriptive file names that reveal the learning goal.
@@ -81,20 +81,18 @@ This is an instruction-only skill. Do not add scripts or new project dependencie
 
 6. Validate before final response.
    - Check the generated Markdown against `references/output-checklist.md`.
-   - Check that every full chapter guide has `## 目录` before `## 0. 文件定位`.
+   - Check that every full chapter guide has `## 目录` before `## 0. 本章工程问题与边界`.
    - Check that the directory matches the actual headings and does not include internal bold teaching labels.
    - Check that every core `9.x` TOC link uses the matching stable `#section-9-x` target, every core heading has the corresponding explicit HTML anchor immediately before it, and no section anchor ID is duplicated.
-   - Check that guides with real practice files include `## 本章代码定位索引`, and that paths or `Snippet:` labels in the index match the guide structures, code-window title bars, and final file list.
+   - Check that guides include `## 本章机制地图`, `## 0. 本章工程问题与边界`, `## 4. 机制依赖图`, and `## 14. 工程迁移与代码审查要点`.
+   - Check that the mechanism map is concept-driven: it connects mechanisms to owner or boundary, runtime layer, project scenario, and selected source reading paths, without becoming a file inventory or status table.
    - Check that non-trivial code examples include correct code, expected output or compiler result, line-by-line explanation, execution process, common mistake, violated rule, correction, and recognition method.
    - Check that every full chapter guide includes a final mini project and an extra cheatsheet.
-   - Check that real code-window file paths appear in the nearest relevant structure block. Concept snippets should use `Snippet:` or `Template:` title-bar labels instead of fake file paths.
-   - Check that final file lists include only the created guide and real final mini-project practice files, not source references, official documentation, configuration files used only for inspection, or concept snippets.
+   - Check that real code-window file paths, when used for source reading or project structure, appear in a nearby structure or explanation. Concept snippets should use `Snippet:` or `Template:` title-bar labels instead of fake file paths.
    - Check that source-code blocks contain no Chinese characters.
    - Check that source-code, terminal command, expected output, and error output examples use the mandatory macOS-style code window wrapper.
    - If the guide uses macOS code-window HTML, verify that the document includes a self-contained `<style>` block defining `.macos-code-window`, `.macos-code-titlebar`, `.macos-code-dot`, all three dot colors, `.macos-code-title`, `.macos-code-titlebar + pre`, and `.macos-code-titlebar + pre code`. If an external stylesheet is used, identify it explicitly and retain enough in-document explanation for standalone Markdown reading.
-   - Resolve every path labeled as a real file from the code location index, recommended structures, real-file title bars, final file list, and final-project structure against the local repository. Create the file or relabel the entry as `Snippet:` / `Template:` / not required. Never claim `已创建`, `已更新`, or `真实练习文件` for a missing path.
-   - Verify that real-file title bars and the final file list agree, and that snippets never appear as real files in the final file list.
-   - Run the necessary repository validation commands before claiming they passed. If a check was not run, report `UNKNOWN` or `FAIL`, never `PASS`.
+   - Move delivery evidence outside the guide body: verify changed files, source file touches, README or App entry changes, dependency changes, and lint/typecheck/test/build results in the final response. If a check was not run, report `UNKNOWN` or `FAIL`, never `PASS`.
 
 ## Delivery Gate
 
@@ -116,11 +114,11 @@ Hard-fail the delivery if any of the following is true:
 3. A core `9.x` section is label-only filler and has no section-specific mechanism evidence chain.
 4. A mechanism explanation can be copied unchanged into another chapter.
 5. The final mini project overwhelms or substitutes for the core teaching sections.
-6. Any path presented as a real file does not exist locally.
-7. Real-file code-window title bars and the final file list disagree.
-8. A `Snippet:` or `Template:` is listed as a real final file.
+6. A guide body keeps file-inventory or file-status sections instead of teaching mechanisms.
+7. The mechanism map becomes a status table rather than a concept-to-boundary map.
+8. Delivery evidence is claimed in the guide body instead of the final response.
 9. The self-check provides only claims such as `已检查` instead of verifiable evidence.
-10. Required lint/build commands were not run, but the final response claims they passed.
+10. Required validation commands were not run, but the final response claims they passed.
 11. Any core `9.x` TOC entry relies on a complex automatic heading slug, lacks its matching explicit `section-9-x` anchor, uses a duplicate anchor ID, or changes meaningful heading text only to satisfy anchor generation.
 
 Before final delivery, produce an evidence-based self-check table with the columns `检查项`, `结果`, and `证据`. Mark every result `PASS`, `FAIL`, or `UNKNOWN`. Cite concrete evidence such as a file path, exact heading, command result, verified file count, required style class, or complete-code mapping; do not write only `已检查`. If any item is `FAIL`, continue revising and do not deliver the guide as a final result. Use `UNKNOWN` when a check was not actually performed and do not present the guide as fully verified.
@@ -199,10 +197,11 @@ Hello
 
 After creating or updating guide files, include:
 
-- Files created or updated.
-- Sources used, including local files and official documentation sources.
-- Official docs still needing manual verification, if any.
-- A self-check checklist.
-- Limitations or outdated references found.
+- Skill files updated, if any.
+- Guide files changed, with a chapter-by-chapter summary of structural section replacements.
+- Whether source code files, README, App entries, package files, or dependencies changed.
+- Validation results for lint, typecheck, test, and build; use `UNKNOWN` for checks not run.
+- Whether existing core `9.x` headings and stable anchors were preserved.
+- Sources used, official docs still needing manual verification, and unresolved issues.
 
 If no file was edited, say so clearly and summarize the review or guidance instead.

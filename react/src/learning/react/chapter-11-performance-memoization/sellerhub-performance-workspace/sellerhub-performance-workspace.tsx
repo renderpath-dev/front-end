@@ -30,7 +30,7 @@ export function SellerHubPerformanceWorkspace() {
           fallback={<p className="performance-loading-state">Loading page code chunk...</p>}
         >
           <Routes>
-            <Route element={<SellerHubPerformanceLayout />} path="/performance">
+            <Route element={<SellerHubPerformanceLayout />}>
               <Route element={<Navigate replace to="catalog" />} index />
               <Route element={<LazyCatalogPage />} path="catalog" />
               <Route element={<LazyOrdersPage />} path="orders" />

@@ -1,0 +1,24 @@
+.moduleCard {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #c7d2fe;
+  border-radius: 18px;
+  padding: 14px;
+  background: #eef2ff;
+}
+
+.moduleTitle {
+  margin: 0;
+  color: #312e81;
+  font-size: 1rem;
+}
+
+.moduleBadge {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: #ffffff;
+  background: #4f46e5;
+  font-size: 0.78rem;
+  font-weight: 800;
+}

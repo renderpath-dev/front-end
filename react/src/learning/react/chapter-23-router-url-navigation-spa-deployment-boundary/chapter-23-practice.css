@@ -1,0 +1,186 @@
+.route-lab-page {
+  min-height: 100vh;
+  padding: 48px;
+  background:
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 32rem),
+    linear-gradient(135deg, #07111f 0%, #111827 48%, #172554 100%);
+  color: #e5eefb;
+}
+
+.route-lab-hero,
+.route-lab-card,
+.sellerhub-route-lab {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.78);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.32);
+}
+
+.route-lab-hero {
+  max-width: 1180px;
+  margin: 0 auto 28px;
+  padding: 32px;
+}
+
+.route-lab-eyebrow,
+.route-card-kicker {
+  margin: 0 0 8px;
+  color: #93c5fd;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.route-lab-hero h1,
+.route-lab-card h2,
+.sellerhub-route-lab h2,
+.sellerhub-route-lab h3 {
+  margin-top: 0;
+}
+
+.route-lab-hero h1 {
+  max-width: 780px;
+  font-size: clamp(2.2rem, 5vw, 4.8rem);
+  line-height: 0.95;
+}
+
+.route-lab-hero p {
+  max-width: 880px;
+  color: #cbd5e1;
+}
+
+.route-lab-pill-row,
+.route-button-row,
+.sellerhub-nav,
+.route-link-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.route-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(96, 165, 250, 0.36);
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: rgba(37, 99, 235, 0.14);
+  color: #bfdbfe;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.route-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.route-lab-card,
+.sellerhub-route-lab {
+  padding: 24px;
+}
+
+.route-lab-card p,
+.route-lab-card li,
+.sellerhub-route-lab p,
+.sellerhub-route-lab li {
+  color: #cbd5e1;
+}
+
+.route-code {
+  display: inline-flex;
+  border-radius: 8px;
+  padding: 2px 6px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.route-list {
+  display: grid;
+  gap: 8px;
+  padding-left: 1.2rem;
+}
+
+.route-button-row button,
+.route-link-grid a,
+.sellerhub-nav a,
+.sellerhub-action-link,
+.sellerhub-route-lab button {
+  border: 1px solid rgba(125, 211, 252, 0.38);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(14, 165, 233, 0.1);
+  color: #e0f2fe;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.sellerhub-nav a.active,
+.sellerhub-nav a[aria-current='page'] {
+  border-color: #facc15;
+  background: rgba(250, 204, 21, 0.16);
+  color: #fef3c7;
+}
+
+.sellerhub-route-lab {
+  grid-column: 1 / -1;
+}
+
+.sellerhub-route-frame {
+  min-height: 460px;
+  margin-top: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 20px;
+  background: rgba(2, 6, 23, 0.62);
+}
+
+.sellerhub-shell {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+}
+
+.sellerhub-main {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.sellerhub-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sellerhub-table th,
+.sellerhub-table td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+  padding: 10px;
+  text-align: left;
+}
+
+.sellerhub-status {
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(22, 163, 74, 0.14);
+  color: #bbf7d0;
+}
+
+.sellerhub-warning {
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(245, 158, 11, 0.16);
+  color: #fde68a;
+}
+
+@media (max-width: 720px) {
+  .route-lab-page {
+    padding: 24px;
+  }
+}

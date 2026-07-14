@@ -54,12 +54,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -88,37 +88,28 @@
   - [12.5 核心执行流程](#125-核心执行流程)
   - [12.6 机制边界与常见错误](#126-机制边界与常见错误)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 区分 client navigation 与 document navigation | `src/learning/react/chapter-10-routing-url-state/01-client-routing-boundary/client-routing-boundary.tsx` | 核心机制练习 | 9.1 |
-| 观察 location 如何选择 route branch | `src/learning/react/chapter-10-routing-url-state/02-route-matching-tree/route-matching-tree.tsx` | 核心机制练习 | 9.2 |
-| 区分 Link 与 NavLink intent | `src/learning/react/chapter-10-routing-url-state/03-link-navlink-intent/link-navlink-intent.tsx` | 核心机制练习 | 9.3 |
-| 理解 nested route 与 Outlet ownership | `src/learning/react/chapter-10-routing-url-state/04-nested-layout-outlet/nested-layout-outlet.tsx` | 核心机制练习 | 9.4 |
-| 处理 dynamic param 的 string/undefined 边界 | `src/learning/react/chapter-10-routing-url-state/05-dynamic-route-params/dynamic-route-params.tsx` | 核心机制练习 | 9.5 |
-| 把筛选条件建模为 URL search params | `src/learning/react/chapter-10-routing-url-state/06-search-params-url-state/search-params-url-state.tsx` | 核心机制练习 | 9.6 |
-| 比较 URL、local 与 Context state owner | `src/learning/react/chapter-10-routing-url-state/07-url-local-context-state/url-local-context-state.tsx` | 核心机制练习 | 9.7 |
-| 在事件完成后调用 navigate | `src/learning/react/chapter-10-routing-url-state/08-programmatic-navigation/event-driven-navigation.tsx` | 核心机制练习 | 9.8 |
-| 使用 splat route 提供 fallback | `src/learning/react/chapter-10-routing-url-state/09-not-found-route/not-found-fallback-route.tsx` | 核心机制练习 | 9.9 |
-| 理解前端 UI guard 与后端权限边界 | `src/learning/react/chapter-10-routing-url-state/10-protected-route-placeholder/protected-route-placeholder.tsx` | 核心机制练习 | 9.10 |
-| 用 route param key 明确 reset state | `src/learning/react/chapter-10-routing-url-state/11-route-state-reset/route-param-state-reset.tsx` | 核心机制练习 | 9.11 |
-| 把 route param 连接到 abortable async criteria | `src/learning/react/chapter-10-routing-url-state/12-route-params-async-criteria/route-param-async-criteria.tsx` | 核心机制练习 | 9.12 |
-| 挂载 BrowserRouter、练习页与最终 workspace | `src/learning/react/chapter-10-routing-url-state/chapter-10-practice-root.tsx` | 入口 adapter | 7、8、14 |
-| 提供本章练习与 workspace 通用样式 | `src/learning/react/chapter-10-routing-url-state/chapter-10-practice.css` | 章节 shell CSS | 7、14 |
-| 集成 SellerHub route architecture | `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/` | 最终小项目 | 12 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Client routing boundary | The router maps URL intent to React elements. | React Router runtime | SellerHub pages switch without full document navigation. | `src/learning/react/chapter-10-routing-url-state/01-client-routing-boundary/client-routing-boundary.tsx` |
+| Route matching tree | Nested routes inherit layout boundaries. | React Router matcher | Catalog, orders, checkout, and detail pages share shells intentionally. | `src/learning/react/chapter-10-routing-url-state/02-route-matching-tree/route-matching-tree.tsx` |
+| URL search state | Shareable UI state belongs in the URL when it identifies the view. | Browser history and URLSearchParams | Catalog filters can be copied and restored. | `src/learning/react/chapter-10-routing-url-state/06-search-params-url-state/search-params-url-state.tsx` |
+| Protected route placeholder | Access checks sit at route boundaries, not inside every leaf page. | Routing architecture | Seller-only pages describe the guard even without real auth. | `src/learning/react/chapter-10-routing-url-state/10-protected-route-placeholder/protected-route-placeholder.tsx` |
 
-本章位于第 9 章 async data 之后。第 9 章已经能把一个明确 criteria 转换为 pending、success、empty 或 error UI；第 10 章补上另一个 owner：浏览器 URL。`productId`、订单 `status` 与 catalog `category` 可以进入地址栏，因此刷新、后退、前进、复制链接时仍能重新表达“用户正在看什么”。
+## 0. 本章工程问题与边界
 
-本章只使用 React Router 7.18.0 的 **Declarative mode**：`BrowserRouter`、`Routes`、`Route` 与普通 React elements。不会引入 loader、action、framework mode、SSR、Server Components 或后端 API。
+本章解决的工程问题是：URL 不只是地址栏文本，它是应用状态、导航意图和页面边界的一部分。路由让页面结构、嵌套 layout、URL 参数和本地状态重置变得可审查。
+
+本章不实现真实认证、后端权限、SSR 或完整产品路由架构。边界是 client router、links、nested routes、params、search params、not-found 和 placeholder guard。
 
 ## 1. 本章解决的问题
 
@@ -149,11 +140,16 @@
 8. 把 route params 接到第 9 章 async request criteria，并清理 obsolete request。
 9. 说明 protected route 只是前端 UI boundary，不是后端 authorization。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-先理解 browser document navigation 和 session history，再学习 route matching；否则容易把 router 误解成“显示组件的 switch”。接着学习 Link/NavLink、nested Outlet、params 和 search params，因为这些 API 都依赖 current location。最后讨论 ownership、programmatic navigation、fallback、UI guard、identity 与 async criteria，这些主题需要前几章的 state/effect 心智模型。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
 
-推荐顺序是：`BrowserRouter` 边界 -> location 与 matching -> declarative links -> nested layout -> dynamic/search URL values -> state ownership -> event navigation -> fallback/guard -> identity -> async criteria -> SellerHub architecture。
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| URL path | Route match | 先理解 path 如何匹配元素，才能设计页面边界。 | 会把条件渲染误当路由系统。 |
+| Layout route | Outlet child route | 嵌套页面需要父 layout 提供稳定壳层。 | 重复 shell 或子页面无法出现。 |
+| URL param | Data lookup criteria | 动态段是读取具体资源的条件。 | 详情页无法区分不同产品或订单。 |
+| Search param | Shareable filter state | 只有适合分享和恢复的状态才应进入 URL。 | 本地 UI 状态污染地址栏或筛选不可复制。 |
 
 ## 5. 核心术语表
 
@@ -264,7 +260,7 @@ docs/react/chapter-10-routing-url-state/
 
 ### 概念示例结构
 
-本章错误对比优先使用正文和错误表。若出现 `Snippet:`，它只代表短错误片段，不是需要创建的路径，也不会进入最终文件清单。
+本章错误对比优先使用正文和错误表。若出现 `Snippet:`，它只代表短错误片段，不是需要创建的路径，也不用于交付验证记录。
 
 ### 最终小项目结构
 
@@ -2551,39 +2547,25 @@ export function AppRoutes() {
 
 该 template 只展示 route nesting 形状，不是本章真实文件。真实页面仍要 narrow params、选择 state owner，并配置生产 SPA fallback。
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-| File | Role | Status |
-| --- | --- | --- |
-| `docs/react/chapter-10-routing-url-state/react-chapter-10-learning-guide.md` | 第 10 章学习指导。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/chapter-10-practice-root.tsx` | BrowserRouter 与章节挂载 adapter。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/chapter-10-practice.css` | 章节通用页面和 workspace 样式。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/01-client-routing-boundary/client-routing-boundary.tsx` | Client/document navigation 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/02-route-matching-tree/route-matching-tree.tsx` | Route matching branch 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/03-link-navlink-intent/link-navlink-intent.tsx` | Link/NavLink intent 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/04-nested-layout-outlet/nested-layout-outlet.tsx` | Nested Outlet 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/05-dynamic-route-params/dynamic-route-params.tsx` | Dynamic param boundary 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/06-search-params-url-state/search-params-url-state.tsx` | Search params URL state 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/07-url-local-context-state/url-local-context-state.tsx` | State owner comparison 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/08-programmatic-navigation/event-driven-navigation.tsx` | Event-driven navigation 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/09-not-found-route/not-found-fallback-route.tsx` | Fallback matching 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/10-protected-route-placeholder/protected-route-placeholder.tsx` | UI guard boundary 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/11-route-state-reset/route-param-state-reset.tsx` | Param-key identity 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/12-route-params-async-criteria/route-param-async-criteria.tsx` | Route-driven async criteria 练习。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-catalog-data.ts` | SellerHub local domain data。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-product-request.ts` | Abortable local product request。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-workspace-layout.tsx` | Root layout 与 Outlet。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-catalog-page.tsx` | Catalog URL filters。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-product-detail-page.tsx` | Product param/async page。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-seller-layout.tsx` | Seller nested layout。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-orders-page.tsx` | Seller order status URL state。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-checkout-page.tsx` | Checkout URL/local boundary。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-login-page.tsx` | Login redirect flow。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-protected-route.tsx` | Seller UI guard。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-not-found-page.tsx` | Route fallback page。 | 已创建并保留 |
-| `src/learning/react/chapter-10-routing-url-state/sellerhub-routing-workspace/sellerhub-routing-workspace.tsx` | 最终 route tree composition root。 | 已创建并保留 |
+### Code review questions
 
-`Template: declarative nested routes` 不需要创建，也不属于最终文件。
+- 这个状态应该在 URL、route param、本地 state 还是 Context？
+- 嵌套路由是否通过 layout 和 Outlet 表达共同外壳？
+- not-found 和 protected placeholder 是否在正确边界处理？
+
+### Migration checks
+
+- 从手写 tab state 迁移到 route 时，先定义 URL 是否有分享价值。
+- 把页面级数据读取条件从组件内部常量迁移到 route params。
+- 不要在没有真实 auth 的章节里伪造认证系统，只保留边界模型。
+
+### Production risk signals
+
+- 刷新后页面回到默认筛选，说明可分享状态没有进入 URL。
+- 子页面重复 header，说明 layout route 边界不清。
+- 未知路径渲染空白，检查 fallback route。
 
 ## 15. 如何转换成个人笔记
 

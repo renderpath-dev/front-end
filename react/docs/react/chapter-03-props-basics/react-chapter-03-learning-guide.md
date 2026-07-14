@@ -62,11 +62,12 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -95,82 +96,28 @@
   - [常见错误](#常见错误)
   - [可选扩展](#可选扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 本章普通练习总入口 | `src/learning/react/chapter-03-props-basics/chapter-03-practice-root.tsx` | 真实练习文件 | 8 |
-| 本章普通练习共享样式 | `src/learning/react/chapter-03-props-basics/chapter-03-practice.css` | 真实练习文件 | 8 |
-| props object 运行时本质 | `src/learning/react/chapter-03-props-basics/props-object-boundary/props-object-runtime-demo.tsx` | 真实练习文件 | 9.1 |
-| props 与普通 function parameter 的关系 | `Snippet: function parameter comparison` | 概念 snippet | 9.1 |
-| JSX attributes 到 props object | `src/learning/react/chapter-03-props-basics/props-object-boundary/jsx-attributes-to-props-demo.tsx` | 真实练习文件 | 9.2 |
-| HTML attribute 与 custom component prop 对比 | `Snippet: DOM prop versus component prop` | 概念 snippet | 9.2 |
-| destructuring props 写法 | `src/learning/react/chapter-03-props-basics/props-object-boundary/props-destructuring-demo.tsx` | 真实练习文件 | 9.3 |
-| destructuring 类型标注错误 | `Snippet: destructuring type annotation mistake` | 概念 snippet | 9.3 |
-| required props | `src/learning/react/chapter-03-props-basics/props-type-boundary/required-props-demo.tsx` | 真实练习文件 | 9.4 |
-| optional props | `src/learning/react/chapter-03-props-basics/props-type-boundary/optional-props-demo.tsx` | 真实练习文件 | 9.4 |
-| default prop values | `src/learning/react/chapter-03-props-basics/props-type-boundary/default-prop-values-demo.tsx` | 真实练习文件 | 9.4 |
-| 缺失 required prop 错误 | `Snippet: missing required prop error` | 概念 snippet | 9.4 |
-| boolean props | `src/learning/react/chapter-03-props-basics/props-type-boundary/boolean-props-demo.tsx` | 真实练习文件 | 9.5 |
-| boolean string mistake | `Snippet: boolean prop string mistake` | 概念 snippet | 9.5 |
-| children 基础组合 | `src/learning/react/chapter-03-props-basics/children-props-basics/children-basic-composition.tsx` | 真实练习文件 | 9.6 |
-| children 可渲染边界 | `src/learning/react/chapter-03-props-basics/children-props-basics/children-renderable-boundary.tsx` | 真实练习文件 | 9.6 |
-| children object mistake | `Snippet: children object mistake` | 概念 snippet | 9.6 |
-| props readonly 原则 | `src/learning/react/chapter-03-props-basics/props-object-boundary/props-readonly-mistake.tsx` | 真实练习文件 | 9.7 |
-| 修改 props 错误 | `Snippet: mutate props mistake` | 概念 snippet | 9.7 |
-| TypeScript props runtime 边界 | `src/learning/react/chapter-03-props-basics/props-type-boundary/typescript-runtime-boundary-demo.tsx` | 真实练习文件 | 9.8 |
-| type erasure 对比 | `Snippet: erased props type boundary` | 概念 snippet | 9.8 |
-| props 与 state 边界预告 | `Snippet: props versus state boundary` | 概念 snippet | 9.9 |
-| 最终小项目入口适配 | `src/App.tsx` | 最终小项目文件 | 12 |
-| 最终小项目静态数据和类型 | `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-card-data.ts` | 最终小项目文件 | 12 |
-| 最终小项目 avatar 组件 | `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-avatar.tsx` | 最终小项目文件 | 12 |
-| 最终小项目 badge 组件 | `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-badge.tsx` | 最终小项目文件 | 12 |
-| 最终小项目 card 组件 | `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-card.tsx` | 最终小项目文件 | 12 |
-| 最终小项目 grid 组件 | `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-card-grid.tsx` | 最终小项目文件 | 12 |
-| 最终小项目 root component | `src/learning/react/chapter-03-props-basics/props-composition-gallery/props-composition-gallery.tsx` | 最终小项目文件 | 12 |
-| 最终小项目样式 | `src/learning/react/chapter-03-props-basics/props-composition-gallery/props-composition-gallery.css` | 最终小项目文件 | 12 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Props object creation | Parent JSX attributes become a props object for the child. | React component call model | Profile cards receive display data through explicit inputs. | `src/learning/react/chapter-03-props-basics/props-object-boundary/props-object-runtime-demo.tsx` |
+| Required and optional props | TypeScript checks parent-child contracts before runtime. | TypeScript type system | Card variants can require core data while allowing optional badges. | `src/learning/react/chapter-03-props-basics/props-type-boundary/optional-props-demo.tsx` |
+| Default prop values | The receiving component owns fallback display behavior. | JavaScript parameter destructuring | Missing optional labels still render predictably. | `src/learning/react/chapter-03-props-basics/props-type-boundary/default-prop-values-demo.tsx` |
+| Children composition | The parent owns nested content; the child owns layout slots. | React component model | Reusable shells render supplied content without knowing its internals. | `src/learning/react/chapter-03-props-basics/children-props-basics/children-basic-composition.tsx` |
 
-本文件是当前 `React + TypeScript + Vite` 学习项目的 React 第三章学习指导。第一章建立 React、Vite、TypeScript、browser DOM 的运行边界；第二章讲 JSX、function component、component composition 和真实练习文件组织；第三章开始系统学习 `props`。
+## 0. 本章工程问题与边界
 
-本章定位是“组件输入对象”。它解释父组件如何把数据传给子组件，JSX custom component attributes 如何变成 props object，function component 在运行时如何接收这个 object，以及 TypeScript 如何在 compile time 检查 props 的形状。
+本章解决的工程问题是：组件之间如何通过显式输入协作。props 不是全局变量，也不是子组件可以随意修改的共享对象；它是父组件向子组件传递渲染信息的边界。
 
-本章不深入：
-
-- `useState`
-- `useEffect`
-- lifecycle
-- context
-- reducer
-- router
-- Next.js
-- Redux
-- data fetching
-- React Native
-- Tailwind
-- testing
-- render props
-- compound components
-- advanced children patterns
-- prop drilling 的系统解决方案
-- event handler props 的系统学习
-
-本章会轻微对比 `props` 和 `state`，但只用于建立边界：`props` 是外部输入，`state` 是组件内部由 React 管理的数据。真正的 state 学习留到后续章节。
-
-当前项目证据：
-
-- `package.json` 使用 `react@^19.2.0`、`react-dom@^19.2.0`、`typescript~5.9.3`、`vite@^7.2.4`。
-- `tsconfig.app.json` 使用 `jsx: "react-jsx"`、`strict: true`、`noEmit: true`、`moduleResolution: "bundler"`。
-- `index.html` 通过 `/src/sudoku/main.tsx` 进入 Vite 模块图。
-- 当前根级 `src/App.tsx` 临时挂载第二章练习；Sudoku 原应用保留在 `src/sudoku/App.tsx`。
-- 第二章真实练习已放在 `src/learning/react/chapter-02-jsx-and-components/`，第三章继续沿用 `src/learning/react/chapter-03-props-basics/`。
+本章不进入 Context、状态提升、运行时 schema 校验或复杂数据获取。TypeScript 在这里用于表达组件契约，但它不会在浏览器运行时自动验证外部数据。
 
 ## 1. 本章解决的问题
 
@@ -224,17 +171,16 @@
 - 设计第三章真实练习文件结构，方便后续复习和扩展。
 - 完成 `Props Composition Gallery` 静态小项目。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-1. 先从运行时本质开始：props 是 object，function component 是 function。
-2. 再看 JSX custom component attributes 如何被组合成 props。
-3. 学两种读取方式：完整 `props` object 和 destructuring。
-4. 学 TypeScript props 类型：required、optional、default values。
-5. 学 boolean props，因为它同时涉及 JSX、React props 和 HTML boolean attribute 边界。
-6. 学基础 children，让 component composition 不只依赖命名 props。
-7. 学 readonly 原则，理解为什么子组件不改 props。
-8. 学 TypeScript 与 runtime 的边界，避免把类型当成 runtime validator。
-9. 最后用 `Props Composition Gallery` 把 typed components 组合成静态页面。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| JSX attributes | Props object | 先理解属性如何变成对象，才能理解解构和类型声明。 | 会把参数列表写成多个独立参数。 |
+| Required fields | Optional/default fields | 必须先区分必需输入，才能安全设计 fallback。 | 会隐藏真正缺失的数据问题。 |
+| Readonly input | Callback output | 子组件不能改 props，需要通过 callback 表达事件意图。 | 会尝试直接 mutate props。 |
+| Renderable children | Slot composition | children 依赖上一章的可渲染值规则。 | 会把布局壳和业务内容耦合在一起。 |
 
 ## 5. 核心术语表
 
@@ -2486,61 +2432,25 @@ export function SectionPanel({ title, children }: SectionPanelProps) {
 ```
 </div>
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-本次实际创建的文件：
+### Code review questions
 
-| File | Role | Status |
-| --- | --- | --- |
-| `docs/react/chapter-03-props-basics/react-chapter-03-learning-guide.md` | 第三章学习指导文件。 | 已创建并保留。 |
+- 组件的 required props 是否表达了真正不可缺少的业务输入？
+- 默认值是否只处理展示 fallback，而不是吞掉数据错误？
+- 子组件是否通过 callback 通知父级，而不是修改 props？
 
-本章建议创建的真实练习文件：
+### Migration checks
 
-| File | Role | Status |
-| --- | --- | --- |
-| `src/learning/react/chapter-03-props-basics/chapter-03-practice-root.tsx` | 本章普通练习总入口。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/chapter-03-practice.css` | 本章普通练习共享样式。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-object-boundary/props-object-runtime-demo.tsx` | 练习 props object 运行时本质。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-object-boundary/jsx-attributes-to-props-demo.tsx` | 练习 JSX attributes 到 props object。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-object-boundary/props-destructuring-demo.tsx` | 练习 destructuring props。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-object-boundary/props-readonly-mistake.tsx` | 练习 props readonly 边界。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-type-boundary/required-props-demo.tsx` | 练习 required props。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-type-boundary/optional-props-demo.tsx` | 练习 optional props。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-type-boundary/default-prop-values-demo.tsx` | 练习 default prop values。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-type-boundary/boolean-props-demo.tsx` | 练习 boolean props。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-type-boundary/typescript-runtime-boundary-demo.tsx` | 练习 TypeScript props 类型和 runtime 边界。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/children-props-basics/children-basic-composition.tsx` | 练习基础 children composition。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/children-props-basics/children-renderable-boundary.tsx` | 练习 children 可渲染值边界。 | 仅在执行本章练习时创建；本次未修改。 |
+- 拆分旧组件时，先列出子组件真正需要的 props，再写类型。
+- 把隐式全局读取改成显式 props 传入，便于测试和复用。
+- children 适合布局槽，不适合绕过清晰的数据契约。
 
-最终小项目建议创建或替换的真实文件：
+### Production risk signals
 
-| File | Role | Status |
-| --- | --- | --- |
-| `src/App.tsx` | Thin adapter；挂载 `Props Composition Gallery`。 | 仅在执行最终小项目时替换；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-card-data.ts` | profile 静态数据和 TypeScript 类型。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-avatar.tsx` | avatar 展示组件。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-badge.tsx` | badge 展示组件。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-card.tsx` | profile card 组合组件。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-composition-gallery/profile-card-grid.tsx` | card grid 组件。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-composition-gallery/props-composition-gallery.tsx` | gallery root component。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-03-props-basics/props-composition-gallery/props-composition-gallery.css` | gallery 样式。 | 仅在执行最终小项目时创建；本次未修改。 |
-
-不需要创建这些概念 snippet：
-
-- `Snippet: function parameter comparison`
-- `Snippet: DOM prop versus component prop`
-- `Snippet: destructuring type annotation mistake`
-- `Snippet: destructuring type annotation correction`
-- `Snippet: missing required prop error`
-- `Snippet: boolean prop string mistake`
-- `Snippet: children object mistake`
-- `Snippet: children object correction`
-- `Snippet: mutate props mistake`
-- `Snippet: readonly props type`
-- `Snippet: erased props type boundary`
-- `Snippet: props versus state boundary`
-- `Template: typed props component`
-- `Template: typed children wrapper`
+- 组件参数越来越多时，检查是否需要拆分业务对象或组件职责。
+- 大量 optional props 组合可能说明组件承担了过多变体。
+- props 类型和运行时数据不一致时，需要补充边界转换或校验。
 
 ## 15. 如何转换成个人笔记
 
@@ -2578,7 +2488,7 @@ export function SectionPanel({ title, children }: SectionPanelProps) {
 11. TypeScript props type 为什么不能验证 browser runtime 的外部数据？
 12. props 和 state 的边界是什么？
 13. 为什么第三章练习文件不应该继续堆到 `App.tsx`？
-14. 如何检查真实文件路径是否和目录结构、代码窗口 title bar、最终文件清单一致？
+14. 如何检查真实路径引用、目录结构和代码窗口 title bar 是否服务同一个学习目标？
 
 ## 17. 最终记忆模型
 

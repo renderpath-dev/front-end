@@ -4,8 +4,8 @@ This directory is a React + TypeScript learning project. It uses Vite for local 
 
 ## Current Contents
 
-- `docs/react/`: React learning notes for chapters 1 through 16.
-- `src/learning/react/`: Runnable TSX exercises for chapters 1 through 16, linked from the local learning home.
+- `docs/react/`: React learning notes for chapters 1 through 25.
+- `src/learning/react/`: Runnable TSX exercises for chapters 1 through 25, with practice routes in the local app.
 - `src/sudoku/`: A Daily Sudoku practice app covering React state, event handlers, derived rendering, a browser-local `localStorage` leaderboard, and pure TypeScript puzzle logic.
 - `references/books/react/`: Local React PDF reference directory. PDF files are local-only study material and are not committed to the public repository.
 
@@ -26,12 +26,21 @@ Run `npm run dev`, then open the local URL printed by Vite. The root page is the
 - Daily Sudoku at `/sudoku`.
 - React chapter practice roots for chapters 1 through 9 at `/react/chapter-01` through `/react/chapter-09`.
 - Chapter 10 routing practice at `/practice`; its existing React Router workspace continues through `/catalog`, `/seller`, `/checkout`, and `/login`.
-- Chapter 11 performance practice and workspace under `/performance/*`.
+- Chapter 11 performance practice at `/react/chapter-11/practice`, with workspace routes under `/react/chapter-11/catalog`, `/react/chapter-11/orders`, and `/react/chapter-11/dashboard`.
 - Chapter 12 testing and quality-gate practice at `/react/chapter-12`.
 - Chapter 13 Next.js boundary practice at `/react/chapter-13`.
 - Chapter 14 React 19 Actions and Compiler boundary practice at `/react/chapter-14`.
 - Chapter 15 production frontend architecture practice at `/react/chapter-15`.
 - Chapter 16 SellerHub capstone at `/react/chapter-16/catalog`.
+- Chapter 17 React official API gaps and escape-hatch practice at `/react/chapter-17`.
+- Chapter 18 React DOM, server/static API boundary, and legacy API reading practice at `/react/chapter-18`.
+- Chapter 19 Vite, module graph, HMR, env, assets, and production build practice at `/react/chapter-19`.
+- Chapter 20 Error Boundaries, recovery UI, and failure-handling practice at `/react/chapter-20`.
+- Chapter 21 accessibility, semantic HTML, ARIA, and keyboard-interaction practice at `/react/chapter-21`.
+- Chapter 22 state architecture, server state, URL state, and form-state boundary practice at `/react/chapter-22`.
+- Chapter 23 router, URL design, navigation state, and SPA deployment boundary practice at `/react/chapter-23`.
+- Chapter 24 data fetching, cancellation, race condition, and cache-boundary practice at `/react/chapter-24`.
+- Chapter 25 deployment observability, runtime error, performance evidence, and release-gate practice at `/react/chapter-25`.
 
 `index.html` loads `src/sudoku/main.tsx`, which mounts the root `src/App.tsx` learning navigation. Each destination is loaded only when selected, and every practice page includes a link back to the learning home.
 
@@ -178,26 +187,101 @@ If the local PDF conflicts with current official documentation, follow the offic
 - Deliver accessible primitives, user behavior tests, quality gates, engineering documents, and honest portfolio evidence.
 - Current notes and exercises: `docs/react/chapter-16-sellerhub-capstone/`, `src/learning/react/chapter-16-sellerhub-capstone/`.
 
+### 17. React Official API Gaps, Escape Hatches, and External Store Boundary
+
+- Fill remaining official React API gaps that were not trained systematically in chapters 1 through 16.
+- Practice deferred rendering, transition scheduling, external store subscriptions, generated accessibility IDs, debug labels, layout measurement, CSS insertion timing, imperative ref handles, and effect events.
+- Mark `cache`, `cacheSignal`, and `captureOwnerStack` as framework, server, or diagnostic boundaries instead of normal Vite client business APIs.
+- Current notes and exercises: `docs/react/chapter-17-official-api-gaps/`, `src/learning/react/chapter-17-official-api-gaps/`.
+
+### 18. React DOM, Server / Static APIs, and Legacy API Reading
+
+- Distinguish React owner tree, browser DOM tree, DOM containers, portal targets, event propagation, and synchronous DOM flush boundaries.
+- Practice `createPortal`, `flushSync`, and React DOM resource preloading APIs in the Vite client runtime.
+- Read `createRoot`, `hydrateRoot`, React DOM server APIs, React DOM static APIs, removed React DOM APIs, and legacy React APIs as entry, framework, server, static, or migration boundaries.
+- Keep server/static APIs honest as boundary-only concepts in this Vite project instead of faking SSR, streaming, RSC, static prerender, or resume execution.
+- Current notes and exercises: `docs/react/chapter-18-react-dom-server-static-legacy/`, `src/learning/react/chapter-18-react-dom-server-static-legacy/`.
+
+### 19. Vite, Module Graph, HMR, Env, Assets, and Production Build
+
+- Treat Vite as the project tooling boundary behind the React runtime: dev server, module graph, transforms, HMR, and production build.
+- Distinguish `index.html` as source and module graph entry, native ESM development requests, dependency pre-bundling, and production bundling.
+- Practice `import.meta.env`, modes, `VITE_` client exposure, env typing, CSS imports, CSS Modules, static assets, `?url`, `?raw`, `?worker`, `import.meta.glob`, and dynamic import chunk boundaries.
+- Keep SSR, backend integration, deployment automation, and custom plugin publishing as boundary-only topics in this client-side Vite learning app.
+- Current notes and exercises: `docs/react/chapter-19-vite-module-graph-hmr-env-assets-build/`, `src/learning/react/chapter-19-vite-module-graph-hmr-env-assets-build/`.
+
+### 20. Error Boundaries, Recovery UI, and Failure Handling
+
+- Practice error boundary placement, fallback UI, retry/reset, Suspense vs error fallback, logging boundaries, and failure UI testing.
+- Distinguish render crashes, event handler errors, async request failures, Suspense suspension, lazy import rejection, and server/runtime boundaries.
+- Keep monitoring SDKs, production reporting, and SSR behavior as boundary-only topics in this client-side Vite learning app.
+- Current notes and exercises: `docs/react/chapter-20-error-boundaries-recovery-failure-handling/`, `src/learning/react/chapter-20-error-boundaries-recovery-failure-handling/`.
+
+### 21. Accessibility, Semantic HTML, ARIA, and Keyboard Interaction
+
+- Practice semantic HTML, accessible names, ARIA boundaries, keyboard interaction, focus management, dialogs, live regions, and accessibility test evidence.
+- Distinguish native controls, ARIA states and properties, disabled behavior, custom composite widgets, dialogs, disclosure UI, tables, and manual testing boundaries.
+- Keep screen reader output, extension audits, and full accessibility certification as boundary-only topics; automated tests provide evidence but not proof of complete accessibility.
+- Current notes and exercises: `docs/react/chapter-21-accessibility-semantic-html-aria-keyboard/`, `src/learning/react/chapter-21-accessibility-semantic-html-aria-keyboard/`.
+
+### 22. State Architecture, Server State, URL State, and Form State Boundary
+
+- Practice state ownership, local/derived/form/URL/server/external/optimistic state boundaries, reducers, context scope, key reset, and SellerHub state mapping.
+- Distinguish form draft state, validation state, URL state, server-owned data snapshots, request status, cache keys, optimistic pending intent, and external store state.
+- Keep server cache, persistence, backend behavior, and state-management libraries as boundary-only topics in this client-side Vite learning app.
+- Current notes and exercises: `docs/react/chapter-22-state-architecture-server-url-form-boundary/`, `src/learning/react/chapter-22-state-architecture-server-url-form-boundary/`.
+
+### 23. Router, URL Design, Navigation State, and SPA Deployment Boundary
+
+- Practice URL design, route matching, params/search params, nested layouts, protected UI routes, route identity, SPA deep links, base/basename, HashRouter tradeoffs, and routed UI tests.
+- Distinguish URL state, route params, location state, component state, navigation accessibility evidence, SPA fallback behavior, Vite base, BrowserRouter basename, static host rewrites, and HashRouter tradeoffs.
+- Keep static hosting rewrites, backend authorization, production deployment, SSR, and framework-mode routing as boundary-only topics in this client-side Vite learning app.
+- Current notes and exercises: `docs/react/chapter-23-router-url-navigation-spa-deployment-boundary/`, `src/learning/react/chapter-23-router-url-navigation-spa-deployment-boundary/`.
+
+### 24. Data Fetching, Cancellation, Race Condition, and Cache Boundary
+
+- Practice Fetch/Response boundaries, runtime parsing, request lifecycle, cleanup, race guards, AbortController, timeout, cache keys, dedupe, pagination, optimistic rollback, and async UI tests.
+- Distinguish cache keys, cache entries, dedupe, refetch, invalidation, pagination, optimistic pending UI, rollback, and server authority.
+- Keep backend implementation, production cache, SSR, framework data loading, and server-state libraries as boundary-only topics in this client-side Vite learning app.
+- Current notes and exercises: `docs/react/chapter-24-data-fetching-cancellation-race-cache-boundary/`, `src/learning/react/chapter-24-data-fetching-cancellation-race-cache-boundary/`.
+
+### 25. Deployment Observability, Runtime Error, Performance Evidence, and Release Gate
+
+- Practice build artifact evidence, runtime config, runtime diagnostics, source map boundaries, Performance API, React Profiler, Web Vitals boundaries, chunk review, release gates, rollback, and incident triage.
+- Distinguish local Vite preview, deterministic lab measurements, and boundary-only field observability from production deployment, real telemetry, monitoring SDKs, source map uploads, and real user monitoring.
+- Current notes and exercises: `docs/react/chapter-25-deployment-observability-runtime-error-performance-release-gate/`, `src/learning/react/chapter-25-deployment-observability-runtime-error-performance-release-gate/`.
+
 ## Chapter Progress
 
 | Chapter | Topic | Status | Main files |
 | --- | --- | --- | --- |
-| 01 | React introduction and app boundary | Done | `docs/react/chapter-01-react-introduction/`, `src/learning/react/chapter-01-react-introduction/` |
-| 02 | JSX and component basics | Done | `docs/react/chapter-02-jsx-and-components/`, `src/learning/react/chapter-02-jsx-and-components/` |
-| 03 | Props basics and TypeScript props types | Done | `docs/react/chapter-03-props-basics/`, `src/learning/react/chapter-03-props-basics/` |
-| 04 | State and events | Done | `docs/react/chapter-04-state-and-events/`, `src/learning/react/chapter-04-state-and-events/` |
-| 05 | Lists, keys, and conditional rendering | Done | `docs/react/chapter-05-rendering-data/`, `src/learning/react/chapter-05-rendering-data/` |
-| 06 | Forms and controlled components | Done | `docs/react/chapter-06-forms/`, `src/learning/react/chapter-06-forms/` |
-| 07 | Effects and refs | Done | `docs/react/chapter-07-effects-and-refs/`, `src/learning/react/chapter-07-effects-and-refs/` |
-| 08 | State architecture, reducer, context, and custom hooks | Done | `docs/react/chapter-08-state-architecture/`, `src/learning/react/chapter-08-state-architecture/` |
-| 09 | Async data, fetch lifecycle, and UI state | Done | `docs/react/chapter-09-async-data/`, `src/learning/react/chapter-09-async-data/` |
-| 10 | Routing, URL state, and navigation | Done | `docs/react/chapter-10-routing-url-state/`, `src/learning/react/chapter-10-routing-url-state/` |
-| 11 | Performance, memoization, and code splitting | Done | `docs/react/chapter-11-performance-memoization/`, `src/learning/react/chapter-11-performance-memoization/` |
-| 12 | Testing, quality gates, and frontend engineering | Done | `docs/react/chapter-12-testing-quality/`, `src/learning/react/chapter-12-testing-quality/` |
+| 01 | React Application Boundary and Tooling | Done | `docs/react/chapter-01-react-introduction/`, `src/learning/react/chapter-01-react-introduction/` |
+| 02 | JSX and Component Basics | Done | `docs/react/chapter-02-jsx-and-components/`, `src/learning/react/chapter-02-jsx-and-components/` |
+| 03 | Props and Component Inputs | Done | `docs/react/chapter-03-props-basics/`, `src/learning/react/chapter-03-props-basics/` |
+| 04 | State, Events, and Rendering | Done | `docs/react/chapter-04-state-and-events/`, `src/learning/react/chapter-04-state-and-events/` |
+| 05 | Lists, Keys, and Conditional Rendering | Done | `docs/react/chapter-05-rendering-data/`, `src/learning/react/chapter-05-rendering-data/` |
+| 06 | Forms and Controlled Components | Done | `docs/react/chapter-06-forms/`, `src/learning/react/chapter-06-forms/` |
+| 07 | Effects and Refs | Done | `docs/react/chapter-07-effects-and-refs/`, `src/learning/react/chapter-07-effects-and-refs/` |
+| 08 | State Architecture, Reducer, Context, and Custom Hooks | Done | `docs/react/chapter-08-state-architecture/`, `src/learning/react/chapter-08-state-architecture/` |
+| 09 | Async Data, Fetch Lifecycle, and UI State | Done | `docs/react/chapter-09-async-data/`, `src/learning/react/chapter-09-async-data/` |
+| 10 | Routing, URL State, and Navigation | Done | `docs/react/chapter-10-routing-url-state/`, `src/learning/react/chapter-10-routing-url-state/` |
+| 11 | Performance, Memoization, and Code Splitting | Done | `docs/react/chapter-11-performance-memoization/`, `src/learning/react/chapter-11-performance-memoization/` |
+| 12 | Testing, Quality Gates, and Frontend Engineering | Done | `docs/react/chapter-12-testing-quality/`, `src/learning/react/chapter-12-testing-quality/` |
 | 13 | Next.js App Router, SSR, Hydration, and Server Components | Done | `docs/react/chapter-13-nextjs-ssr-rsc/`, `src/learning/react/chapter-13-nextjs-ssr-rsc/` |
 | 14 | React 19 Actions, use API, and React Compiler | Done | `docs/react/chapter-14-react-19-actions-compiler/`, `src/learning/react/chapter-14-react-19-actions-compiler/` |
-| 15 | Production frontend architecture, design system, and engineering governance | Done | `docs/react/chapter-15-production-frontend-architecture/`, `src/learning/react/chapter-15-production-frontend-architecture/` |
-| 16 | SellerHub capstone, production feature delivery, and portfolio evidence | Done | `docs/react/chapter-16-sellerhub-capstone/`, `src/learning/react/chapter-16-sellerhub-capstone/` |
+| 15 | Production Frontend Architecture, Design System, and Engineering Governance | Done | `docs/react/chapter-15-production-frontend-architecture/`, `src/learning/react/chapter-15-production-frontend-architecture/` |
+| 16 | SellerHub Capstone, Production Feature Delivery, and Portfolio Evidence | Done | `docs/react/chapter-16-sellerhub-capstone/`, `src/learning/react/chapter-16-sellerhub-capstone/` |
+| 17 | React Official API Gaps, Escape Hatches, and External Store Boundary | Done; depth repair pending | `docs/react/chapter-17-official-api-gaps/`, `src/learning/react/chapter-17-official-api-gaps/` |
+| 18 | React DOM, Server / Static APIs, and Legacy API Reading | Done; depth repair pending | `docs/react/chapter-18-react-dom-server-static-legacy/`, `src/learning/react/chapter-18-react-dom-server-static-legacy/` |
+| 19 | Vite, Module Graph, HMR, Env, Assets, and Production Build | Done; depth repair pending | `docs/react/chapter-19-vite-module-graph-hmr-env-assets-build/`, `src/learning/react/chapter-19-vite-module-graph-hmr-env-assets-build/` |
+| 20 | Error Boundaries, Recovery UI, and Failure Handling | Done; newer guide standard | `docs/react/chapter-20-error-boundaries-recovery-failure-handling/`, `src/learning/react/chapter-20-error-boundaries-recovery-failure-handling/` |
+| 21 | Accessibility, Semantic HTML, ARIA, and Keyboard Interaction | Done; newer guide standard | `docs/react/chapter-21-accessibility-semantic-html-aria-keyboard/`, `src/learning/react/chapter-21-accessibility-semantic-html-aria-keyboard/` |
+| 22 | State Architecture, Server State, URL State, and Form State Boundary | Done; newer guide standard | `docs/react/chapter-22-state-architecture-server-url-form-boundary/`, `src/learning/react/chapter-22-state-architecture-server-url-form-boundary/` |
+| 23 | Router, URL Design, Navigation State, and SPA Deployment Boundary | Done; newer guide standard | `docs/react/chapter-23-router-url-navigation-spa-deployment-boundary/`, `src/learning/react/chapter-23-router-url-navigation-spa-deployment-boundary/` |
+| 24 | Data Fetching, Cancellation, Race Condition, and Cache Boundary | Done; newer guide standard | `docs/react/chapter-24-data-fetching-cancellation-race-cache-boundary/`, `src/learning/react/chapter-24-data-fetching-cancellation-race-cache-boundary/` |
+| 25 | Deployment Observability, Runtime Error, Performance Evidence, and Release Gate | Done; newer guide standard | `docs/react/chapter-25-deployment-observability-runtime-error-performance-release-gate/`, `src/learning/react/chapter-25-deployment-observability-runtime-error-performance-release-gate/` |
+
+Chapters 17-19 are scheduled for a later teaching-depth repair pass. Chapters 20-25 follow the newer guide standard with code examples, line-by-line explanations, execution flow, wrong examples, corrected versions, and evidence-based self-checks.
 
 ## Practice Principles
 

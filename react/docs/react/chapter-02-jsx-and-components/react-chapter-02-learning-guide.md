@@ -62,11 +62,12 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -92,68 +93,28 @@
   - [常见错误](#常见错误)
   - [可选扩展](#可选扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| JSX expression 可放值 | `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-expression-values.tsx` | 真实练习文件 | 9.1 |
-| JSX statement 错误对比 | `Snippet: JSX statement mistake` | 概念 snippet | 9.1 |
-| JSX expression 修正方式 | `Snippet: JSX expression correction` | 概念 snippet | 9.1 |
-| JSX attribute 边界 | `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-attribute-boundary.tsx` | 真实练习文件 | 9.2 |
-| HTML attribute 直接复制错误 | `Snippet: HTML attribute copied into JSX` | 概念 snippet | 9.2 |
-| JSX attribute 修正方式 | `Snippet: JSX attribute correction` | 概念 snippet | 9.2 |
-| JSX child 可渲染值边界 | `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-child-values.tsx` | 真实练习文件 | 9.3 |
-| object child 错误对比 | `Snippet: object child mistake` | 概念 snippet | 9.3 |
-| object child 修正方式 | `Snippet: object child correction` | 概念 snippet | 9.3 |
-| 自定义组件命名 | `src/learning/react/chapter-02-jsx-and-components/component-basics/component-name-boundary.tsx` | 真实练习文件 | 9.4 |
-| 小写组件名错误对比 | `Snippet: lowercase component mistake` | 概念 snippet | 9.4 |
-| 大写组件名修正方式 | `Snippet: capitalized component correction` | 概念 snippet | 9.4 |
-| 组件导入、导出和组合 | `src/learning/react/chapter-02-jsx-and-components/component-basics/component-module-composition.tsx` | 真实练习文件 | 9.5 |
-| named import 不匹配错误 | `Snippet: named import mismatch` | 概念 snippet | 9.5 |
-| named import 修正方式 | `Snippet: named import correction` | 概念 snippet | 9.5 |
-| TypeScript 检查缺失输入 | `Snippet: missing prop type error` | 概念 snippet | 9.6 |
-| TypeScript 类型擦除边界 | `Snippet: TypeScript erased type boundary` | 概念 snippet | 9.6 |
-| 最终小项目入口适配 | `src/App.tsx` | 最终小项目文件 | 12 |
-| 最终小项目静态数据和类型 | `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/gallery-topic-data.ts` | 最终小项目文件 | 12 |
-| 最终小项目 badge 组件 | `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/gallery-badge.tsx` | 最终小项目文件 | 12 |
-| 最终小项目 card 组件 | `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/gallery-card.tsx` | 最终小项目文件 | 12 |
-| 最终小项目 section 组件 | `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/gallery-section.tsx` | 最终小项目文件 | 12 |
-| 最终小项目 root component | `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/jsx-component-gallery.tsx` | 最终小项目文件 | 12 |
-| 最终小项目样式 | `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/jsx-component-gallery.css` | 最终小项目文件 | 12 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| JSX expression slot | JavaScript expressions are evaluated before React receives children or props. | JavaScript runtime plus JSX transform | Product labels, prices, and badges are inserted through expression positions. | `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-expression-values.tsx` |
+| JSX attribute boundary | Attributes become prop values and must follow JavaScript value rules. | JSX transform | Static and dynamic card attributes show where strings differ from expressions. | `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-attribute-boundary.tsx` |
+| Renderable children | React decides which values can become UI children. | React render runtime | Invalid object children are rejected before they can become DOM text. | `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-child-values.tsx` |
+| Component composition | Capitalized functions become custom React components. | React component model | Small UI pieces are assembled without hiding the module boundary. | `src/learning/react/chapter-02-jsx-and-components/component-basics/component-module-composition.tsx` |
 
-本文件是当前 `React + TypeScript + Vite` 学习项目的第二章学习指导文件。第一章已经建立 React 是什么、React app 如何从 `main.tsx` 启动、Vite / React / TypeScript / browser DOM 的边界。本章开始进入真实练习文件组织：不再只看概念片段，而是设计一组可以长期保留、复习时能直接通过文件名定位知识点的 TSX 练习文件。
+## 0. 本章工程问题与边界
 
-本章主题是：
+本章解决的工程困惑是：JSX 看起来像 HTML，但它实际是 JavaScript 表达式和 React element 描述的组合。组件函数不是模板文件，它们是返回 UI 描述的 JavaScript 函数。
 
-- JSX 基础。
-- JSX expression、attribute、children 的边界。
-- Function component 的 JavaScript function 本质与 React 组件约定。
-- Component file 的命名、导入、导出与组合。
-- TypeScript 在 TSX 中的检查边界。
-- 第二章开始如何组织真实练习文件，为后续 props、state、effect、routing 等章节预留扩展空间。
-
-本章不深入：
-
-- `useState`
-- `useEffect`
-- lifecycle
-- context
-- reducer
-- router
-- Next.js
-- Redux
-- data fetching
-- React Native
-- Tailwind
-- testing
+本章不讨论 state、effect、form 或路由，也不引入 UI 库抽象。边界是把 JSX 的表达式位置、属性规则、children 可渲染值和组件命名规则讲清楚。
 
 ## 1. 本章解决的问题
 
@@ -195,16 +156,16 @@ React 的 JSX 是“源码层的 UI 描述语法”；function component 是 Jav
 - 设计第二章真实练习文件结构，避免所有练习堆到 `App.tsx`。
 - 完成 `JSX Component Gallery` 静态小项目。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-1. 先理解当前项目结构：`src/App.tsx` 已经是 Sudoku 应用，不适合继续塞所有学习片段。
-2. 再设计第二章真实练习目录：按 JSX、component、gallery project 分组。
-3. 学 JSX 基础规则：单一根节点、标签闭合、attribute 命名。
-4. 学 JSX expression：`{}` 中是 JavaScript expression，不是任意 JavaScript 代码。
-5. 学 JSX attribute 和 child：区分源码写法、React DOM 行为和浏览器结果。
-6. 学 function component：它是 function，但 React 会按组件约定调用。
-7. 学 component file：文件名、导出、导入、组合必须服务长期复习。
-8. 最后完成 `JSX Component Gallery`，把本章机制整合到一个静态页面。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| JavaScript expression | JSX expression slot | JSX 中 `{}` 只能接收表达式，不能随意放语句。 | 会把 `if`、`for` 或对象字面量错误地塞进 JSX。 |
+| Renderable value rules | Children rendering | React 只接受可渲染值或 element，普通对象不是 DOM 文本。 | 会遇到 object child runtime error 却不知道原因。 |
+| Capitalized identifier | Custom component resolution | React 通过首字母区分原生标签和组件引用。 | 会把组件当成小写 DOM tag 渲染。 |
+| Module export/import | Component composition | 组件拆分依赖 JavaScript 模块边界。 | 会把所有 JSX 堆进一个文件，无法复用和审查。 |
 
 ## 5. 核心术语表
 
@@ -2359,51 +2320,25 @@ export function StaticCard({ title, summary }: StaticCardProps) {
 ```
 </div>
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-本次实际创建的文件：
+### Code review questions
 
-| File | Role | Status |
-| --- | --- | --- |
-| `docs/react/chapter-02-jsx-and-components/react-chapter-02-learning-guide.md` | 第二章学习指导文件。 | 已创建并保留。 |
+- JSX 中的动态值是否都是表达式，而不是伪模板语法？
+- 组件名称、文件导入和 JSX 使用位置是否一致？
+- children 是否只传递 React 可渲染值，而不是原始对象或未格式化数据？
 
-本章建议创建的真实练习文件：
+### Migration checks
 
-| File | Role | Status |
-| --- | --- | --- |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-expression-values.tsx` | 练习 JSX expression 可放值。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-attribute-boundary.tsx` | 练习 JSX attribute 与 HTML attribute 差异。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-source-boundary/jsx-child-values.tsx` | 练习 JSX child 可渲染值边界。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/component-basics/component-name-boundary.tsx` | 练习 custom component 大写命名边界。 | 仅在执行本章练习时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/component-basics/component-module-composition.tsx` | 练习 component file、named export、composition。 | 仅在执行本章练习时创建；本次未修改。 |
+- 从 HTML 迁移到 JSX 时逐项处理 `className`、表达式插值和自闭合标签。
+- 拆分组件前先确认哪个 UI 片段有独立输入和复用价值。
+- 保留数据格式化在 render 前的可读位置，避免 JSX 里塞复杂转换。
 
-最终小项目建议创建或替换的真实文件：
+### Production risk signals
 
-| File | Role | Status |
-| --- | --- | --- |
-| `src/App.tsx` | Thin adapter；挂载 `JSX Component Gallery`。 | 仅在执行最终小项目时替换；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/gallery-topic-data.ts` | gallery 静态数据和 TypeScript 类型。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/gallery-badge.tsx` | badge 展示组件。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/gallery-card.tsx` | card 展示组件。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/gallery-section.tsx` | section 组合组件。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/jsx-component-gallery.tsx` | gallery root component。 | 仅在执行最终小项目时创建；本次未修改。 |
-| `src/learning/react/chapter-02-jsx-and-components/jsx-component-gallery/jsx-component-gallery.css` | gallery 样式。 | 仅在执行最终小项目时创建；本次未修改。 |
-
-不需要创建这些概念 snippet：
-
-- `Snippet: JSX statement mistake`
-- `Snippet: JSX expression correction`
-- `Snippet: HTML attribute copied into JSX`
-- `Snippet: JSX attribute correction`
-- `Snippet: object child mistake`
-- `Snippet: object child correction`
-- `Snippet: lowercase component mistake`
-- `Snippet: capitalized component correction`
-- `Snippet: named import mismatch`
-- `Snippet: named import correction`
-- `Snippet: missing prop type error`
-- `Snippet: TypeScript erased type boundary`
-- `Template: static typed component`
+- 控制台出现 object child 错误，通常是把原始对象直接放进 JSX。
+- 组件不生效且页面出现未知标签，检查组件名是否小写或 import 是否错误。
+- JSX 变得难读时，通常是表达式边界和组件边界没有拆清。
 
 ## 15. 如何转换成个人笔记
 

@@ -1,0 +1,228 @@
+.chapter-twenty-shell {
+  min-height: 100vh;
+  padding: 32px;
+  color: #172033;
+  background:
+    radial-gradient(circle at top left, rgba(220, 38, 38, 0.14), transparent 34rem),
+    linear-gradient(180deg, #f8fafc 0%, #fff1f2 100%);
+}
+
+.chapter-twenty-hero,
+.chapter-twenty-section,
+.recovery-lab,
+.recovery-card {
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+}
+
+.chapter-twenty-hero {
+  display: grid;
+  gap: 16px;
+  margin: 0 auto 24px;
+  max-width: 1180px;
+  padding: 36px;
+}
+
+.chapter-twenty-eyebrow,
+.recovery-card-kicker {
+  margin: 0;
+  color: #be123c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chapter-twenty-hero h1 {
+  margin: 0;
+  max-width: 960px;
+  color: #0f172a;
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 1;
+}
+
+.chapter-twenty-hero p,
+.chapter-twenty-section p,
+.recovery-lab p,
+.recovery-card p {
+  color: #475569;
+}
+
+.chapter-twenty-layout,
+.chapter-twenty-section,
+.recovery-lab,
+.recovery-card,
+.recovery-widget-card,
+.recovery-code-card {
+  display: grid;
+  gap: 16px;
+}
+
+.chapter-twenty-layout {
+  margin: 0 auto;
+  max-width: 1180px;
+}
+
+.chapter-twenty-section,
+.recovery-lab {
+  padding: 24px;
+}
+
+.chapter-twenty-section h2,
+.recovery-lab h2,
+.recovery-card h3,
+.recovery-card h4 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.chapter-twenty-grid,
+.recovery-grid,
+.recovery-example-pair {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.recovery-card {
+  align-content: start;
+  padding: 18px;
+}
+
+.recovery-card-wide {
+  grid-column: 1 / -1;
+}
+
+.recovery-card button {
+  justify-self: start;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: #ffffff;
+  background: #be123c;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.recovery-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recovery-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recovery-pill {
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #9f1239;
+  background: #ffe4e6;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.recovery-pill-success {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.recovery-pill-warning {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.recovery-widget-card,
+.recovery-code-card,
+.recovery-boundary-fallback,
+.recovery-success-note {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 14px;
+  background: #f8fafc;
+}
+
+.recovery-boundary-fallback {
+  border-color: #fecdd3;
+  background: #fff1f2;
+}
+
+.recovery-success-note {
+  color: #166534;
+  background: #f0fdf4;
+}
+
+.recovery-danger-card {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.recovery-error-note,
+.recovery-muted {
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.recovery-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #334155;
+}
+
+.recovery-list li + li {
+  margin-top: 6px;
+}
+
+.recovery-code-card code {
+  display: block;
+  border-radius: 10px;
+  padding: 8px;
+  color: #f8fafc;
+  background: #0f172a;
+  font-size: 0.86rem;
+  white-space: pre-wrap;
+}
+
+.recovery-table-scroll {
+  overflow-x: auto;
+}
+
+.recovery-table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.recovery-table-scroll th,
+.recovery-table-scroll td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.recovery-table-scroll th {
+  color: #881337;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.recovery-log-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recovery-log-list li {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px;
+  background: #ffffff;
+}

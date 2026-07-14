@@ -1,0 +1,156 @@
+.release-evidence-lab-page {
+  min-height: 100vh;
+  padding: 48px clamp(20px, 5vw, 72px);
+  color: #e5f2ff;
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 34rem),
+    linear-gradient(135deg, #08111f 0%, #121826 52%, #1f2937 100%);
+}
+
+.release-evidence-hero,
+.release-evidence-card,
+.release-evidence-final-lab {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.84);
+  box-shadow: 0 24px 80px rgba(2, 6, 23, 0.24);
+}
+
+.release-evidence-hero {
+  max-width: 1180px;
+  margin: 0 auto 28px;
+  padding: clamp(28px, 5vw, 56px);
+}
+
+.release-evidence-hero h1 {
+  max-width: 1040px;
+  margin: 0;
+  font-size: clamp(2rem, 4.8vw, 4.2rem);
+  line-height: 1;
+}
+
+.release-evidence-hero p {
+  max-width: 880px;
+  color: #c8d8ee;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.release-evidence-card__eyebrow {
+  margin: 0 0 10px;
+  color: #93c5fd;
+  font-size: 0.77rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.release-evidence-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.release-evidence-pill-row span {
+  border: 1px solid rgba(147, 197, 253, 0.36);
+  border-radius: 999px;
+  padding: 8px 12px;
+  color: #dbeafe;
+  background: rgba(37, 99, 235, 0.16);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.release-evidence-grid,
+.release-evidence-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 18px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.release-evidence-card,
+.release-evidence-final-lab {
+  padding: 24px;
+}
+
+.release-evidence-card h2,
+.release-evidence-card h3,
+.release-evidence-final-lab h2 {
+  margin: 0 0 12px;
+  color: #f8fafc;
+}
+
+.release-evidence-card p,
+.release-evidence-card li,
+.release-evidence-final-lab p {
+  color: #d0deef;
+  line-height: 1.6;
+}
+
+.release-evidence-card code {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  border-radius: 10px;
+  padding: 6px 8px;
+  color: #bfdbfe;
+  background: rgba(2, 6, 23, 0.58);
+}
+
+.release-evidence-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.release-evidence-card th,
+.release-evidence-card td {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  padding: 10px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.release-evidence-card th {
+  color: #e2e8f0;
+}
+
+.release-evidence-definition-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.release-evidence-definition-grid div,
+.release-evidence-nested-panel {
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(30, 41, 59, 0.64);
+}
+
+.release-evidence-definition-grid dt {
+  color: #93c5fd;
+  font-weight: 800;
+}
+
+.release-evidence-definition-grid dd {
+  margin: 4px 0 0;
+  color: #d0deef;
+}
+
+.release-evidence-card button {
+  margin: 8px 8px 8px 0;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: #07111f;
+  background: #93c5fd;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.release-evidence-final-lab {
+  max-width: 1180px;
+  margin: 28px auto 0;
+}

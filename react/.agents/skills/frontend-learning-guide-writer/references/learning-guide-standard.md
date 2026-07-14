@@ -85,7 +85,7 @@ Examples:
 
 Do not use generic H1 titles such as `# React 学习指导`, `# Chapter Learning Guide`, `# Forms Guide`, or `# React Chapter`.
 
-For a new chapter, keep the chapter identity consistent across the directory name, file name, H1, directory, code location index, code-window paths, and final file list. For an existing guide revision, do not rename established paths only to satisfy this rule; update the H1 and in-document file locations so they identify the specific chapter.
+For a new chapter, keep the chapter identity consistent across the directory name, file name, H1, mechanism map, boundary section, dependency map, code-window paths, and engineering review section. For an existing guide revision, do not rename established paths only to satisfy this rule; update the H1 and source reading paths so they identify the specific chapter.
 
 ## Required Full Chapter Structure
 
@@ -100,11 +100,12 @@ Use this structure unless the user explicitly asks for a smaller file:
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -114,19 +115,19 @@ Use this structure unless the user explicitly asks for a smaller file:
 - [11. 常见错误表](#11-常见错误表)
 - [12. 最终小项目](#12-最终小项目)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| Replace with actual concept | `replace-with-actual-file-path.tsx` | 真实练习文件 | 9.x |
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Replace with actual mechanism | Replace with owner or boundary | Replace with runtime/tooling/framework layer | Replace with scenario | `selected/source-path.tsx` |
 
-## 0. 文件定位
+## 0. 本章工程问题与边界
 
 ## 1. 本章解决的问题
 
@@ -134,7 +135,7 @@ Use this structure unless the user explicitly asks for a smaller file:
 
 ## 3. 学习目标
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
 ## 5. 核心术语表
 
@@ -154,7 +155,7 @@ Use this structure unless the user explicitly asks for a smaller file:
 
 ## 13. 额外速查表
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
 ## 15. 如何转换成个人笔记
 
@@ -165,26 +166,24 @@ Use this structure unless the user explicitly asks for a smaller file:
 ## 18. 官方文档阅读清单
 ```
 
-The directory and code location index are mandatory structure rules, but the template rows are placeholders. Replace them with the actual headings, section titles, file paths, snippet names, and section numbers for the current chapter.
+The directory and mechanism map are mandatory structure rules. Replace placeholder rows with the actual mechanisms, section titles, owner or boundary names, project scenarios, and selected source reading paths for the current chapter.
 
-## Directory and Code Location Index Rules
+## Directory and Mechanism Map Rules
 
 - Every full chapter learning guide must include `## 目录`.
-- Place the directory near the top of the document, after the chapter title and any local `<style>` block, and before `## 0. 文件定位`.
-- The directory must list every numbered top-level section from `## 0` through `## 18`.
+- Place the directory near the top of the document, after the chapter title and any local `<style>` block, and before `## 本章机制地图` and `## 0. 本章工程问题与边界`.
+- The directory must list every numbered top-level section from `## 0` through `## 18` and include `## 本章机制地图`.
 - The directory must include every core `### 9.x` section under `## 9. 分节教学与练习`.
 - Listing only `9. 分节教学与练习` is not sufficient. Expand the TOC with `9.1`, `9.2`, `9.3`, and every later core subsection through the chapter's final `9.x` heading.
 - If `## 9. 分节教学与练习` is the chapter's main teaching body and any core child heading is absent from the TOC, the delivery check must fail.
 - Apply the stable section anchor rule to every core `9.x` subsection: use `#section-9-1`, `#section-9-2`, and so on in the TOC, and place the matching `<a id="section-9-1"></a>` immediately before each `### 9.1 ...` heading.
 - Keep at most one blank line between an explicit section anchor and its heading, keep every anchor ID unique, and continue the numbering through the actual final core subsection.
 - Do not depend on automatic heading slugs that contain Chinese text, abbreviations, `.`, `/`, quotes, colons, arrows, or other punctuation. Do not change meaningful heading text merely to make automatic slug generation easier.
-- The directory must include important `###` sections under `## 12. 最终小项目`, such as project goal, structure, complete code, run command, expected output, execution flow, and common errors.
+- The directory must include important `###` sections under `## 12. 最终小项目`, such as project goal, structure, complete code or code location, run command, expected output, execution flow, and common errors.
 - Do not include internal bold teaching labels in the directory, such as `结论`, `本节解决的问题`, `技术意义`, `逐行解释`, `执行过程`, or `最终记忆模型`.
-- Prefer Markdown heading links. If the target renderer has uncertain support for Chinese heading anchors, a plain text reading index is acceptable, but it must stay complete and ordered.
-- From the second chapter onward in framework learning documents, if the chapter contains real practice files or final mini-project files, include `## 本章代码定位索引` after the directory.
-- The code location index connects learning goals, exact real file paths or `Snippet:` labels, type, and section location.
-- Real paths in the code location index must exactly match the recommended directory structure, code-window title bars, and final file list.
-- Concept snippets in the code location index must be marked as `概念 snippet` and must not look like real file paths.
+- `## 本章机制地图` must be concept-driven, not a file inventory. It connects each major concept to the problem it solves, owner or boundary, runtime/tooling/framework layer, real project scenario, and selected source reading path when useful.
+- Do not include file status labels such as `已创建`, `已更新`, or `已保留` in the guide body.
+- Complete delivery verification belongs in the final response self-check, not in the guide body.
 
 ## Stable Section Anchor Rule
 
@@ -359,11 +358,15 @@ If a guide uses `.macos-code-window`, `.macos-code-titlebar`, `.macos-code-dot`,
 
 Missing any required selector is a delivery failure. If a future project intentionally uses an external stylesheet, identify its exact source in the guide and preserve enough in-document explanation that standalone Markdown readers still understand the code-window structure.
 
-## Real File Existence Rule
+## Delivery Evidence Rule
 
-Every path presented as a real file in the code location index, recommended directory structure, real-file code-window title bar, final file list, or final mini-project structure must exist in the local repository before delivery. If it does not exist, either create the file or relabel the example as `Snippet:`, `Template:`, or explicitly not required.
+The guide body should teach mechanisms. It may include selected source reading paths, project structures, and code-window title bars when they improve learning, but it must not become a delivery audit.
 
-Do not mark a missing path as `已创建`, `已更新`, or `真实练习文件`. Real-file title bars, directory structures, and final file lists must agree. Concept snippets must never enter the real final file list.
+- Verify real file existence, changed files, README changes, App entry changes, source file changes, dependency changes, and lint/typecheck/test/build results in the final response.
+- Do not use guide sections as file status reports.
+- Do not add file inventory or preservation tables to prove delivery inside the guide body.
+- If a path is used as a source reading path, it should support a mechanism explanation rather than serve as a status claim.
+- Concept snippets still use `Snippet:` or `Template:` titles and must not masquerade as project files.
 
 ## Concept Snippet Rules
 
@@ -446,31 +449,20 @@ Include:
 
 For React chapter 2 and later, the final mini project should use descriptive concept directories and file names instead of only `App.tsx` and `main.tsx` unless the chapter is specifically about app startup.
 
-## Final File List
+## Engineering Migration and Code Review Section
 
-The `最终文件清单` must list only:
+Every full guide must include `## 14. 工程迁移与代码审查要点` instead of a file inventory.
 
-- The guide file actually created or updated.
-- Real files that the final mini project asks the learner to create, keep, or replace.
+This section helps the learner transfer the chapter mechanism into real project review, refactoring, migration, and architecture decisions. Include:
 
-Do not include configuration files, source references, official documentation links, or concept snippets as final files unless the task actually created or changed them as deliverables.
+- code review questions;
+- migration checks;
+- common production risk signals;
+- when to keep the pattern;
+- when to refactor away from the pattern;
+- what evidence to collect before changing production code.
 
-Each final file row should include:
-
-- file path
-- role
-- status
-
-Use status values such as:
-
-- 已创建并保留
-- 仅在执行最终小项目练习时替换
-- 本次未修改
-- 不需要创建
-
-If some files were only concept snippets, list them separately under a note such as `不需要创建这些概念示例文件`.
-
-From React chapter 2 onward, the final file list should expose meaningful concept directories and file names rather than many repeated `App.tsx`, `main.tsx`, or `example.tsx` entries.
+Do not list every generated file, do not include file status, and do not claim delivery completion in the guide body. Complete file verification belongs in the final response.
 
 ## Extra Cheatsheet
 

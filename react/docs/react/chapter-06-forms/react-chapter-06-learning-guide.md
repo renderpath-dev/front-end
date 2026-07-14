@@ -54,11 +54,12 @@
 
 ## 目录
 
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -88,46 +89,28 @@
   - [常见错误](#常见错误)
   - [可选扩展](#可选扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 本章练习总入口 | `src/learning/react/chapter-06-forms/chapter-06-practice-root.tsx` | 真实练习文件 | 8 |
-| 本章共享样式 | `src/learning/react/chapter-06-forms/chapter-06-practice.css` | 真实练习文件 | 8 |
-| form submit 默认行为 | `src/learning/react/chapter-06-forms/01-form-submit-default-behavior/form-submit-default-behavior.tsx` | 真实练习文件 | 9.1 |
-| controlled text input | `src/learning/react/chapter-06-forms/02-controlled-text-input/controlled-text-input.tsx` | 真实练习文件 | 9.2 |
-| 只写 value 的只读错误 | `Snippet: value without onChange` | 概念 snippet | 9.2 |
-| controlled / uncontrolled 边界 | `src/learning/react/chapter-06-forms/03-controlled-uncontrolled-boundary/controlled-uncontrolled-boundary.tsx` | 真实练习文件 | 9.3 |
-| object form state | `src/learning/react/chapter-06-forms/04-object-form-state/object-form-state.tsx` | 真实练习文件 | 9.4 |
-| textarea / select | `src/learning/react/chapter-06-forms/05-controlled-textarea-select/controlled-textarea-select.tsx` | 真实练习文件 | 9.5 |
-| checkbox / radio | `src/learning/react/chapter-06-forms/06-controlled-checkbox-radio/controlled-checkbox-radio.tsx` | 真实练习文件 | 9.6 |
-| validation feedback | `src/learning/react/chapter-06-forms/07-form-validation/form-validation-feedback.tsx` | 真实练习文件 | 9.7 |
-| submit status | `src/learning/react/chapter-06-forms/08-submit-status-model/submit-status-model.tsx` | 真实练习文件 | 9.8 |
-| typed form fields | `src/learning/react/chapter-06-forms/09-typed-form-fields/typed-form-fields.tsx` | 真实练习文件 | 9.9 |
-| mini project 类型模型 | `src/learning/react/chapter-06-forms/seller-product-form-mini-project/product-form-types.ts` | 最终小项目文件 | 9.10、12 |
-| mini project validation | `src/learning/react/chapter-06-forms/seller-product-form-mini-project/product-form-validation.ts` | 最终小项目文件 | 12 |
-| mini project derived preview | `src/learning/react/chapter-06-forms/seller-product-form-mini-project/product-form-preview.tsx` | 最终小项目文件 | 12 |
-| mini project form owner | `src/learning/react/chapter-06-forms/seller-product-form-mini-project/seller-product-form.tsx` | 最终小项目文件 | 12 |
-| mini project styles | `src/learning/react/chapter-06-forms/seller-product-form-mini-project/seller-product-form-mini-project.css` | 最终小项目文件 | 12 |
-| Vite app 挂载 adapter | `src/App.tsx` | 已更新入口文件 | 8 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Controlled field | React state owns the displayed input value. | Browser form element plus React state | Seller product fields stay synchronized with preview data. | `src/learning/react/chapter-06-forms/02-controlled-text-input/controlled-text-input.tsx` |
+| Submit default behavior | The form event owner decides whether browser navigation continues. | Browser event API | Seller forms prevent page reload before validating and saving. | `src/learning/react/chapter-06-forms/01-form-submit-default-behavior/form-submit-default-behavior.tsx` |
+| Validation state | The form owner derives errors from field values. | React state and TypeScript model | Invalid product data produces visible feedback near fields. | `src/learning/react/chapter-06-forms/07-form-validation/form-validation-feedback.tsx` |
+| Submit status | The form tracks pending and completion feedback explicitly. | React state | Submit buttons and messages reflect the workflow state. | `src/learning/react/chapter-06-forms/08-submit-status-model/submit-status-model.tsx` |
 
-本文件是当前 React + TypeScript 学习路线的第六章，主题以 `README.md` 的 Chapter Progress 为准：**Forms and Controlled Components**。README 原先的 Learning Outline 把第六章写成 effects/refs，与 Chapter Progress 冲突；本次已把 Learning Outline 调整为第五章 rendering data、第六章 forms、第七章 effects/refs、第八章 state architecture，使编号和已完成章节一致。
+## 0. 本章工程问题与边界
 
-本章承接三层已经建立的能力：
+本章解决的工程问题是：浏览器 form 有自己的默认行为，而 React 表单需要明确谁拥有字段值、校验结果和提交状态。受控字段让 UI、state 和校验逻辑保持同一事实来源。
 
-- 第三章：props 是 parent 传给 child 的组件输入，callback props 可以把操作意图传回 state owner。
-- 第四章：event handler 是 callback；state 是 render snapshot；object state 要创建新 object；`preventDefault()` 属于 browser event API。
-- 第五章：根据数据选择 UI branch；loading、error、empty、success 表达不同事实；派生值不应重复存入 state。
-
-本章不实现真实 SellerHub，不引入 React Hook Form、Zod、router、backend API、TanStack Query、Prisma 或任何新依赖。最终小项目只模拟本地提交等待，用来学习状态边界。
+本章不引入第三方表单库、后端持久化、路由提交或服务端 action。边界是浏览器事件、字段所有权、校验 state、提交反馈和基本可访问性关系。
 
 ## 1. 本章解决的问题
 
@@ -169,18 +152,16 @@
 - 为 input、textarea、select、form event 和 field names 写出合理类型。
 - 把同一机制映射到 `LoginForm`、`RegisterForm`、`SellerProductForm`、`ShopForm`、`CheckoutForm` 和 `AdminCategoryForm`。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-1. 先观察纯 browser form submit，再引入 React `onSubmit` 和 `preventDefault()`。
-2. 学习 text input 的 `value -> render -> user edit -> onChange -> setter -> render` loop。
-3. 对比 `defaultValue`，明确 uncontrolled input 的后续值由 DOM 保存。
-4. 把两个相关字段组合成 object state，并复用第四章 immutable update。
-5. 把同一 controlled model 扩展到 textarea、select、checkbox、radio。
-6. 从 values 计算 validation errors。
-7. 再加入 pending 和 success，避免互相覆盖。
-8. 最后补 TypeScript field names 和 element-specific event types，并在 Seller Product Form 集成。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
 
-这个顺序先解决运行时所有权，再解决静态类型。若先写复杂 generic handler，容易把 type annotation 误认为表单运行机制。
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Browser submit event | Preventing unwanted navigation | 先理解默认提交会刷新页面，才能安全接管 submit。 | 表单提交会丢失 React state。 |
+| Controlled value | Validation state | 校验必须基于当前字段 state，而不是读取分散 DOM。 | 错误信息会和输入值不同步。 |
+| Field ownership | Object form state | 多个字段需要统一 owner 才能可靠更新部分字段。 | 字段之间互相覆盖或丢失。 |
+| Validation result | Submit status | 只有明确有效性，才能进入 pending 或 success 状态。 | 无效数据也会显示提交成功。 |
 
 ## 5. 核心术语表
 
@@ -1681,7 +1662,7 @@ export function ProductFormPreview({ values }: ProductFormPreviewProps) {
 ```
 </div>
 
-preview 没有自己的 state。它从 parent 的 current values 每次 render 计算，因此不会出现“form 已更新但 preview 还是旧值”的同步问题。
+preview 没有自己的 state。它从 parent 的 current values 每次 render 计算，因此不会出现“form 已经变更但 preview 还是旧值”的同步问题。
 
 <div class="macos-code-window">
   <div class="macos-code-titlebar">
@@ -2306,48 +2287,25 @@ function updateField<FieldName extends keyof FormValues>(
 ```
 </div>
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-### 本章学习指导文件
+### Code review questions
 
-| File | Role | Status |
-| --- | --- | --- |
-| `docs/react/chapter-06-forms/react-chapter-06-learning-guide.md` | 第六章完整学习指导。 | 已创建并保留。 |
+- 每个字段是否明确是 controlled 还是 uncontrolled？
+- 校验结果的 owner 是否和字段 state 在同一边界内？
+- 错误提示是否通过 label、aria 或文本位置和字段建立关系？
 
-### 本章普通练习文件
+### Migration checks
 
-| File | Role | Status |
-| --- | --- | --- |
-| `src/learning/react/chapter-06-forms/chapter-06-practice-root.tsx` | 汇总九个练习和最终小项目。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/chapter-06-practice.css` | 第六章共享练习样式。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/01-form-submit-default-behavior/form-submit-default-behavior.tsx` | browser submit 与 `preventDefault`。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/02-controlled-text-input/controlled-text-input.tsx` | controlled text 与 snapshot。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/03-controlled-uncontrolled-boundary/controlled-uncontrolled-boundary.tsx` | controlled / uncontrolled ownership。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/04-object-form-state/object-form-state.tsx` | immutable object form state。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/05-controlled-textarea-select/controlled-textarea-select.tsx` | textarea 与 select。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/06-controlled-checkbox-radio/controlled-checkbox-radio.tsx` | checkbox 与 radio group。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/07-form-validation/form-validation-feedback.tsx` | basic validation feedback。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/08-submit-status-model/submit-status-model.tsx` | pending 与 success 状态。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/09-typed-form-fields/typed-form-fields.tsx` | event、values、field name 类型。 | 已创建并保留。 |
+- 从 uncontrolled 迁移到 controlled 时，一次迁移一个字段并观察 value/onChange 是否配对。
+- 把 submit 逻辑拆成 prevent default、validate、persist/pending feedback 三段。
+- 不要把后端保存、路由跳转和本章基础字段机制混在同一个示例里。
 
-### 最终小项目文件
+### Production risk signals
 
-| File | Role | Status |
-| --- | --- | --- |
-| `src/learning/react/chapter-06-forms/seller-product-form-mini-project/product-form-types.ts` | 小项目 type model 与 initial values。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/seller-product-form-mini-project/product-form-validation.ts` | 小项目 pure validation。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/seller-product-form-mini-project/product-form-preview.tsx` | derived product preview。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/seller-product-form-mini-project/seller-product-form.tsx` | 小项目 form state owner。 | 已创建并保留。 |
-| `src/learning/react/chapter-06-forms/seller-product-form-mini-project/seller-product-form-mini-project.css` | 小项目样式。 | 已创建并保留。 |
-
-### 入口与路线更新文件
-
-| File | Role | Status |
-| --- | --- | --- |
-| `README.md` | 修正路线冲突并标记第六章完成。 | 已更新。 |
-| `src/App.tsx` | 按当前学习入口约定挂载第六章。 | 已更新。 |
-
-概念错误示例和短对比示例已经集中列在 `7. 推荐目录结构 -> 概念示例结构`，它们使用 `Snippet:` 或 `Template:` 逻辑标题，不是需要创建的文件，因此不进入最终文件清单。
+- 控制台出现 controlled/uncontrolled warning，检查初始值和 value 绑定。
+- 提交后页面刷新，检查是否处理了 form submit 默认行为。
+- 错误提示滞后，检查校验是否基于旧 state 或分散 DOM 读取。
 
 ## 15. 如何转换成个人笔记
 

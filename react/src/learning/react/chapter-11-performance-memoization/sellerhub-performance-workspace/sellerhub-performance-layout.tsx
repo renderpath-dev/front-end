@@ -7,6 +7,8 @@ function performanceLinkClassName({ isActive }: { isActive: boolean }): string {
     : 'sellerhub-performance-link'
 }
 
+const chapter11BasePath = '/react/chapter-11'
+
 export function SellerHubPerformanceLayout() {
   const preferences = usePerformancePreferences()
 
@@ -22,13 +24,13 @@ export function SellerHubPerformanceLayout() {
         </button>
       </header>
       <nav aria-label="Performance workspace" className="sellerhub-performance-nav">
-        <NavLink className={performanceLinkClassName} to="/performance/catalog">
+        <NavLink className={performanceLinkClassName} to={`${chapter11BasePath}/catalog`}>
           Catalog
         </NavLink>
-        <NavLink className={performanceLinkClassName} to="/performance/orders">
+        <NavLink className={performanceLinkClassName} to={`${chapter11BasePath}/orders`}>
           Orders
         </NavLink>
-        <NavLink className={performanceLinkClassName} to="/performance/dashboard">
+        <NavLink className={performanceLinkClassName} to={`${chapter11BasePath}/dashboard`}>
           Dashboard
         </NavLink>
       </nav>

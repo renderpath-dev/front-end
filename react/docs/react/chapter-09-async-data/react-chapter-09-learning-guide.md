@@ -54,12 +54,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -88,39 +88,28 @@
   - [12.5 核心执行流程](#125-核心执行流程)
   - [12.6 机制边界与常见错误](#126-机制边界与常见错误)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 本章练习入口 | `src/learning/react/chapter-09-async-data/chapter-09-practice-root.tsx` | 真实文件 | 8 |
-| 本章共享样式 | `src/learning/react/chapter-09-async-data/chapter-09-practice.css` | 真实文件 | 8 |
-| Async source boundary | `src/learning/react/chapter-09-async-data/01-async-data-boundary/async-data-source-boundary.tsx` | 真实练习 | 9.1 |
-| Lifecycle union | `src/learning/react/chapter-09-async-data/02-async-state-union/async-lifecycle-union.tsx` | 真实练习 | 9.2 |
-| HTTP / network / JSON boundary | `src/learning/react/chapter-09-async-data/03-http-error-boundary/http-response-boundary.tsx` | 真实练习 | 9.3 |
-| Explicit event request | `src/learning/react/chapter-09-async-data/04-event-driven-fetch/event-driven-product-search.tsx` | 真实练习 | 9.4 |
-| Criteria-driven Effect | `src/learning/react/chapter-09-async-data/05-effect-driven-fetch/effect-driven-product-query.tsx` | 真实练习 | 9.5 |
-| Abort obsolete work | `src/learning/react/chapter-09-async-data/06-abort-obsolete-result/abort-obsolete-request.tsx` | 真实练习 | 9.6 |
-| Race protection | `src/learning/react/chapter-09-async-data/07-race-condition/race-condition-protection.tsx` | 真实练习 | 9.7 |
-| Runtime response guard | `src/learning/react/chapter-09-async-data/08-runtime-type-guard/unknown-response-guard.tsx` | 真实练习 | 9.8 |
-| Async reducer | `src/learning/react/chapter-09-async-data/09-async-reducer/async-lifecycle-reducer.tsx` | 真实练习 | 9.9 |
-| Derived fetched data | `src/learning/react/chapter-09-async-data/10-derived-fetched-data/derived-order-summary.tsx` | 真实练习 | 9.10 |
-| Custom async hook | `src/learning/react/chapter-09-async-data/11-custom-async-hook/custom-async-resource.tsx` | 真实练习 | 9.11 |
-| Context async delivery | `src/learning/react/chapter-09-async-data/12-context-async-delivery/context-async-delivery.tsx` | 真实练习 | 9.12 |
-| Seller Orders Async Workspace | `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/` | 最终小项目 | 12 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Async lifecycle state | The component models idle, loading, success, and error explicitly. | React state plus TypeScript union | Seller orders show accurate request progress. | `src/learning/react/chapter-09-async-data/02-async-state-union/async-lifecycle-union.tsx` |
+| HTTP response boundary | Network success and business success are separate checks. | Browser fetch/API layer | Order requests distinguish failed transport from invalid response shape. | `src/learning/react/chapter-09-async-data/03-http-error-boundary/http-response-boundary.tsx` |
+| Abort obsolete request | The request owner cancels work that no longer matches current intent. | AbortController and effect cleanup | Changing filters prevents stale order results from winning. | `src/learning/react/chapter-09-async-data/06-abort-obsolete-result/abort-obsolete-request.tsx` |
+| Runtime response guard | Unknown external data is narrowed before entering typed state. | TypeScript narrowing at runtime boundary | Seller order payloads are checked before rendering. | `src/learning/react/chapter-09-async-data/08-runtime-type-guard/unknown-response-guard.tsx` |
 
-**学习指导文件：** `docs/react/chapter-09-async-data/react-chapter-09-learning-guide.md`
+## 0. 本章工程问题与边界
 
-**源码根目录：** `src/learning/react/chapter-09-async-data/`
+本章解决的工程问题是：异步数据不是一个普通数组，它有请求生命周期、失败模式、竞态和外部数据边界。把这些状态显式建模，UI 才能可信。
 
-本章位于 `D:\vite_ts` 项目根目录下，与第 7、8 章同级。`src/App.tsx` 只挂载 `Chapter09PracticeRoot`，不承载 request、parser、reducer 或 Context 逻辑。
+本章不引入 React Query、服务器缓存、认证或真实后端部署。边界是浏览器请求、AbortController、runtime guard、async reducer 和 Context delivery。
 
 ## 1. 本章解决的问题
 
@@ -153,16 +142,16 @@ Async data 来自 React tree 外部，具有延迟、失败、空结果、乱序
 - 提取 custom async hook，并解释每次 call 默认拥有独立 state。
 - 用 Context 交付 async resource，同时保留明确 request owner。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-1. 先区分 external resource 与 local UI state。
-2. 再把 lifecycle 建模为互斥 union。
-3. 拆开 network、HTTP、body parse 与 runtime validation。
-4. 对比 event-driven 与 criteria-driven request。
-5. 学习 abort、ignore 与 race protection。
-6. 用 `unknown` guard 建立可信 domain boundary。
-7. 用 reducer 集中 transition，并在 render 派生可见数据。
-8. 最后提取 custom hook、定义 Context scope，并组合最终项目。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Lifecycle union | Loading/error UI | 先有状态模型，UI 才能准确表达请求阶段。 | 会用空数组同时代表未请求、加载中和无结果。 |
+| HTTP response check | Runtime guard | 先确认响应状态，再收窄未知 payload。 | 会把错误页面或错误对象当成业务数据。 |
+| Request ownership | Abort cleanup | 只有知道谁发起请求，才能取消过期请求。 | 旧请求可能覆盖新筛选结果。 |
+| Reducer transition | Context async delivery | 复杂异步状态需要集中转移规则后再分发。 | 多个组件会各自猜测请求状态。 |
 
 ## 5. 核心术语表
 
@@ -2921,44 +2910,25 @@ export async function fetchUnknown(url: string, signal: AbortSignal): Promise<un
 
 该template只完成transport/status/body parse；caller仍必须用domain parser验证returned unknown。
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-| 文件路径 | 职责 | 状态 |
-| --- | --- | --- |
-| `docs/react/chapter-09-async-data/react-chapter-09-learning-guide.md` | 第9章学习指导 | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/chapter-09-practice-root.tsx` | 本章入口 | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/chapter-09-practice.css` | 本章共享样式 | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/01-async-data-boundary/async-data-source-boundary.tsx` | Async source boundary | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/02-async-state-union/async-lifecycle-union.tsx` | Lifecycle union | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/03-http-error-boundary/http-response-boundary.tsx` | HTTP/network/JSON boundary | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/04-event-driven-fetch/event-driven-product-search.tsx` | Event request | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/05-effect-driven-fetch/effect-driven-product-query.tsx` | Effect criteria request | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/06-abort-obsolete-result/abort-obsolete-request.tsx` | Abort cleanup | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/07-race-condition/race-condition-protection.tsx` | Race protection | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/08-runtime-type-guard/unknown-response-guard.tsx` | Runtime guard | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/09-async-reducer/async-lifecycle-reducer.tsx` | Async reducer | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/10-derived-fetched-data/derived-order-summary.tsx` | Derived fetched data | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/11-custom-async-hook/custom-async-resource.tsx` | Custom async hook | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/12-context-async-delivery/context-async-delivery.tsx` | Context delivery | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-order-types.ts` | Domain/type contracts | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-order-response-guard.ts` | Runtime parser | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-order-request.ts` | Abortable mock request | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-orders-reducer.ts` | Pure lifecycle reducer | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/use-seller-orders-resource.ts` | Resource custom hook | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-orders-context.ts` | Context contract/guard | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-orders-provider.tsx` | Provider owner | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-orders-toolbar.tsx` | Criteria/retry intent | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-orders-list.tsx` | Lifecycle UI branches | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-orders-summary.tsx` | Derived summary | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-orders-async-workspace.tsx` | Final composition | 已创建并保留 |
-| `src/learning/react/chapter-09-async-data/seller-orders-async-workspace/seller-orders-async-workspace.css` | Final project styles | 已创建并保留 |
-| `README.md` | 第9章路线、状态与路径 | 已更新 |
-| `src/App.tsx` | 挂载第9章入口 | 已更新 |
+### Code review questions
 
-不需要创建这些概念片段：
+- 异步状态是否能区分 idle、loading、success、empty 和 error？
+- 外部 payload 是否在进入组件状态前完成 runtime guard？
+- 过期请求是否会被取消或忽略？
 
-- `Snippet: SellerHub resource boundary`
-- `Template: guarded fetch boundary`
+### Migration checks
+
+- 把 `data: []` 风格迁移为 discriminated union，再改 UI 分支。
+- 把 fetch 逻辑从组件 JSX 中移到明确的 request boundary。
+- 增加 AbortController 前先确认请求和筛选条件的所有权。
+
+### Production risk signals
+
+- 快速切换筛选后结果倒退，检查 race condition。
+- TypeScript 类型正确但页面崩溃，检查 runtime response guard。
+- 错误状态没有可恢复路径，检查 async transition 设计。
 
 ## 15. 如何转换成个人笔记
 

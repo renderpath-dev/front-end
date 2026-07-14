@@ -14,12 +14,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -48,66 +48,28 @@
   - [12.5 Runtime、类型与工具链边界](#125-runtime类型与工具链边界)
   - [12.6 验证步骤](#126-验证步骤)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 测试金字塔与测试边界 | `src/learning/react/chapter-12-testing-quality/01-test-boundary/testing-boundary-map.tsx` | 真实练习文件 | 9.1 |
-| Vitest unit test：pure function、parser 与 reducer | `src/learning/react/chapter-12-testing-quality/02-unit-reducer-parser/cart-quality-rules.ts` | 真实练习文件 | 9.2 |
-| Vitest unit test：pure function、parser 与 reducer behavior check | `src/learning/react/chapter-12-testing-quality/02-unit-reducer-parser/cart-quality-rules.test.ts` | 真实测试文件 | 9.2 |
-| Component test：render、screen 与 user-visible output | `src/learning/react/chapter-12-testing-quality/03-component-render-screen/visible-summary-panel.tsx` | 真实练习文件 | 9.3 |
-| Component test：render、screen 与 user-visible output behavior check | `src/learning/react/chapter-12-testing-quality/03-component-render-screen/visible-summary-panel.behavior.test.tsx` | 真实测试文件 | 9.3 |
-| getByRole / getByLabelText 与 accessibility-first query | `src/learning/react/chapter-12-testing-quality/04-accessible-queries/accessible-login-form.tsx` | 真实练习文件 | 9.4 |
-| getByRole / getByLabelText 与 accessibility-first query behavior check | `src/learning/react/chapter-12-testing-quality/04-accessible-queries/accessible-login-form.behavior.test.tsx` | 真实测试文件 | 9.4 |
-| userEvent 与真实交互序列 | `src/learning/react/chapter-12-testing-quality/05-user-event-interaction/quantity-stepper.tsx` | 真实练习文件 | 9.5 |
-| userEvent 与真实交互序列 behavior check | `src/learning/react/chapter-12-testing-quality/05-user-event-interaction/quantity-stepper.behavior.test.tsx` | 真实测试文件 | 9.5 |
-| Async UI test：findBy、waitFor 与 loading/error/success | `src/learning/react/chapter-12-testing-quality/06-async-ui-state/async-order-status-panel.tsx` | 真实练习文件 | 9.6 |
-| Async UI test：findBy、waitFor 与 loading/error/success behavior check | `src/learning/react/chapter-12-testing-quality/06-async-ui-state/async-order-status-panel.behavior.test.tsx` | 真实测试文件 | 9.6 |
-| Controlled form behavior test | `src/learning/react/chapter-12-testing-quality/07-controlled-form-test/seller-filter-form.tsx` | 真实练习文件 | 9.7 |
-| Controlled form behavior test behavior check | `src/learning/react/chapter-12-testing-quality/07-controlled-form-test/seller-filter-form.behavior.test.tsx` | 真实测试文件 | 9.7 |
-| Router integration test 与 initial route | `src/learning/react/chapter-12-testing-quality/08-router-integration-test/seller-route-workspace.tsx` | 真实练习文件 | 9.8 |
-| Router integration test 与 initial route behavior check | `src/learning/react/chapter-12-testing-quality/08-router-integration-test/seller-route-workspace.behavior.test.tsx` | 真实测试文件 | 9.8 |
-| Context provider / custom hook boundary test | `src/learning/react/chapter-12-testing-quality/09-context-hook-boundary/seller-preferences-context.ts` | 真实练习文件 | 9.9 |
-| Context provider / custom hook boundary test behavior check | `src/learning/react/chapter-12-testing-quality/09-context-hook-boundary/seller-preferences.behavior.test.tsx` | 真实测试文件 | 9.9 |
-| MSW 与 network boundary mock | `src/learning/react/chapter-12-testing-quality/10-msw-network-mock/seller-orders-network-panel.tsx` | 真实练习文件 | 9.10 |
-| MSW 与 network boundary mock behavior check | `src/learning/react/chapter-12-testing-quality/10-msw-network-mock/seller-orders-network-panel.msw.test.tsx` | 真实测试文件 | 9.10 |
-| Error boundary 与错误状态测试 | `src/learning/react/chapter-12-testing-quality/11-error-boundary-test/render-error-boundary.tsx` | 真实练习文件 | 9.11 |
-| Error boundary 与错误状态测试 behavior check | `src/learning/react/chapter-12-testing-quality/11-error-boundary-test/render-error-boundary.behavior.test.tsx` | 真实测试文件 | 9.11 |
-| Quality gates：lint、typecheck、test、build 与 CI command model | `src/learning/react/chapter-12-testing-quality/12-quality-gates/quality-gate-command-model.ts` | 真实练习文件 | 9.12 |
-| Quality gates：lint、typecheck、test、build 与 CI command model behavior check | `src/learning/react/chapter-12-testing-quality/12-quality-gates/quality-gate-command-model.test.ts` | 真实测试文件 | 9.12 |
-| SellerHub testing architecture mapping | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-testing-types.ts` | 真实练习文件 | 9.13 |
-| adapter / setup | `src/learning/react/chapter-12-testing-quality/chapter-12-practice-root.tsx` | adapter / 测试配置 | 8 |
-| adapter / setup | `src/learning/react/chapter-12-testing-quality/chapter-12-practice.css` | adapter / 测试配置 | 8 |
-| adapter / setup | `vitest.config.ts` | adapter / 测试配置 | 8 |
-| adapter / setup | `src/test/setup.ts` | adapter / 测试配置 | 8 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-testing-types.ts` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-cart-rules.ts` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-auth-context.ts` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-auth-provider.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-catalog-filter.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-login-form.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-orders-panel.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-protected-route.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-workflow-routes.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-error-boundary.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-test-handlers.ts` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-test-server.ts` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-cart-reducer.test.ts` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-login-form.behavior.test.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-orders-msw.behavior.test.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-router-integration.behavior.test.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-context-hook-boundary.behavior.test.tsx` | 最终小项目真实文件 | 12.3 |
-| SellerHub Tested Workflow | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-error-boundary.behavior.test.tsx` | 最终小项目真实文件 | 12.3 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Behavior test | The test asserts user-visible behavior instead of implementation details. | Vitest and Testing Library | SellerHub login and order flows are verified through the DOM. | `src/learning/react/chapter-12-testing-quality/01-behavior-test-boundary/behavior-test-boundary.tsx` |
+| Async assertion | The test waits for UI state that appears after async work. | Testing Library async utilities | Order panels are asserted after request-like state changes. | `src/learning/react/chapter-12-testing-quality/04-async-ui-test/async-ui-test.tsx` |
+| Mock Service Worker boundary | Network behavior is mocked at request level, not by rewriting components. | MSW test boundary | SellerHub order tests keep component code close to production usage. | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-orders-msw.behavior.test.tsx` |
+| Integration route test | Router and workflow behavior are tested together when boundaries interact. | React Router plus test runtime | Protected routes and workflow pages are verified as user flows. | `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-router-integration.behavior.test.tsx` |
 
-本章位于 `D:/vite_ts` 的 React 学习路线第 12 章。学习指导文件是 `docs/react/chapter-12-testing-quality/react-chapter-12-learning-guide.md`，练习源码根目录是 `src/learning/react/chapter-12-testing-quality/`。本章明确指定主题为 Testing、Quality Gates 与 Frontend Engineering，不因 README 中旧路线缺失而改变主题。
+## 0. 本章工程问题与边界
+
+本章解决的工程问题是：测试应该证明用户行为和边界契约，而不是复制组件实现。React 学习项目需要能区分单元逻辑、组件行为、异步 UI 和路由集成。
+
+本章不引入新的测试框架、不追求覆盖率数字游戏，也不把测试写成 snapshot 仓库。边界是 Vitest、Testing Library、MSW、user-event、router integration 和可维护测试数据。
 
 ## 1. 本章解决的问题
 
@@ -121,9 +83,16 @@
 
 完成本章后，你应能区分 unit/component/integration/E2E boundary；用 Vitest 测 pure rule；用 Testing Library 和 userEvent 测 UI 行为；用 findBy/waitFor 等待异步 DOM；用 MSW mock request boundary；用 MemoryRouter 和 provider wrapper 测集成边界；用 lint/typecheck/test/build 组织质量门禁。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-先学测试边界，再学 unit test；再进入 render/screen、accessible query、userEvent；随后学习 async UI、controlled form、router、context、MSW 和 error boundary；最后把它们收束到 quality gates 和 SellerHub mapping。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| User behavior | DOM query | 先从用户能看到和操作的结果出发，才能选择合适 query。 | 会依赖 className 或组件内部结构。 |
+| State transition | Async assertion | 异步 UI 必须等待可见结果，而不是猜时间。 | 测试会 flake 或提前断言失败。 |
+| Network boundary | MSW handler | 请求层 mock 保留组件真实调用路径。 | 直接 mock hook 会掩盖集成问题。 |
+| Route behavior | Integration test | 跨页面流程需要 router context。 | 只测 leaf component 会漏掉导航和 guard 错误。 |
 
 ## 5. 核心术语表
 
@@ -316,7 +285,7 @@ npm run build
 ```
 </div>
 
-`chapter-12-practice-root.tsx`、`chapter-12-practice.css`、`src/App.tsx` 和 `src/test/setup.ts` 是 adapter/setup 边界，只列入索引、结构和最终文件清单，不在正文中展开完整代码。
+`chapter-12-practice-root.tsx`、`chapter-12-practice.css`、`src/App.tsx` 和 `src/test/setup.ts` 是 adapter/setup 边界，只作为结构说明和运行入口说明，不在正文中展开完整代码。
 
 ## 9. 分节教学与练习
 
@@ -3456,107 +3425,25 @@ it('submits visible form values', async () => {
 ```
 </div>
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-| File | Role | Status |
-| --- | --- | --- |
+### Code review questions
 
-| `docs/react/chapter-12-testing-quality/react-chapter-12-learning-guide.md` | 本章真实文件。 | 已创建并保留 |
+- 测试名称是否描述用户行为，而不是组件内部函数？
+- 异步断言是否等待 DOM 变化，而不是使用固定 timeout？
+- mock 是否放在真实边界，还是过度替换了被测逻辑？
 
-| `vitest.config.ts` | 本章真实文件。 | 已创建并保留 |
+### Migration checks
 
-| `src/test/setup.ts` | 本章真实文件。 | 已创建并保留 |
+- 把 brittle snapshot 迁移为 role/text/user-event 行为断言。
+- 把 fetch mock 迁移到 MSW handler，保留组件请求代码。
+- 把复杂流程拆成少量高价值 integration tests，加上更小的纯函数 tests。
 
-| `src/learning/react/chapter-12-testing-quality/chapter-12-practice-root.tsx` | 本章真实文件。 | 已创建并保留 |
+### Production risk signals
 
-| `src/learning/react/chapter-12-testing-quality/chapter-12-practice.css` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/01-test-boundary/testing-boundary-map.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/02-unit-reducer-parser/cart-quality-rules.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/03-component-render-screen/visible-summary-panel.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/04-accessible-queries/accessible-login-form.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/05-user-event-interaction/quantity-stepper.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/06-async-ui-state/async-order-status-panel.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/07-controlled-form-test/seller-filter-form.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/08-router-integration-test/seller-route-workspace.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/09-context-hook-boundary/seller-preferences-context.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/10-msw-network-mock/seller-orders-network-panel.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/11-error-boundary-test/render-error-boundary.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/12-quality-gates/quality-gate-command-model.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-testing-types.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/02-unit-reducer-parser/cart-quality-rules.test.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/03-component-render-screen/visible-summary-panel.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/04-accessible-queries/accessible-login-form.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/05-user-event-interaction/quantity-stepper.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/06-async-ui-state/async-order-status-panel.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/07-controlled-form-test/seller-filter-form.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/08-router-integration-test/seller-route-workspace.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/09-context-hook-boundary/seller-preferences.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/10-msw-network-mock/seller-orders-network-panel.msw.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/11-error-boundary-test/render-error-boundary.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/12-quality-gates/quality-gate-command-model.test.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-testing-types.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-cart-rules.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-auth-context.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-auth-provider.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-catalog-filter.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-login-form.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-orders-panel.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-protected-route.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-workflow-routes.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-error-boundary.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-test-handlers.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-test-server.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-cart-reducer.test.ts` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-login-form.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-orders-msw.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-router-integration.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-context-hook-boundary.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-| `src/learning/react/chapter-12-testing-quality/sellerhub-tested-workflow/sellerhub-error-boundary.behavior.test.tsx` | 本章真实文件。 | 已创建并保留 |
-
-
-不需要创建这些概念 snippet：`Template: behavior test pattern` 只用于速查，不进入真实文件清单。
+- 测试偶发失败，检查 async wait 和 mock reset。
+- 重构组件结构导致大量测试失败，说明测试过度绑定实现。
+- 生产 bug 未被测试捕获，检查是否缺少用户路径或边界测试。
 
 ## 15. 如何转换成个人笔记
 

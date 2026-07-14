@@ -1,0 +1,210 @@
+.chapter-nineteen-shell {
+  min-height: 100vh;
+  padding: 32px;
+  color: #172033;
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.14), transparent 34rem),
+    linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.chapter-nineteen-hero,
+.chapter-nineteen-section,
+.sellerhub-vite-lab,
+.vite-boundary-card {
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+}
+
+.chapter-nineteen-hero {
+  display: grid;
+  gap: 16px;
+  margin: 0 auto 24px;
+  max-width: 1180px;
+  padding: 36px;
+}
+
+.chapter-nineteen-eyebrow,
+.vite-boundary-kicker {
+  margin: 0;
+  color: #4f46e5;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chapter-nineteen-hero h1 {
+  margin: 0;
+  max-width: 940px;
+  color: #0f172a;
+  font-size: clamp(2rem, 4vw, 4rem);
+  line-height: 1;
+}
+
+.chapter-nineteen-hero p,
+.chapter-nineteen-section p,
+.vite-boundary-card p,
+.sellerhub-vite-lab p {
+  color: #475569;
+}
+
+.chapter-nineteen-layout,
+.chapter-nineteen-section,
+.sellerhub-vite-lab,
+.vite-boundary-card,
+.vite-boundary-stack {
+  display: grid;
+  gap: 16px;
+}
+
+.chapter-nineteen-layout {
+  margin: 0 auto;
+  max-width: 1180px;
+}
+
+.chapter-nineteen-section,
+.sellerhub-vite-lab {
+  padding: 24px;
+}
+
+.chapter-nineteen-section h2,
+.sellerhub-vite-lab h2,
+.vite-boundary-card h3,
+.vite-boundary-card h4 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.chapter-nineteen-grid,
+.vite-boundary-two-column {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.vite-boundary-card {
+  padding: 18px;
+}
+
+.vite-boundary-card ul,
+.vite-boundary-card ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #334155;
+}
+
+.vite-boundary-card li + li {
+  margin-top: 6px;
+}
+
+.vite-boundary-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vite-boundary-list li,
+.vite-boundary-note,
+.vite-boundary-metric {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.vite-boundary-muted {
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.vite-boundary-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vite-boundary-pill {
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #3730a3;
+  background: #e0e7ff;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.vite-boundary-pill-warning {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.vite-boundary-pill-success {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.vite-boundary-button {
+  justify-self: start;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  color: #ffffff;
+  background: #4f46e5;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.vite-boundary-button:hover {
+  background: #4338ca;
+}
+
+.vite-boundary-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 16px;
+  color: #334155;
+  background: #ffffff;
+}
+
+.vite-boundary-table th,
+.vite-boundary-table td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.vite-boundary-table th {
+  color: #0f172a;
+  background: #eef2ff;
+}
+
+.vite-boundary-code {
+  overflow-x: auto;
+  border-radius: 16px;
+  padding: 12px;
+  color: #e2e8f0;
+  background: #111827;
+}
+
+.vite-boundary-warning {
+  border-radius: 16px;
+  padding: 12px;
+  color: #92400e;
+  background: #fef3c7;
+  font-weight: 700;
+}
+
+.vite-boundary-success {
+  border-radius: 16px;
+  padding: 12px;
+  color: #166534;
+  background: #dcfce7;
+  font-weight: 700;
+}

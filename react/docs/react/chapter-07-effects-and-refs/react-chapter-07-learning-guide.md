@@ -14,12 +14,12 @@
 
 ## 目录
 
-- [本章代码定位索引](#本章代码定位索引)
-- [0. 文件定位](#0-文件定位)
+- [本章机制地图](#本章机制地图)
+- [0. 本章工程问题与边界](#0-本章工程问题与边界)
 - [1. 本章解决的问题](#1-本章解决的问题)
 - [2. 前置概念](#2-前置概念)
 - [3. 学习目标](#3-学习目标)
-- [4. 推荐学习顺序](#4-推荐学习顺序)
+- [4. 机制依赖图](#4-机制依赖图)
 - [5. 核心术语表](#5-核心术语表)
 - [6. 底层心智模型](#6-底层心智模型)
 - [7. 推荐目录结构](#7-推荐目录结构)
@@ -52,47 +52,28 @@
   - [常见错误](#常见错误)
   - [可选扩展](#可选扩展)
 - [13. 额外速查表](#13-额外速查表)
-- [14. 最终文件清单](#14-最终文件清单)
+- [14. 工程迁移与代码审查要点](#14-工程迁移与代码审查要点)
 - [15. 如何转换成个人笔记](#15-如何转换成个人笔记)
 - [16. 必须能回答的问题](#16-必须能回答的问题)
 - [17. 最终记忆模型](#17-最终记忆模型)
 - [18. 官方文档阅读清单](#18-官方文档阅读清单)
 
-## 本章代码定位索引
+## 本章机制地图
 
-| 学习目标 | 对应文件 / 片段 | 类型 | 所在章节 |
-| --- | --- | --- | --- |
-| 本章总入口 | `src/learning/react/chapter-07-effects-and-refs/chapter-07-practice-root.tsx` | 真实练习文件 | 8 |
-| 本章共享样式 | `src/learning/react/chapter-07-effects-and-refs/chapter-07-practice.css` | 真实练习文件 | 8 |
-| pure render | `src/learning/react/chapter-07-effects-and-refs/01-pure-render-boundary/pure-render-boundary.tsx` | 真实练习文件 | 9.1 |
-| event / effect 边界 | `src/learning/react/chapter-07-effects-and-refs/02-event-handler-vs-effect/event-handler-vs-effect.tsx` | 真实练习文件 | 9.2 |
-| mutable ref | `src/learning/react/chapter-07-effects-and-refs/03-ref-mutable-value/ref-mutable-value.tsx` | 真实练习文件 | 9.3 |
-| DOM ref | `src/learning/react/chapter-07-effects-and-refs/04-dom-node-ref/dom-node-ref.tsx` | 真实练习文件 | 9.4 |
-| setup / cleanup | `src/learning/react/chapter-07-effects-and-refs/05-effect-setup-cleanup/effect-setup-cleanup.tsx` | 真实练习文件 | 9.5 |
-| dependency array | `src/learning/react/chapter-07-effects-and-refs/06-effect-dependencies/effect-dependencies.tsx` | 真实练习文件 | 9.6 |
-| stale closure | `src/learning/react/chapter-07-effects-and-refs/07-stale-closure/stale-closure-interval.tsx` | 真实练习文件 | 9.7 |
-| timer cleanup | `src/learning/react/chapter-07-effects-and-refs/08-timer-cleanup/timer-cleanup.tsx` | 真实练习文件 | 9.8 |
-| document title | `src/learning/react/chapter-07-effects-and-refs/09-document-title-sync/document-title-sync.tsx` | 真实练习文件 | 9.9 |
-| async cleanup | `src/learning/react/chapter-07-effects-and-refs/10-async-effect-cleanup/async-effect-cleanup.tsx` | 真实练习文件 | 9.10 |
-| derived data | `src/learning/react/chapter-07-effects-and-refs/11-derived-data-without-effect/derived-data-without-effect.tsx` | 真实练习文件 | 9.11 |
-| typed refs | `src/learning/react/chapter-07-effects-and-refs/12-typed-refs-effects/typed-refs-effects.tsx` | 真实练习文件 | 9.12 |
-| render 中执行副作用 | `Snippet: side effect during render` | 概念 snippet | 9.1 |
-| 空依赖掩盖 reactive value | `Snippet: missing dependency` | 概念 snippet | 9.6 |
-| stale interval callback | `Snippet: stale interval closure` | 概念 snippet | 9.7 |
-| derived state effect | `Snippet: redundant derived state` | 概念 snippet | 9.11 |
-| mini project 类型 | `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-types.ts` | 最终小项目文件 | 12 |
-| mini project 数据 | `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-data.ts` | 最终小项目文件 | 12 |
-| mini project 输入 | `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-input.tsx` | 最终小项目文件 | 12 |
-| mini project 结果 | `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-results.tsx` | 最终小项目文件 | 12 |
-| mini project owner | `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-sync-workspace.tsx` | 最终小项目文件 | 12 |
-| mini project 样式 | `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-sync-mini-project.css` | 最终小项目文件 | 12 |
-| Vite 挂载 adapter | `src/App.tsx` | 已更新入口文件 | 8 |
+这张表只保留能帮助理解机制的工程路径；它不是文件盘点，也不记录文件状态。
 
-## 0. 文件定位
+| Mechanism | Owner / Boundary | Runtime Layer | Project Scenario | Source Reading Path |
+| --- | --- | --- | --- | --- |
+| Pure render boundary | Render computes UI and must not perform synchronization work. | React render runtime | Seller search rendering stays separate from document or timer effects. | `src/learning/react/chapter-07-effects-and-refs/01-pure-render-boundary/pure-render-boundary.tsx` |
+| Ref mutable cell | A ref stores mutable data without scheduling render. | React hook runtime | Timer ids or DOM nodes can be retained without UI state churn. | `src/learning/react/chapter-07-effects-and-refs/03-ref-mutable-value/ref-mutable-value.tsx` |
+| Effect setup and cleanup | The component owns external synchronization lifetime. | React commit phase | Subscriptions, timers, and requests are cleaned up when dependencies change. | `src/learning/react/chapter-07-effects-and-refs/05-effect-setup-cleanup/effect-setup-cleanup.tsx` |
+| Dependency array | React decides when synchronization must rerun. | React hook dependency model | Search criteria changes drive effect refresh without stale closures. | `src/learning/react/chapter-07-effects-and-refs/06-effect-dependencies/effect-dependencies.tsx` |
 
-本文件是当前 React + TypeScript + Vite 学习路线的第 7 章。主题由本地 `README.md` 的 Learning Outline 与 Chapter Progress 共同确认：**Effects and Refs**。目标不是记住两个 Hook 的写法，而是建立“纯 render、用户事件、React 同步过程、browser 外部系统、TypeScript 静态检查”之间的边界。
+## 0. 本章工程问题与边界
 
-本章承接：第 3 章的 props 输入，第 4 章的 state snapshot 与 event handler，第 5 章的派生列表，第 6 章的 controlled form。它不引入 router、backend、TanStack Query、React Hook Form、Zod、Prisma 或新依赖。
+本章解决的工程问题是：哪些工作属于 render，哪些工作属于与外部系统同步。Effect 不是“任何逻辑都能放进去”的工具；ref 也不是 state 的替代品。
+
+本章不构建完整数据请求架构、缓存层或性能优化系统。它只处理 DOM node、timer、document title、async cleanup 等外部同步边界。
 
 ## 1. 本章解决的问题
 
@@ -133,16 +114,16 @@
 - 直接在 render 中计算 derived data，避免 `effect + state` 镜像。
 - 把机制映射到 SellerHub 的 search、modal、draft、dashboard 与 request 场景。
 
-## 4. 推荐学习顺序
+## 4. 机制依赖图
 
-1. 先划分 pure render 与 side effect。
-2. 再区分 event-specific logic 与 render-caused synchronization。
-3. 学习 ref object 为什么能跨 render 保留，又为什么不驱动 UI。
-4. 把 ref 交给 JSX `ref` attribute，观察 React 在 commit 时写入 DOM node。
-5. 学习 effect 的 setup / cleanup 对称过程。
-6. 从 reactive values 推导 dependencies，再分析 closure snapshot。
-7. 用 timer、document title、browser subscription 和 async 模拟验证 cleanup。
-8. 最后先删除不必要的 effect，再把必要同步组合进 Seller Search Sync Workspace。
+这些依赖不是阅读顺序清单，而是本章概念成立的前置关系。
+
+| First Understand | Then Understand | Dependency Reason | Failure If Skipped |
+| --- | --- | --- | --- |
+| Pure render | Effect necessity | 先判断能否在 render 中派生，才能避免滥用 effect。 | 会把可计算数据放进 effect 造成额外 render。 |
+| Mutable value need | Ref usage | 只有不需要触发 UI 更新的数据才适合 ref。 | UI 不更新或状态不可追踪。 |
+| External resource lifetime | Cleanup function | 外部订阅或 timer 必须有结束条件。 | 会泄漏订阅、重复 timer 或过期请求。 |
+| Closure capture | Dependency list | effect 使用的值来自闭包，依赖数组必须反映同步输入。 | 会产生 stale closure。 |
 
 ## 5. 核心术语表
 
@@ -2235,7 +2216,7 @@ function handleFocus(): void {
 
 ### 不需要创建的概念 snippet
 
-下列名称只标记概念片段、错误对比或模板，不属于最终文件清单：
+下列名称只标记概念片段、错误对比或模板，不用于交付验证记录：
 
 | 名称 | 角色 | 状态 |
 | --- | --- | --- |
@@ -2247,50 +2228,25 @@ function handleFocus(): void {
 | `Template: external synchronization` | setup / cleanup 最小模板 | 不创建 |
 | `Template: typed DOM ref` | typed DOM ref 最小模板 | 不创建 |
 
-## 14. 最终文件清单
+## 14. 工程迁移与代码审查要点
 
-### 本章学习指导文件
+### Code review questions
 
-| 文件 | 角色 | 状态 |
-| --- | --- | --- |
-| `docs/react/chapter-07-effects-and-refs/react-chapter-07-learning-guide.md` | 第 7 章机制讲解、练习与项目文档 | 已创建 |
+- 这段 effect 是否真的同步外部系统，还是可以在 render 中计算？
+- ref 保存的数据是否不需要触发 UI 更新？
+- effect cleanup 是否覆盖组件卸载和依赖变化两种情况？
 
-### 本章普通练习文件
+### Migration checks
 
-| 文件 | 角色 | 状态 |
-| --- | --- | --- |
-| `src/learning/react/chapter-07-effects-and-refs/chapter-07-practice-root.tsx` | 汇总全部练习与最终项目 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/chapter-07-practice.css` | 本章共享页面与练习卡片样式 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/01-pure-render-boundary/pure-render-boundary.tsx` | pure render 练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/02-event-handler-vs-effect/event-handler-vs-effect.tsx` | event / effect 边界练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/03-ref-mutable-value/ref-mutable-value.tsx` | mutable ref 练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/04-dom-node-ref/dom-node-ref.tsx` | DOM ref 与 focus 练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/05-effect-setup-cleanup/effect-setup-cleanup.tsx` | subscription setup / cleanup 练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/06-effect-dependencies/effect-dependencies.tsx` | reactive dependencies 练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/07-stale-closure/stale-closure-interval.tsx` | stale closure 修正练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/08-timer-cleanup/timer-cleanup.tsx` | timer ownership 练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/09-document-title-sync/document-title-sync.tsx` | document title 同步练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/10-async-effect-cleanup/async-effect-cleanup.tsx` | obsolete async result 防护练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/11-derived-data-without-effect/derived-data-without-effect.tsx` | 删除不必要 effect 练习 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/12-typed-refs-effects/typed-refs-effects.tsx` | TypeScript DOM/timer ref 练习 | 已创建 |
+- 迁移旧生命周期代码时，先拆出 render 派生值，再保留真正外部同步。
+- 把 timer、subscription、request 的 setup/cleanup 放在同一个 effect 中审查。
+- 遇到 dependency lint warning 时，先修正数据流，不要默认 suppress。
 
-### 最终小项目文件
+### Production risk signals
 
-| 文件 | 角色 | 状态 |
-| --- | --- | --- |
-| `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-types.ts` | domain 与 status 类型 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-data.ts` | local typed fixtures | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-input.tsx` | controlled search controls 与 ref 接线 | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-results.tsx` | derived result rendering | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-sync-workspace.tsx` | state/ref/effect owner | 已创建 |
-| `src/learning/react/chapter-07-effects-and-refs/seller-search-sync-mini-project/seller-search-sync-mini-project.css` | 小项目独立样式 | 已创建 |
-
-### 入口与路线更新文件
-
-| 文件 | 角色 | 状态 |
-| --- | --- | --- |
-| `README.md` | 第 7 章状态与位置索引 | 已更新 |
-| `src/App.tsx` | 当前章节挂载 adapter | 已更新 |
+- UI 闪烁或重复请求，检查 effect 是否由派生 state 触发循环。
+- 组件卸载后仍有日志或请求回写，检查 cleanup。
+- handler 使用旧值，检查 closure 和依赖边界。
 
 ## 15. 如何转换成个人笔记
 
