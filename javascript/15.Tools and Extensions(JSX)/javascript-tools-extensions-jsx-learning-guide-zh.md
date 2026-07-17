@@ -25,13 +25,14 @@
 12. [08：JSX 表达式、属性和子元素](#12-08jsx-表达式属性和子元素)
 13. [09：JSX 组件和 UI 组合](#13-09jsx-组件和-ui-组合)
 14. [10：JSX 条件渲染和列表渲染](#14-10jsx-条件渲染和列表渲染)
-15. [11：Flow 类型检查扩展](#15-11flow-类型检查扩展)
-16. [12：小项目整合](#16-12小项目整合)
-17. [最终文件清单](#17-最终文件清单)
-18. [最终学习笔记转换要求](#18-最终学习笔记转换要求)
-19. [本章最终要能回答的问题](#19-本章最终要能回答的问题)
-20. [MDN 和官方文档阅读清单](#20-mdn-和官方文档阅读清单)
-21. [最终记忆模型](#21-最终记忆模型)
+15. [11：JSX 必学边界：事件、Fragment、样式、安全和 TSX](#15-11jsx-必学边界事件fragment样式安全和-tsx)
+16. [12：Flow 类型检查扩展](#16-12flow-类型检查扩展)
+17. [13：小项目整合](#17-13小项目整合)
+18. [最终文件清单](#18-最终文件清单)
+19. [最终学习笔记转换要求](#19-最终学习笔记转换要求)
+20. [本章最终要能回答的问题](#20-本章最终要能回答的问题)
+21. [MDN 和官方文档阅读清单](#21-mdn-和官方文档阅读清单)
+22. [最终记忆模型](#22-最终记忆模型)
 
 ---
 
@@ -96,7 +97,9 @@ toolchain model
   -> Jest
   -> bundling
   -> Babel
-  -> JSX
+  -> JSX transform
+  -> JSX syntax and composition
+  -> JSX event, Fragment, style, security, and TSX boundary
   -> Flow
   -> mini project
 ```
@@ -112,6 +115,7 @@ Jest verifies behavior.
 Bundlers process the module graph.
 Babel transforms syntax.
 JSX is a JavaScript syntax extension that needs transformation.
+JSX composition, event props, Fragment, style object, and TSX boundaries are required before React projects.
 Flow is a type-checking extension.
 ```
 
@@ -1239,6 +1243,24 @@ JSX 花括号让你从 markup 回到 JavaScript 表达式。
     ProductBadge.jsx
 ```
 
+### `package.json`
+
+```json
+{
+  "name": "jsx-expressions-props-children-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check": "node --check src/ProductBadge.jsx"
+  },
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}
+```
+
 ### `src/ProductBadge.jsx`
 
 ```jsx
@@ -1324,6 +1346,24 @@ React 里自定义组件名必须大写开头。小写标签被当作内置 DOM 
     components/
       ProfileSummary.jsx
       StatusPill.jsx
+```
+
+### `package.json`
+
+```json
+{
+  "name": "jsx-components-composition-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check": "node --check src/App.jsx"
+  },
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}
 ```
 
 ### `src/components/StatusPill.jsx`
@@ -1439,8 +1479,24 @@ Key 是帮助 React 识别列表元素身份的特殊 prop。
 
 ```txt
 10-jsx-conditional-list-rendering/
+  package.json
   src/
     NotificationList.jsx
+```
+
+### `package.json`
+
+```json
+{
+  "name": "jsx-conditional-list-rendering-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  }
+}
 ```
 
 ### `src/NotificationList.jsx`
@@ -1511,7 +1567,378 @@ export function NotificationList() {
 
 ---
 
-## 15. 11：Flow 类型检查扩展
+## 15. 11：JSX 必学边界：事件、Fragment、样式、安全和 TSX
+
+### 结论
+
+前面几节已经讲了 JSX 的主线：JSX 不是 HTML，它会被转换；JSX 可以写表达式、props、children；组件名大写；条件和列表靠 JavaScript 表达式控制。
+
+但真正开始写 React 之前，还必须补齐这一组边界知识：
+
+```txt
+one root boundary
+self-closing tag
+camelCase DOM prop
+event handler prop
+Fragment
+inline style object
+boolean prop
+props spreading
+default escaping
+dangerouslySetInnerHTML
+TSX file boundary
+```
+
+这些内容不是高级技巧，而是你写第一个 React 页面时就会碰到的基础规则。
+
+### 这一节解决什么问题
+
+这一节解决的问题是：为什么 JSX 看起来像 HTML，但写法、属性名、事件、样式、安全边界、TypeScript 文件边界都不是普通 HTML 规则。
+
+你要建立下面这个判断：
+
+```txt
+When I write JSX, I am still writing JavaScript expressions.
+When I pass a JSX prop, I am passing a JavaScript value.
+When I pass an event handler, I am passing a function value.
+When I render text, React escapes it by default.
+When I write TSX, TypeScript must parse JSX and type syntax at the same time.
+```
+
+### 新关键字和新概念
+
+#### 根元素边界（single root boundary）
+
+一个组件返回的 JSX 表达式必须有一个单一外层边界。这个边界可以是真实 DOM 元素，也可以是 Fragment。
+
+#### 自闭合标签（self-closing tag）
+
+JSX 中没有子元素的标签必须显式闭合，例如 `<img />`、`<ProfileCard />`。这比 HTML 更严格。
+
+#### 驼峰属性名（camelCase prop name）
+
+很多 DOM 属性在 JSX 里使用 JavaScript 风格的属性名，例如 `className`、`htmlFor`、`onClick`、`tabIndex`。
+
+#### 事件处理器属性（event handler prop）
+
+`onClick={handleClick}` 传入的是函数值。`onClick={handleClick()}` 会在渲染时立即调用函数，这通常是错误写法。
+
+#### Fragment
+
+Fragment 用来包住多个相邻 JSX 节点，但不额外生成 DOM 包装元素。常见写法是 `<>...</>`，需要 `key` 时使用 `<Fragment key={...}>...</Fragment>`。
+
+#### 内联样式对象（inline style object）
+
+React 的 `style` prop 接收 JavaScript 对象，不接收 CSS 字符串。`style={{ padding: '12px' }}` 外层 `{}` 表示进入 JS 表达式，内层 `{}` 是对象字面量。
+
+#### 布尔属性（boolean prop）
+
+布尔 prop 可以用表达式传入，例如 `hidden={!isExpanded}`。对自定义组件来说，`<Panel isOpen />` 等价于 `isOpen={true}`。
+
+#### 属性展开（props spreading）
+
+`{...sharedButtonProps}` 会把对象的可枚举属性展开成 JSX props。它减少重复，但也可能让传入的属性来源变得不清晰。
+
+#### 默认转义（default escaping）
+
+React 默认会把插入 JSX 的字符串作为文本处理，而不是当成 HTML 执行。这是重要的安全边界。
+
+#### 危险 HTML 注入（dangerouslySetInnerHTML）
+
+`dangerouslySetInnerHTML` 会绕过默认文本转义，把字符串作为 HTML 插入。只有在内容已经可信或已经净化时才能使用。
+
+#### TSX
+
+TSX 是 TypeScript + JSX 的文件形式。包含 JSX 的 TypeScript 文件必须使用 `.tsx` 扩展名；在 TSX 中，尖括号类型断言容易和 JSX 标签冲突，所以要使用 `as` 断言。
+
+### 语法、运行时、对象模型、类型系统边界
+
+| 内容 | 所属层级 | 技术意义 |
+|---|---|---|
+| `<section>...</section>` | JSX syntax | 描述 UI 节点 |
+| `{profileRecord.displayName}` | JavaScript expression | 在 JSX 中插入 JS 表达式结果 |
+| `className="profile-panel"` | React DOM prop convention | 传给 React DOM 的属性名 |
+| `style={{ padding: '12px' }}` | JavaScript object value | 把对象作为 prop 传入 |
+| `onClick={onToggle}` | function value | 把函数引用作为事件处理器传入 |
+| `<>...</>` | Fragment syntax | 分组但不创建额外 DOM 节点 |
+| `{...sharedButtonProps}` | JSX spread syntax | 把对象属性展开成 props |
+| `.tsx` | TypeScript tooling boundary | 让 TypeScript 按 TSX 规则解析文件 |
+
+### 文件结构
+
+```txt
+11-jsx-essential-boundaries/
+  package.json
+  src/
+    InteractiveProfilePanel.jsx
+    TsxBoundaryPreview.tsx
+```
+
+### `package.json`
+
+```json
+{
+  "name": "jsx-essential-boundaries-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest"
+  }
+}
+```
+
+### `src/InteractiveProfilePanel.jsx`
+
+```jsx
+// Goal:
+// Verify JSX event props, Fragment, style object, boolean props, and escaping.
+
+import { Fragment } from 'react';
+
+const sharedButtonProps = {
+  type: 'button',
+  className: 'profile-action-button',
+};
+
+const profileRecord = {
+  displayName: 'Ada Lovelace',
+  titleText: 'First programmer',
+  unsafeBioHtml: '<strong>Math</strong> and code',
+};
+
+export function InteractiveProfilePanel({ isExpanded, onToggle }) {
+  const summaryText = `${profileRecord.displayName}: ${profileRecord.titleText}`;
+
+  return (
+    <Fragment>
+      <article
+        className="profile-panel"
+        style={{ border: '1px solid #ccc', padding: '12px' }}
+      >
+        <label htmlFor="profile-summary">Summary</label>
+        <p id="profile-summary">{summaryText}</p>
+
+        <button
+          {...sharedButtonProps}
+          aria-expanded={isExpanded}
+          onClick={onToggle}
+        >
+          {isExpanded ? 'Collapse' : 'Expand'}
+        </button>
+
+        <p hidden={!isExpanded}>{profileRecord.unsafeBioHtml}</p>
+      </article>
+    </Fragment>
+  );
+}
+```
+
+### 代码逐行解释
+
+| 代码 | 解释 |
+|---|---|
+| `import { Fragment } from 'react';` | 导入 Fragment，用它包住多个 JSX 节点时不会创建额外 DOM 元素。 |
+| `sharedButtonProps` | 保存一组普通对象属性，后面用 JSX spread 展开。 |
+| `profileRecord` | 普通 JavaScript 对象，保存页面要显示的数据。 |
+| `unsafeBioHtml` | 字符串里包含 HTML-like 文本，但默认插入 JSX 时不会作为 HTML 执行。 |
+| `InteractiveProfilePanel({ isExpanded, onToggle })` | 函数组件接收 props 对象，并用解构拿到两个属性。 |
+| `summaryText` | 普通字符串值，后面作为 JSX children 插入。 |
+| `<Fragment>` | 提供单一返回边界，不增加额外 DOM wrapper。 |
+| `className="profile-panel"` | JSX 中使用 `className`，不是 HTML 的 `class`。 |
+| `style={{ ... }}` | 外层 `{}` 进入 JavaScript 表达式；内层 `{}` 创建样式对象。 |
+| `htmlFor="profile-summary"` | JSX 中 label 关联 input 或文本区域时使用 `htmlFor`，不是 `for`。 |
+| `{summaryText}` | 把 JavaScript 表达式的值作为文本 children 插入。 |
+| `{...sharedButtonProps}` | 把对象中的 `type` 和 `className` 展开成 button props。 |
+| `aria-expanded={isExpanded}` | 把布尔表达式作为 prop 值传入。 |
+| `onClick={onToggle}` | 把函数值传给 React，等待用户点击时再调用。 |
+| `{isExpanded ? 'Collapse' : 'Expand'}` | 三元表达式根据状态决定按钮文本。 |
+| `hidden={!isExpanded}` | 把布尔表达式传给 DOM prop，控制元素是否隐藏。 |
+| `{profileRecord.unsafeBioHtml}` | 默认作为文本渲染，字符串中的 `<strong>` 不会变成真正标签。 |
+
+### 执行过程
+
+```txt
+1. 组件函数被调用。
+2. props 对象中的 isExpanded 和 onToggle 被取出。
+3. summaryText 字符串被创建。
+4. JSX 被构建成 React element 描述。
+5. style prop 保存的是一个对象值。
+6. onClick prop 保存的是函数引用。
+7. unsafeBioHtml 被作为文本 children 传入。
+8. React 渲染时会转义文本内容，避免把普通字符串当成 HTML 执行。
+```
+
+### 对比写法
+
+#### 事件 handler：传函数值，不要立即调用
+
+错误：
+
+```jsx
+<button type="button" onClick={onToggle()}>
+  Toggle
+</button>
+```
+
+原因：`onToggle()` 在渲染过程中立即执行，执行结果才会被传给 `onClick`。如果返回值不是函数，点击时就没有正确的事件处理器。
+
+正确：
+
+```jsx
+<button type="button" onClick={onToggle}>
+  Toggle
+</button>
+```
+
+如果需要传参数，使用箭头函数包一层：
+
+```jsx
+<button type="button" onClick={() => onToggle('profile')}>
+  Toggle
+</button>
+```
+
+#### style：传对象，不传 CSS 字符串
+
+错误：
+
+```jsx
+<div style="padding: 12px"></div>
+```
+
+正确：
+
+```jsx
+<div style={{ padding: '12px' }}></div>
+```
+
+#### Fragment：不想增加 DOM wrapper 时使用
+
+```jsx
+<>
+  <label htmlFor="search-input">Search</label>
+  <input id="search-input" />
+</>
+```
+
+如果 Fragment 出现在列表中并且需要 key，不能用空标签简写：
+
+```jsx
+import { Fragment } from 'react';
+
+const rows = profileRecords.map((profileRecord) => {
+  return (
+    <Fragment key={profileRecord.id}>
+      <dt>{profileRecord.displayName}</dt>
+      <dd>{profileRecord.titleText}</dd>
+    </Fragment>
+  );
+});
+```
+
+#### HTML 注入：默认不要绕过转义
+
+默认安全写法：
+
+```jsx
+<p>{profileRecord.unsafeBioHtml}</p>
+```
+
+危险写法：
+
+```jsx
+<div dangerouslySetInnerHTML={{ __html: profileRecord.unsafeBioHtml }} />
+```
+
+危险写法的问题是：字符串会被当成 HTML 插入。如果这个字符串来自用户输入或不可信接口，可能造成跨站脚本攻击（cross-site scripting / XSS）。
+
+### `src/TsxBoundaryPreview.tsx`
+
+```tsx
+// Goal:
+// Verify the file boundary between JSX and TSX.
+
+type ProfileChipProps = {
+  displayName: string;
+  isOnline: boolean;
+};
+
+export function ProfileChip({ displayName, isOnline }: ProfileChipProps) {
+  const normalizedName = displayName as string;
+
+  return <span data-online={isOnline}>{normalizedName}</span>;
+}
+```
+
+### TSX 边界解释
+
+| 规则 | 原因 |
+|---|---|
+| 包含 JSX 的 TypeScript 文件使用 `.tsx` | TypeScript 需要用 TSX 解析规则同时处理类型语法和 JSX 标签。 |
+| TSX 中使用 `as` 做类型断言 | `<string>value` 这种尖括号断言会和 JSX 标签语法冲突。 |
+| JSX 的类型检查发生在编译期 | 运行时执行的是转译后的 JavaScript。 |
+| TypeScript 不会自动验证外部数据 | props 类型只能约束编译期调用处，不能替代运行时验证。 |
+
+### JSX 必学覆盖检查表
+
+| 必学内容 | 本文件位置 | 状态 |
+|---|---|---|
+| JSX 不是 HTML | 07：JSX 的本质 | 已覆盖 |
+| JSX transform | 07：JSX 的本质 | 已覆盖 |
+| classic runtime / automatic runtime | 07：JSX 的本质 | 已覆盖 |
+| JSX 表达式 | 08：JSX 表达式、属性和子元素 | 已覆盖 |
+| props 和 children | 08、09 | 已覆盖 |
+| 组件名大写规则 | 09：JSX 组件和 UI 组合 | 已覆盖 |
+| 条件渲染 | 10：JSX 条件渲染和列表渲染 | 已覆盖 |
+| 列表渲染和 key | 10：JSX 条件渲染和列表渲染 | 已覆盖 |
+| Fragment | 11：JSX 必学边界 | 已补齐 |
+| 事件 handler prop | 11：JSX 必学边界 | 已补齐 |
+| style 对象和双花括号 | 11：JSX 必学边界 | 已补齐 |
+| `className` / `htmlFor` / camelCase prop | 08、11 | 已补齐 |
+| 布尔 prop | 11：JSX 必学边界 | 已补齐 |
+| props spreading | 11：JSX 必学边界 | 已补齐 |
+| 默认转义和 HTML 注入风险 | 11：JSX 必学边界 | 已补齐 |
+| TSX 文件边界 | 11：JSX 必学边界 | 已补齐 |
+
+### 常见错误为什么错
+
+| 错误 | 违反的规则 | 正确判断 |
+|---|---|---|
+| 把 JSX 当 HTML | JSX 是 JavaScript 语法扩展 | 看是否需要 JS 表达式、props、transform |
+| 多个相邻元素直接 return | 组件返回值需要单一 JSX 边界 | 用外层元素或 Fragment |
+| `onClick={handleClick()}` | 渲染时立即调用了函数 | 传 `handleClick` 函数值 |
+| `style="color: red"` | React `style` prop 需要对象 | 写 `style={{ color: 'red' }}` |
+| 用 `for` 和 `class` | JSX 使用 React DOM prop 命名 | 写 `htmlFor` 和 `className` |
+| 用不可信字符串写 `dangerouslySetInnerHTML` | 绕过了默认转义 | 先净化内容，或作为文本渲染 |
+| 在 `.ts` 文件写 JSX | TypeScript 不按 TSX 规则解析 | 改成 `.tsx` |
+
+### 和实际项目的关系
+
+这些规则会直接出现在 React 表单、按钮、列表、布局组件和接口数据显示里。尤其是事件 handler、Fragment、key、默认转义和 TSX 边界，后面学 React 时不会单独等你补基础；它们会混在组件代码里同时出现。
+
+### 最终记忆模型
+
+```txt
+JSX is not HTML.
+JSX is JavaScript syntax that describes UI.
+Props are JavaScript values.
+Event props receive function values.
+Fragment groups nodes without adding DOM.
+Style receives an object.
+Text is escaped by default.
+TSX is the TypeScript parsing boundary for JSX.
+```
+
+---
+
+## 16. 12：Flow 类型检查扩展
 
 ### 结论
 
@@ -1534,7 +1961,7 @@ Flow 是给 JavaScript 添加静态类型检查的工具。
 ### 文件结构
 
 ```txt
-11-flow-concept-preview/
+12-flow-concept-preview/
   priceLabel.js
 ```
 
@@ -1573,7 +2000,7 @@ A tool must strip or check them before browser execution.
 
 ---
 
-## 16. 12：小项目整合
+## 17. 13：小项目整合
 
 ### 结论
 
@@ -1582,18 +2009,23 @@ A tool must strip or check them before browser execution.
 ### 文件结构
 
 ```txt
-12-mini-toolchain-jsx-project/
+13-mini-toolchain-jsx-project/
   package.json
+  vite.config.js
   eslint.config.js
   .prettierrc.json
+  babel.config.cjs
+  jest.config.cjs
   index.html
   src/
     main.jsx
     App.jsx
+    components/
+      ActionButton.jsx
     cart/
       cartMath.js
-      CartSummary.jsx
       cartMath.test.cjs
+      CartSummary.jsx
 ```
 
 ### 创建项目建议
@@ -1604,6 +2036,124 @@ A tool must strip or check them before browser execution.
 npm create vite@latest mini-toolchain-jsx-project -- --template react
 cd mini-toolchain-jsx-project
 npm install
+```
+
+### `package.json`
+
+```json
+{
+  "name": "mini-toolchain-jsx-project",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "jest"
+  },
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@babel/core": "latest",
+    "@babel/preset-env": "latest",
+    "@babel/preset-react": "latest",
+    "@eslint/js": "latest",
+    "@vitejs/plugin-react": "latest",
+    "babel-jest": "latest",
+    "eslint": "latest",
+    "jest": "latest",
+    "jest-environment-jsdom": "latest",
+    "prettier": "latest",
+    "vite": "latest"
+  }
+}
+```
+
+### `vite.config.js`
+
+```js
+// Goal:
+// Configure Vite to transform React JSX during development and build.
+
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+});
+```
+
+### `eslint.config.js`
+
+```js
+// Goal:
+// Configure ESLint for browser-based JSX source files.
+
+import js from '@eslint/js';
+
+export default [
+  js.configs.recommended,
+  {
+    files: ['src/**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      globals: {
+        console: 'readonly',
+        document: 'readonly',
+      },
+    },
+  },
+];
+```
+
+### `.prettierrc.json`
+
+```json
+{
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 80
+}
+```
+
+### `babel.config.cjs`
+
+```js
+// Goal:
+// Let Jest transform modern JavaScript modules and JSX for tests.
+
+module.exports = {
+  presets: [
+    ['@babel/preset-env', { targets: { node: 'current' } }],
+    ['@babel/preset-react', { runtime: 'automatic' }],
+  ],
+};
+```
+
+### `jest.config.cjs`
+
+```js
+// Goal:
+// Configure Jest for JSX-related tests and Babel transformation.
+
+module.exports = {
+  testEnvironment: 'jsdom',
+  transform: {
+    '^.+\\.[jt]sx?$': 'babel-jest',
+  },
+};
 ```
 
 ### `src/cart/cartMath.js`
@@ -1617,6 +2167,28 @@ export function calculateCartSubtotal(cartItems) {
     return runningTotal + cartItem.priceAmount * cartItem.quantityCount;
   }, 0);
 }
+```
+
+### `src/cart/cartMath.test.cjs`
+
+```js
+// Goal:
+// Verify cart calculation logic with Jest.
+
+const { calculateCartSubtotal } = require('./cartMath.js');
+
+test('calculates subtotal from multiple cart items', () => {
+  const cartItems = [
+    { priceAmount: 30, quantityCount: 2 },
+    { priceAmount: 15, quantityCount: 4 },
+  ];
+
+  expect(calculateCartSubtotal(cartItems)).toBe(120);
+});
+
+test('returns zero for an empty cart', () => {
+  expect(calculateCartSubtotal([])).toBe(0);
+});
 ```
 
 ### `src/cart/CartSummary.jsx`
@@ -1639,6 +2211,21 @@ export function CartSummary({ cartItems }) {
 }
 ```
 
+### `src/components/ActionButton.jsx`
+
+```jsx
+// Goal:
+// Reuse a button component with event handler props and children.
+
+export function ActionButton({ children, onPress }) {
+  return (
+    <button type="button" className="action-button" onClick={onPress}>
+      {children}
+    </button>
+  );
+}
+```
+
 ### `src/App.jsx`
 
 ```jsx
@@ -1646,6 +2233,7 @@ export function CartSummary({ cartItems }) {
 // Compose the root application component.
 
 import { CartSummary } from './cart/CartSummary.jsx';
+import { ActionButton } from './components/ActionButton.jsx';
 
 const cartItems = [
   { priceAmount: 30, quantityCount: 2 },
@@ -1653,10 +2241,15 @@ const cartItems = [
 ];
 
 export function App() {
+  function handleCheckout() {
+    console.log('Checkout clicked');
+  }
+
   return (
     <main>
       <h1>Toolchain JSX Demo</h1>
       <CartSummary cartItems={cartItems} />
+      <ActionButton onPress={handleCheckout}>Checkout</ActionButton>
     </main>
   );
 }
@@ -1668,7 +2261,6 @@ export function App() {
 // Goal:
 // Render the root React component into the browser page.
 
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App.jsx';
 
@@ -1697,11 +2289,22 @@ root.render(<App />);
 ### 运行方式
 
 ```bash
+npm run lint
+npm run format:check
+npm run test
 npm run dev
 npm run build
 ```
 
 ### 预期页面
+
+`npm run test` 应该看到 Jest 测试通过。
+
+```txt
+PASS src/cart/cartMath.test.cjs
+```
+
+浏览器页面应该显示：
 
 ```txt
 Toolchain JSX Demo
@@ -1718,35 +2321,118 @@ npm scripts
   -> development server
   -> module graph
   -> JSX transform
+  -> component composition
+  -> event handler prop
   -> browser rendering
   -> build output
 ```
 
 ---
 
-## 17. 最终文件清单
+## 18. 最终文件清单
 
 ```txt
 javascript-tools-extensions-learning/
   00-toolchain-model/
+    package.json
+    src/
+      mathTools.js
+      main.js
+
   01-npm-package-json/
+    package.json
+    src/
+      greetingMessage.js
+
   02-eslint-linting/
+    package.json
+    eslint.config.js
+    src/
+      brokenOrderCalculator.js
+      fixedOrderCalculator.js
+
   03-prettier-formatting/
+    package.json
+    .prettierrc.json
+    src/
+      messyProfileCard.js
+
   04-jest-testing/
+    package.json
+    src/
+      cartMath.cjs
+      cartMath.test.cjs
+
   05-bundling-with-vite/
+    package.json
+    index.html
+    src/
+      main.js
+      dashboardMessage.js
+
   06-babel-transpilation/
+    package.json
+    babel.config.json
+    src/
+      modernSyntax.js
+
   07-jsx-core-model/
+    package.json
+    babel.config.json
+    src/
+      ProfileCard.jsx
+
   08-jsx-expressions-props-children/
+    package.json
+    src/
+      ProductBadge.jsx
+
   09-jsx-components-composition/
+    package.json
+    src/
+      App.jsx
+      components/
+        ProfileSummary.jsx
+        StatusPill.jsx
+
   10-jsx-conditional-list-rendering/
-  11-flow-concept-preview/
-  12-mini-toolchain-jsx-project/
+    package.json
+    src/
+      NotificationList.jsx
+
+  11-jsx-essential-boundaries/
+    package.json
+    src/
+      InteractiveProfilePanel.jsx
+      TsxBoundaryPreview.tsx
+
+  12-flow-concept-preview/
+    priceLabel.js
+
+  13-mini-toolchain-jsx-project/
+    package.json
+    vite.config.js
+    eslint.config.js
+    .prettierrc.json
+    babel.config.cjs
+    jest.config.cjs
+    index.html
+    src/
+      main.jsx
+      App.jsx
+      components/
+        ActionButton.jsx
+      cart/
+        cartMath.js
+        cartMath.test.cjs
+        CartSummary.jsx
+
   javascript-tools-extensions-jsx-learning-notes.md
 ```
 
 ---
 
-## 18. 最终学习笔记转换要求
+## 19. 最终学习笔记转换要求
 
 每一节最终整理成学习笔记时，固定使用这个结构：
 
@@ -1778,7 +2464,7 @@ MDN links: normal Markdown links.
 
 ---
 
-## 19. 本章最终要能回答的问题
+## 20. 本章最终要能回答的问题
 
 学完本章，你应该能回答：
 
@@ -1805,13 +2491,19 @@ MDN links: normal Markdown links.
 20. Why should React component names start with a capital letter?
 21. Why is && common in conditional rendering?
 22. Why does list rendering need keys?
-23. What is the relationship between Flow and JavaScript itself?
-24. Why do modern frontend projects need a toolchain?
+23. Why does JSX need Fragment?
+24. Why should event handler props receive function values instead of function call results?
+25. Why does React style receive an object instead of a CSS string?
+26. Why does React escape text by default?
+27. When is dangerouslySetInnerHTML dangerous?
+28. Why does TypeScript use .tsx for files containing JSX?
+29. What is the relationship between Flow and JavaScript itself?
+30. Why do modern frontend projects need a toolchain?
 ```
 
 ---
 
-## 20. MDN 和官方文档阅读清单
+## 21. MDN 和官方文档阅读清单
 
 ### MDN
 
@@ -1825,6 +2517,12 @@ MDN links: normal Markdown links.
 - [React: JavaScript in JSX with Curly Braces](https://react.dev/learn/javascript-in-jsx-with-curly-braces)
 - [React: Rendering Lists](https://react.dev/learn/rendering-lists)
 - [React: Conditional Rendering](https://react.dev/learn/conditional-rendering)
+- [React: Responding to Events](https://react.dev/learn/responding-to-events)
+- [React: Fragment](https://react.dev/reference/react/Fragment)
+- [React DOM: Common components and props](https://react.dev/reference/react-dom/components/common)
+- [React: Using TypeScript](https://react.dev/learn/typescript)
+- [TypeScript: JSX](https://www.typescriptlang.org/docs/handbook/jsx.html)
+- [TSConfig: jsx](https://www.typescriptlang.org/tsconfig/jsx.html)
 
 ### Tooling official docs
 
@@ -1837,7 +2535,7 @@ MDN links: normal Markdown links.
 
 ---
 
-## 21. 最终记忆模型
+## 22. 最终记忆模型
 
 ```txt
 npm:
@@ -1863,6 +2561,11 @@ HTML-like markup syntax inside JavaScript.
 It describes UI.
 It is not real HTML.
 It must be transformed.
+Props are JavaScript values.
+Event props receive function values.
+Fragment groups nodes without extra DOM.
+Text children are escaped by default.
+TSX is the TypeScript file boundary for JSX.
 
 Flow:
 Static type checking extension for JavaScript.

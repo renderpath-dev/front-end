@@ -1,0 +1,13 @@
+{
+  "name": "prettier-formatting",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write src",
+    "format:check": "prettier --check src"
+  },
+  "devDependencies": {
+    "prettier": "latest"
+  }
+}

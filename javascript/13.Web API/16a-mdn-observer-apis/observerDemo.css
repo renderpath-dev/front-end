@@ -1,0 +1,18 @@
+body {
+    font-family: system-ui, sans-serif;
+    min-height: 140vh;
+}
+
+.card-list {
+    display: grid;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.card {
+    width: 240px;
+    min-height: 80px;
+    padding: 16px;
+    border: 1px solid #999;
+    border-radius: 12px;
+}

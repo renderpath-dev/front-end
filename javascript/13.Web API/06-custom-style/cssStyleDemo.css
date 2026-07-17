@@ -1,0 +1,8 @@
+.status-card {
+    padding: 16px;
+    border: 1px solid black;
+}
+
+.status-card.is-active {
+    font-weight: 700;
+}

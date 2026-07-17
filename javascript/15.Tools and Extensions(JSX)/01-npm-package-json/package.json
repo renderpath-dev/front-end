@@ -1,0 +1,12 @@
+{
+  "name": "npm-package-json-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node src/greetingMessage.js",
+    "check": "node --check src/greetingMessage.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

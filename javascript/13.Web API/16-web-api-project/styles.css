@@ -1,0 +1,16 @@
+body {
+    font-family: system-ui, sans-serif;
+}
+
+main {
+    max-width: 720px;
+    margin: 40px auto;
+}
+
+button {
+    margin-right: 8px;
+}
+
+#chart-canvas {
+    border: 1px solid black;
+}

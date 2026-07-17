@@ -30,11 +30,12 @@
 17. [13：Fetch、Request、Response 和 AbortController](#17-13fetchrequestresponse-和-abortcontroller)
 18. [14：Web Storage、Cookie 和 IndexedDB 预习](#18-14web-storagecookie-和-indexeddb-预习)
 19. [15：Worker 和消息传递](#19-15worker-和消息传递)
-20. [16：小项目整合](#20-16小项目整合)
-21. [最终文件清单](#21-最终文件清单)
-22. [最终学习笔记转换要求](#22-最终学习笔记转换要求)
-23. [本章最终要能回答的问题](#23-本章最终要能回答的问题)
-24. [MDN 阅读清单](#24-mdn-阅读清单)
+20. [16A：MDN 补充 API 查漏补缺](#20-16amdn-补充-api-查漏补缺)
+21. [16：小项目整合](#21-16小项目整合)
+22. [最终文件清单](#22-最终文件清单)
+23. [最终学习笔记转换要求](#23-最终学习笔记转换要求)
+24. [本章最终要能回答的问题](#24-本章最终要能回答的问题)
+25. [MDN 阅读清单](#25-mdn-阅读清单)
 
 ---
 
@@ -124,6 +125,7 @@ browser environment model
   -> Fetch
   -> Storage
   -> Workers
+  -> MDN supplementary APIs
   -> integrated browser project
 ```
 
@@ -1949,7 +1951,1195 @@ Prime count: 2262
 
 ---
 
-## 20. 16：小项目整合
+
+## 20. 16A：MDN 补充 API 查漏补缺
+
+### 结论
+
+原来的学习路径已经覆盖《JavaScript 权威指南》第 15 章的主干：DOM、事件、CSSOM、几何、Web Components、SVG、Canvas、Audio、History、Fetch、Storage 和 Worker。
+
+但 MDN 的 Web APIs 参考不是一章书的范围，而是一整个平台参考。这里补的不是“所有 API 的百科全书”，而是现代前端学习和项目开发中高频、容易遇到、并且会直接影响 React / Next.js / 全栈项目能力的 API。
+
+本节补齐这些方向：
+
+| 补充方向 | 代表 API | 为什么要补 |
+|---|---|---|
+| DOM 观察 | `MutationObserver`、`IntersectionObserver`、`ResizeObserver` | 现代 UI 经常需要观察 DOM 变化、元素进入视口、元素尺寸变化。 |
+| 文件、剪贴板、拖放 | `Clipboard`、`File`、`Blob`、`FileReader`、`DataTransfer` | 上传图片、复制链接、拖拽文件是项目常见交互。 |
+| 权限和设备能力 | `Permissions`、`Geolocation`、`MediaDevices.getUserMedia()`、`Notification`、`navigator.share()` | 浏览器访问隐私能力时必须经过权限边界。 |
+| 性能和页面状态 | `performance`、`PerformanceObserver`、`requestAnimationFrame()`、`visibilitychange` | 前端性能优化和后台标签页行为必须理解。 |
+| 实时通信和离线能力 | `WebSocket`、`BroadcastChannel`、`ServiceWorker`、`Cache` | 聊天、跨标签页同步、PWA、离线缓存都依赖这些。 |
+| 安全和注入边界 | `Trusted Types` | DOM-based XSS 防护和 `innerHTML` 安全边界必须提前建立。 |
+| UI 动画和原生浮层 | `Element.animate()`、Popover API | 现代浏览器逐渐把部分 UI 能力原生化。 |
+
+### 技术意义
+
+Web API 学习不能只按对象名记忆。更合理的分类方式是按“浏览器能力边界”学习：
+
+```text
+DOM state
+  -> observe with observers
+
+User-provided data
+  -> read with File API, Drag and Drop, Clipboard
+
+Permission-gated capability
+  -> check/request permission, then use device or notification API
+
+Runtime performance
+  -> measure, schedule, pause, and avoid unnecessary work
+
+Network and application lifecycle
+  -> fetch, websocket, service worker, cache, broadcast channel
+
+Security boundary
+  -> never send untrusted strings directly into injection sinks
+```
+
+这套分类比“背 API 列表”更重要。真实项目里你首先遇到的不是 API 名字，而是问题：
+
+```text
+图片什么时候懒加载？
+卡片尺寸变了怎么重新布局？
+用户上传的文件怎么预览？
+复制按钮为什么线上失效？
+页面切到后台为什么计时器不准？
+登录状态怎么同步到另一个 tab？
+离线时页面为什么不能打开？
+innerHTML 为什么危险？
+```
+
+这些问题都不是 ECMAScript 核心语言能直接解决的，它们属于浏览器宿主环境。
+
+### 查漏结果
+
+| 原文件已有覆盖 | 本节补充覆盖 |
+|---|---|
+| `document.querySelector()`、`createElement()`、`append()`、`remove()` | `MutationObserver`、`IntersectionObserver`、`ResizeObserver`、`DOMParser`、`Range`、`Selection` |
+| `addEventListener()`、表单事件、默认行为 | Drag and Drop 事件、Clipboard 异步权限事件边界 |
+| `getComputedStyle()`、`getBoundingClientRect()`、`scrollIntoView()` | `requestAnimationFrame()`、Web Animations API、Page Visibility API |
+| `fetch()`、`Request`、`Response`、`AbortController` | `WebSocket`、`BroadcastChannel`、`ServiceWorker`、`Cache` |
+| `localStorage`、`sessionStorage`、`document.cookie`、IndexedDB 预习 | Cache Storage、跨标签页通信、权限状态 |
+| Worker 和 `postMessage()` | Service Worker 生命周期、Broadcast Channel、structured clone 在跨上下文通信中的角色 |
+
+### 16A-1：Observer APIs：不要用轮询硬查 DOM 状态
+
+#### 结论
+
+`MutationObserver`、`IntersectionObserver` 和 `ResizeObserver` 都是在解决同一类问题：不要让代码自己频繁轮询浏览器状态，而是把“变化发生了”这件事交给浏览器通知。
+
+它们的差别是观察对象不同：
+
+| API | 观察什么 | 常见用途 |
+|---|---|---|
+| `MutationObserver` | DOM tree 的结构、属性、文本变化 | 监控第三方组件插入节点、调试 DOM 变更、自动增强动态内容。 |
+| `IntersectionObserver` | 元素是否和视口或某个滚动容器相交 | 图片懒加载、无限滚动、曝光统计、进入视口后播放动画。 |
+| `ResizeObserver` | 元素尺寸变化 | 响应式卡片、图表重绘、组件级布局变化。 |
+
+#### 底层机制
+
+这三个 API 都不是同步读取 API。你不会写：
+
+```js
+const changed = observer.checkNow();
+```
+
+而是写：
+
+```js
+const observer = new ObserverType(callback);
+observer.observe(target);
+```
+
+浏览器内部在合适的时机收集变化，然后把变化记录交给 callback。
+
+这和事件系统很像，但它们不是普通用户事件：
+
+```text
+DOM mutation / layout / visibility calculation
+  -> browser collects records
+  -> observer callback is queued
+  -> callback receives entries or records
+  -> JavaScript reacts to the changes
+```
+
+#### API / 语法规则
+
+| API | 创建方式 | 关键方法 | callback 参数 |
+|---|---|---|---|
+| `MutationObserver` | `new MutationObserver(callback)` | `observe(target, options)`、`disconnect()`、`takeRecords()` | `MutationRecord[]` |
+| `IntersectionObserver` | `new IntersectionObserver(callback, options)` | `observe(target)`、`unobserve(target)`、`disconnect()` | `IntersectionObserverEntry[]` |
+| `ResizeObserver` | `new ResizeObserver(callback)` | `observe(target)`、`unobserve(target)`、`disconnect()` | `ResizeObserverEntry[]` |
+
+#### 文件结构
+
+```text
+16a-mdn-observer-apis/
+  index.html
+  observerDemo.css
+  observerDemo.js
+```
+
+#### `index.html`
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Observer APIs</title>
+    <link rel="stylesheet" href="./observerDemo.css" />
+  </head>
+  <body>
+    <h1>Observer APIs</h1>
+
+    <button id="add-card-button">Add Card</button>
+    <button id="resize-card-button">Resize First Card</button>
+
+    <p id="mutation-output">DOM mutations: 0</p>
+    <p id="resize-output">Resize entries: 0</p>
+    <p id="intersection-output">Visible card: none</p>
+
+    <main id="card-list" class="card-list">
+      <article class="card observed-card">Initial Card</article>
+    </main>
+
+    <script type="module" src="./observerDemo.js"></script>
+  </body>
+</html>
+```
+
+#### `observerDemo.css`
+
+```css
+body {
+  font-family: system-ui, sans-serif;
+  min-height: 140vh;
+}
+
+.card-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.card {
+  width: 240px;
+  min-height: 80px;
+  padding: 16px;
+  border: 1px solid #999;
+  border-radius: 12px;
+}
+```
+
+#### `observerDemo.js`
+
+```js
+// Goal:
+// Compare MutationObserver, IntersectionObserver, and ResizeObserver.
+
+const cardList = document.querySelector('#card-list');
+const addCardButton = document.querySelector('#add-card-button');
+const resizeCardButton = document.querySelector('#resize-card-button');
+const mutationOutput = document.querySelector('#mutation-output');
+const resizeOutput = document.querySelector('#resize-output');
+const intersectionOutput = document.querySelector('#intersection-output');
+
+let mutationCount = 0;
+let resizeCount = 0;
+let cardId = 1;
+
+const mutationObserver = new MutationObserver((records) => {
+  mutationCount += records.length;
+  mutationOutput.textContent = `DOM mutations: ${mutationCount}`;
+
+  for (const record of records) {
+    console.log(record.type, record.addedNodes.length);
+  }
+});
+
+mutationObserver.observe(cardList, {
+  childList: true,
+});
+
+const intersectionObserver = new IntersectionObserver(
+  (entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        intersectionOutput.textContent = `Visible card: ${entry.target.textContent}`;
+      }
+    }
+  },
+  {
+    threshold: 0.5,
+  },
+);
+
+const resizeObserver = new ResizeObserver((entries) => {
+  resizeCount += entries.length;
+  resizeOutput.textContent = `Resize entries: ${resizeCount}`;
+
+  for (const entry of entries) {
+    console.log(entry.target.textContent, entry.contentRect.width);
+  }
+});
+
+for (const card of document.querySelectorAll('.card')) {
+  intersectionObserver.observe(card);
+  resizeObserver.observe(card);
+}
+
+addCardButton.addEventListener('click', () => {
+  cardId += 1;
+
+  const card = document.createElement('article');
+  card.className = 'card';
+  card.textContent = `Card ${cardId}`;
+
+  cardList.append(card);
+  intersectionObserver.observe(card);
+  resizeObserver.observe(card);
+});
+
+resizeCardButton.addEventListener('click', () => {
+  const firstCard = document.querySelector('.card');
+  firstCard.style.width = `${firstCard.offsetWidth + 40}px`;
+});
+```
+
+#### 执行过程
+
+| 步骤 | 发生什么 |
+|---|---|
+| 1 | `MutationObserver` 开始观察 `cardList` 的子节点变化。 |
+| 2 | `IntersectionObserver` 开始观察 `.card` 是否进入视口并达到 `threshold`。 |
+| 3 | `ResizeObserver` 开始观察 `.card` 的尺寸变化。 |
+| 4 | 点击 Add Card，代码创建新 `article` 并插入 DOM。 |
+| 5 | DOM 插入不是由 `MutationObserver` 主动触发，而是浏览器记录 mutation 后通知 callback。 |
+| 6 | 新 card 被加入 intersection 和 resize 观察列表。 |
+| 7 | 点击 Resize First Card，inline style 改变宽度。 |
+| 8 | 浏览器重新计算布局后，`ResizeObserver` callback 收到新的尺寸记录。 |
+
+#### 常见错误
+
+| 错误 | 原因 |
+|---|---|
+| 以为 observer callback 立即同步执行 | Observer callback 是浏览器在变化记录产生后异步通知，不是当前行立刻返回结果。 |
+| 忘记 `disconnect()` | 长生命周期页面或组件卸载时可能继续保留观察关系。 |
+| 用 `scroll` 事件循环调用 `getBoundingClientRect()` 做懒加载 | 这种写法容易造成主线程压力，`IntersectionObserver` 更适合。 |
+| 用 `window.resize` 判断某个组件尺寸变化 | `window.resize` 只能代表视口变化，不能代表某个元素的内容尺寸变化。 |
+
+### 16A-2：文件、Blob、Clipboard 和 Drag and Drop
+
+#### 结论
+
+浏览器不能随便读取用户电脑文件，也不能随便读写用户剪贴板。`File API`、`Clipboard API`、`Drag and Drop API` 都是“用户主动提供数据”或“用户明确触发操作”后的能力边界。
+
+核心模型：
+
+```text
+User gesture
+  -> browser grants limited access
+  -> JavaScript receives File / Blob / Clipboard data
+  -> code reads data asynchronously
+  -> UI updates with safe derived result
+```
+
+#### 新关键字和新概念
+
+| 概念 | English term | 技术意义 |
+|---|---|---|
+| 文件对象 | `File` | 用户选择或拖入的单个文件对象，包含 `name`、`size`、`type` 等元数据。 |
+| 二进制大对象 | `Blob` | 表示不可变的原始数据块，`File` 是特殊的 `Blob`。 |
+| 文件列表 | `FileList` | `<input type="file">` 或拖放操作产生的类数组文件集合。 |
+| 文件读取器 | `FileReader` | 旧式 event-based 文件读取 API。现代项目更常用 `file.text()`、`file.arrayBuffer()`。 |
+| 剪贴板对象 | `navigator.clipboard` | 暴露异步的 `readText()`、`writeText()`、`read()`、`write()`。 |
+| 拖放数据 | `DataTransfer` | 拖放事件里携带文本、文件等数据的对象。 |
+
+#### API / 语法规则
+
+| 场景 | API |
+|---|---|
+| 读取文件文本 | `await file.text()` |
+| 读取文件二进制 | `await file.arrayBuffer()` |
+| 创建临时预览 URL | `URL.createObjectURL(file)` |
+| 释放临时 URL | `URL.revokeObjectURL(url)` |
+| 写入剪贴板文本 | `await navigator.clipboard.writeText(text)` |
+| 读取剪贴板文本 | `await navigator.clipboard.readText()` |
+| 允许 drop | 在 `dragover` 中调用 `event.preventDefault()` |
+| 获取拖入文件 | `event.dataTransfer.files` |
+
+#### 文件结构
+
+```text
+16b-file-clipboard-drag-drop/
+  index.html
+  fileClipboardDemo.css
+  fileClipboardDemo.js
+```
+
+#### `index.html`
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>File Clipboard Drag Drop</title>
+    <link rel="stylesheet" href="./fileClipboardDemo.css" />
+  </head>
+  <body>
+    <h1>File, Clipboard, and Drag Drop</h1>
+
+    <input id="file-input" type="file" accept="image/*,.txt" />
+    <button id="copy-button">Copy Summary</button>
+
+    <section id="drop-zone" class="drop-zone">
+      Drop a file here
+    </section>
+
+    <pre id="file-output">No file selected.</pre>
+    <img id="preview-image" alt="Selected file preview" />
+
+    <script type="module" src="./fileClipboardDemo.js"></script>
+  </body>
+</html>
+```
+
+#### `fileClipboardDemo.css`
+
+```css
+body {
+  font-family: system-ui, sans-serif;
+}
+
+.drop-zone {
+  display: grid;
+  place-items: center;
+  width: 320px;
+  height: 120px;
+  margin-top: 16px;
+  border: 2px dashed #999;
+  border-radius: 12px;
+}
+
+#preview-image {
+  display: block;
+  max-width: 320px;
+  margin-top: 16px;
+}
+```
+
+#### `fileClipboardDemo.js`
+
+```js
+// Goal:
+// Read user-provided files and copy derived text to the clipboard.
+
+const fileInput = document.querySelector('#file-input');
+const copyButton = document.querySelector('#copy-button');
+const dropZone = document.querySelector('#drop-zone');
+const fileOutput = document.querySelector('#file-output');
+const previewImage = document.querySelector('#preview-image');
+
+let currentSummary = 'No file selected.';
+
+async function inspectFile(file) {
+  currentSummary = [
+    `Name: ${file.name}`,
+    `Size: ${file.size} bytes`,
+    `Type: ${file.type || 'unknown'}`,
+  ].join('\n');
+
+  fileOutput.textContent = currentSummary;
+
+  if (file.type.startsWith('image/')) {
+    const objectUrl = URL.createObjectURL(file);
+    previewImage.src = objectUrl;
+
+    previewImage.addEventListener(
+      'load',
+      () => {
+        URL.revokeObjectURL(objectUrl);
+      },
+      { once: true },
+    );
+    return;
+  }
+
+  previewImage.removeAttribute('src');
+
+  if (file.type === 'text/plain') {
+    const text = await file.text();
+    fileOutput.textContent = `${currentSummary}\n\nPreview:\n${text.slice(0, 500)}`;
+  }
+}
+
+fileInput.addEventListener('change', async () => {
+  const [file] = fileInput.files;
+
+  if (file) {
+    await inspectFile(file);
+  }
+});
+
+dropZone.addEventListener('dragover', (event) => {
+  event.preventDefault();
+});
+
+dropZone.addEventListener('drop', async (event) => {
+  event.preventDefault();
+
+  const [file] = event.dataTransfer.files;
+
+  if (file) {
+    await inspectFile(file);
+  }
+});
+
+copyButton.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(currentSummary);
+    copyButton.textContent = 'Copied';
+  } catch (error) {
+    console.error(error);
+    copyButton.textContent = 'Copy failed';
+  }
+});
+```
+
+#### 执行过程
+
+| 步骤 | 发生什么 |
+|---|---|
+| 1 | 用户通过 input 或拖放把文件交给页面。 |
+| 2 | 浏览器创建 `File` 对象，页面只能访问这些被用户选中的文件。 |
+| 3 | `inspectFile(file)` 读取文件元数据。 |
+| 4 | 图片文件通过 `URL.createObjectURL(file)` 得到临时 URL 用于预览。 |
+| 5 | 图片加载后调用 `URL.revokeObjectURL()` 释放临时引用。 |
+| 6 | 文本文件通过 `await file.text()` 异步读取内容。 |
+| 7 | 用户点击 copy 按钮时，`navigator.clipboard.writeText()` 尝试写入剪贴板。 |
+
+#### 常见错误
+
+| 错误 | 原因 |
+|---|---|
+| 在页面加载时直接读取用户文件路径 | 浏览器不会给网页任意文件系统访问权限。 |
+| 拖放时忘记在 `dragover` 调用 `preventDefault()` | 默认情况下元素不是 drop target，`drop` 可能不会按预期触发。 |
+| `navigator.clipboard.writeText()` 在线上 HTTP 页面失效 | Clipboard API 通常要求 secure context，并且常常要求用户手势。 |
+| 创建 object URL 后从不释放 | 大文件预览可能造成内存占用。 |
+
+### 16A-3：权限、设备能力和用户隐私边界
+
+#### 结论
+
+`Geolocation`、`MediaDevices.getUserMedia()`、`Notification`、`Clipboard`、`Web Share` 这类 API 的共同点是：它们不是普通函数调用，而是浏览器权限系统保护下的能力调用。
+
+你写的是 JavaScript 代码，但能不能执行成功取决于：
+
+```text
+secure context
+  + permissions policy
+  + user gesture
+  + user permission decision
+  + browser support
+```
+
+#### 关键 API
+
+| API | 入口 | 返回或行为 |
+|---|---|---|
+| Permissions API | `navigator.permissions.query({ name })` | 返回 `Promise<PermissionStatus>` |
+| Geolocation API | `navigator.geolocation.getCurrentPosition()` | 通过 callback 返回位置或错误 |
+| Media Capture | `navigator.mediaDevices.getUserMedia(constraints)` | 返回 `Promise<MediaStream>` |
+| Notifications API | `Notification.requestPermission()`、`new Notification()` | 请求通知权限并显示系统通知 |
+| Web Share API | `navigator.share(data)` | 调用系统分享面板，返回 `Promise<void>` |
+
+#### 文件结构
+
+```text
+16c-permissions-device-apis/
+  index.html
+  permissionDeviceDemo.js
+```
+
+#### `index.html`
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Permission Device APIs</title>
+  </head>
+  <body>
+    <h1>Permission and Device APIs</h1>
+
+    <button id="check-permission-button">Check Geolocation Permission</button>
+    <button id="location-button">Get Location</button>
+    <button id="camera-button">Start Camera</button>
+    <button id="notify-button">Notify</button>
+    <button id="share-button">Share</button>
+
+    <p id="permission-output">Permission state: unknown</p>
+    <p id="location-output">Location: none</p>
+    <video id="camera-preview" autoplay playsinline width="320"></video>
+
+    <script type="module" src="./permissionDeviceDemo.js"></script>
+  </body>
+</html>
+```
+
+#### `permissionDeviceDemo.js`
+
+```js
+// Goal:
+// Inspect permission-gated browser APIs.
+
+const checkPermissionButton = document.querySelector('#check-permission-button');
+const locationButton = document.querySelector('#location-button');
+const cameraButton = document.querySelector('#camera-button');
+const notifyButton = document.querySelector('#notify-button');
+const shareButton = document.querySelector('#share-button');
+
+const permissionOutput = document.querySelector('#permission-output');
+const locationOutput = document.querySelector('#location-output');
+const cameraPreview = document.querySelector('#camera-preview');
+
+checkPermissionButton.addEventListener('click', async () => {
+  if (!navigator.permissions) {
+    permissionOutput.textContent = 'Permission API is not available.';
+    return;
+  }
+
+  const status = await navigator.permissions.query({ name: 'geolocation' });
+  permissionOutput.textContent = `Permission state: ${status.state}`;
+
+  status.addEventListener('change', () => {
+    permissionOutput.textContent = `Permission state: ${status.state}`;
+  });
+});
+
+locationButton.addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    locationOutput.textContent = 'Geolocation is not available.';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      locationOutput.textContent = `Location: ${latitude}, ${longitude}`;
+    },
+    (error) => {
+      locationOutput.textContent = `Location error: ${error.message}`;
+    },
+  );
+});
+
+cameraButton.addEventListener('click', async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false,
+    });
+
+    cameraPreview.srcObject = stream;
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+notifyButton.addEventListener('click', async () => {
+  if (!('Notification' in window)) {
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+
+  if (permission === 'granted') {
+    new Notification('Web API practice', {
+      body: 'Permission was granted.',
+    });
+  }
+});
+
+shareButton.addEventListener('click', async () => {
+  if (!navigator.share) {
+    console.log('Web Share API is not available.');
+    return;
+  }
+
+  await navigator.share({
+    title: 'Web API practice',
+    text: 'Learning browser permission boundaries.',
+    url: location.href,
+  });
+});
+```
+
+#### 执行过程
+
+| 步骤 | 发生什么 |
+|---|---|
+| 1 | `navigator.permissions.query()` 查询当前权限状态，但不一定弹窗请求权限。 |
+| 2 | `getCurrentPosition()` 才是真正触发位置访问的能力调用。 |
+| 3 | `getUserMedia()` 请求摄像头媒体流，成功后 `video.srcObject` 指向 `MediaStream`。 |
+| 4 | `Notification.requestPermission()` 请求通知权限。 |
+| 5 | `navigator.share()` 依赖设备和浏览器是否支持原生分享面板。 |
+
+#### 常见错误
+
+| 错误 | 原因 |
+|---|---|
+| 以为 Permissions API 可以统一请求所有权限 | 它主要用于查询权限状态，具体请求通常由对应 API 自己触发。 |
+| 在 HTTP 页面使用摄像头、剪贴板、通知 | 这些能力通常需要 secure context。 |
+| 以为权限一次允许就永远可用 | 用户可以在浏览器设置里撤销权限，代码要处理失败路径。 |
+| 只写成功路径，不写 rejected Promise 或 error callback | 权限 API 的失败是正常业务分支，不是罕见异常。 |
+
+### 16A-4：Performance、requestAnimationFrame 和 Page Visibility
+
+#### 结论
+
+性能相关 API 解决两个问题：
+
+```text
+Measure what happened.
+Schedule work at the right time.
+```
+
+`performance.now()`、`performance.mark()`、`performance.measure()` 用来测量；`requestAnimationFrame()` 用来把视觉更新安排到浏览器下一帧；Page Visibility API 用来判断页面是否在前台，避免隐藏标签页继续做不必要工作。
+
+#### 关键 API
+
+| API | 作用 |
+|---|---|
+| `performance.now()` | 返回高精度时间戳，适合测量代码耗时。 |
+| `performance.mark(name)` | 标记一个性能时间点。 |
+| `performance.measure(name, start, end)` | 根据两个 mark 生成一条测量记录。 |
+| `PerformanceObserver` | 监听性能记录产生。 |
+| `requestAnimationFrame(callback)` | 在下一次重绘前运行 callback。 |
+| `cancelAnimationFrame(id)` | 取消还没执行的动画帧 callback。 |
+| `document.hidden` | 判断页面是否隐藏。 |
+| `document.visibilityState` | 读取页面可见性状态。 |
+| `visibilitychange` | 页面可见性变化时触发。 |
+
+#### 文件结构
+
+```text
+16d-performance-page-state/
+  index.html
+  performancePageDemo.css
+  performancePageDemo.js
+```
+
+#### `index.html`
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Performance Page State</title>
+    <link rel="stylesheet" href="./performancePageDemo.css" />
+  </head>
+  <body>
+    <h1>Performance and Page State</h1>
+
+    <button id="work-button">Run Work</button>
+    <button id="animation-button">Toggle Animation</button>
+
+    <p id="visibility-output">Visibility: visible</p>
+    <p id="measure-output">Measure: none</p>
+
+    <div id="box" class="box"></div>
+
+    <script type="module" src="./performancePageDemo.js"></script>
+  </body>
+</html>
+```
+
+#### `performancePageDemo.css`
+
+```css
+body {
+  font-family: system-ui, sans-serif;
+}
+
+.box {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  background: #888;
+}
+```
+
+#### `performancePageDemo.js`
+
+```js
+// Goal:
+// Measure work and schedule visual updates with browser timing APIs.
+
+const workButton = document.querySelector('#work-button');
+const animationButton = document.querySelector('#animation-button');
+const visibilityOutput = document.querySelector('#visibility-output');
+const measureOutput = document.querySelector('#measure-output');
+const box = document.querySelector('#box');
+
+let frameId = 0;
+let isAnimating = false;
+let x = 0;
+
+const performanceObserver = new PerformanceObserver((list) => {
+  for (const entry of list.getEntries()) {
+    measureOutput.textContent = `${entry.name}: ${entry.duration.toFixed(2)}ms`;
+  }
+});
+
+performanceObserver.observe({
+  entryTypes: ['measure'],
+});
+
+function runExpensiveWork() {
+  let total = 0;
+
+  for (let index = 0; index < 5_000_000; index += 1) {
+    total += Math.sqrt(index);
+  }
+
+  return total;
+}
+
+workButton.addEventListener('click', () => {
+  performance.mark('work-start');
+  runExpensiveWork();
+  performance.mark('work-end');
+  performance.measure('expensive-work', 'work-start', 'work-end');
+});
+
+function updateAnimation() {
+  if (!isAnimating || document.hidden) {
+    return;
+  }
+
+  x = (x + 2) % 240;
+  box.style.transform = `translateX(${x}px)`;
+
+  frameId = requestAnimationFrame(updateAnimation);
+}
+
+animationButton.addEventListener('click', () => {
+  isAnimating = !isAnimating;
+
+  if (isAnimating) {
+    frameId = requestAnimationFrame(updateAnimation);
+  } else {
+    cancelAnimationFrame(frameId);
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  visibilityOutput.textContent = `Visibility: ${document.visibilityState}`;
+
+  if (!document.hidden && isAnimating) {
+    frameId = requestAnimationFrame(updateAnimation);
+  }
+});
+```
+
+#### 执行过程
+
+| 步骤 | 发生什么 |
+|---|---|
+| 1 | 点击 Run Work 时，代码设置开始和结束 mark。 |
+| 2 | `performance.measure()` 创建一条 performance entry。 |
+| 3 | `PerformanceObserver` 收到 measure entry 并更新页面。 |
+| 4 | 点击 Toggle Animation 时，`requestAnimationFrame()` 安排下一帧更新。 |
+| 5 | 每一帧只修改 `transform`，让视觉更新和浏览器重绘节奏对齐。 |
+| 6 | 页面隐藏时，`document.hidden` 让动画逻辑停止继续排队。 |
+
+#### 常见错误
+
+| 错误 | 原因 |
+|---|---|
+| 用 `Date.now()` 测量短任务 | `performance.now()` 更适合高精度性能测量。 |
+| 用 `setInterval()` 做视觉动画 | 它不和浏览器重绘节奏绑定，后台标签页还会受到节流影响。 |
+| 页面隐藏时继续轮询接口或更新动画 | 会浪费资源，移动端尤其明显。 |
+| 以为 `requestAnimationFrame()` 是微任务 | 它属于浏览器渲染调度，不是 Promise job queue。 |
+
+### 16A-5：WebSocket、BroadcastChannel、Service Worker 和 Cache
+
+#### 结论
+
+Fetch 适合“一次请求，一次响应”。但真实应用还需要三类通信和生命周期能力：
+
+```text
+Real-time server communication
+  -> WebSocket
+
+Same-origin cross-tab communication
+  -> BroadcastChannel
+
+Offline and network interception
+  -> Service Worker + Cache
+```
+
+这三类 API 都和“普通函数调用”不同。它们背后有长期存在的连接、浏览上下文、worker 生命周期和浏览器缓存策略。
+
+#### 关键 API
+
+| API | 作用 |
+|---|---|
+| `new WebSocket(url)` | 建立浏览器和服务器之间的双向实时连接。 |
+| `socket.send(data)` | 通过 WebSocket 发送消息。 |
+| `message` event | 接收 WebSocket 或 BroadcastChannel 消息。 |
+| `new BroadcastChannel(name)` | 加入同源同名广播频道。 |
+| `channel.postMessage(value)` | 向同频道其他上下文广播消息。 |
+| `navigator.serviceWorker.register(url)` | 注册 service worker。 |
+| `install` event | service worker 安装阶段，常用于预缓存资源。 |
+| `fetch` event | service worker 拦截页面网络请求。 |
+| `caches.open(name)` | 打开一个命名 Cache。 |
+| `cache.match(request)` | 从 Cache 查找响应。 |
+| `cache.addAll(urls)` | 批量缓存资源。 |
+
+#### 文件结构
+
+```text
+16e-realtime-offline-security/
+  index.html
+  realtimeOfflineDemo.js
+  serviceWorker.js
+```
+
+#### `index.html`
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Realtime Offline APIs</title>
+  </head>
+  <body>
+    <h1>Realtime and Offline APIs</h1>
+
+    <button id="broadcast-button">Broadcast Login State</button>
+    <button id="websocket-button">Open Echo WebSocket</button>
+
+    <p id="service-worker-output">Service worker: not registered</p>
+    <p id="broadcast-output">Broadcast: none</p>
+    <p id="websocket-output">WebSocket: closed</p>
+
+    <script type="module" src="./realtimeOfflineDemo.js"></script>
+  </body>
+</html>
+```
+
+#### `realtimeOfflineDemo.js`
+
+```js
+// Goal:
+// Compare same-origin tab messaging, service worker registration, and websocket state.
+
+const broadcastButton = document.querySelector('#broadcast-button');
+const websocketButton = document.querySelector('#websocket-button');
+const serviceWorkerOutput = document.querySelector('#service-worker-output');
+const broadcastOutput = document.querySelector('#broadcast-output');
+const websocketOutput = document.querySelector('#websocket-output');
+
+const authChannel = new BroadcastChannel('auth-state');
+
+authChannel.addEventListener('message', (event) => {
+  broadcastOutput.textContent = `Broadcast: ${event.data.type}`;
+});
+
+broadcastButton.addEventListener('click', () => {
+  authChannel.postMessage({
+    type: 'user-login',
+    at: Date.now(),
+  });
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('./serviceWorker.js')
+    .then((registration) => {
+      serviceWorkerOutput.textContent = `Service worker: ${registration.scope}`;
+    })
+    .catch((error) => {
+      serviceWorkerOutput.textContent = `Service worker error: ${error.message}`;
+    });
+}
+
+websocketButton.addEventListener('click', () => {
+  const socket = new WebSocket('wss://echo.websocket.events');
+
+  socket.addEventListener('open', () => {
+    websocketOutput.textContent = 'WebSocket: open';
+    socket.send('hello from browser');
+  });
+
+  socket.addEventListener('message', (event) => {
+    websocketOutput.textContent = `WebSocket message: ${event.data}`;
+    socket.close();
+  });
+
+  socket.addEventListener('close', () => {
+    console.log('WebSocket closed.');
+  });
+
+  socket.addEventListener('error', (event) => {
+    console.error(event);
+    websocketOutput.textContent = 'WebSocket: error';
+  });
+});
+```
+
+#### `serviceWorker.js`
+
+```js
+// Goal:
+// Cache a small application shell and respond from cache when possible.
+
+const CACHE_NAME = 'web-api-guide-v1';
+const APP_SHELL = [
+  './',
+  './index.html',
+  './realtimeOfflineDemo.js',
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(APP_SHELL);
+    }),
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      return cachedResponse || fetch(event.request);
+    }),
+  );
+});
+```
+
+#### 执行过程
+
+| 步骤 | 发生什么 |
+|---|---|
+| 1 | 页面创建 `BroadcastChannel('auth-state')`。 |
+| 2 | 打开同源同路径的第二个标签页时，两个页面加入同名频道。 |
+| 3 | 一个页面调用 `postMessage()`，另一个页面收到 `message` event。 |
+| 4 | 页面注册 `serviceWorker.js`，浏览器在后台 worker 上下文执行它。 |
+| 5 | `install` event 中打开 Cache，并缓存 app shell。 |
+| 6 | 后续请求经过 service worker 的 `fetch` event。 |
+| 7 | 如果 Cache 命中，返回缓存响应；否则继续 `fetch(event.request)`。 |
+| 8 | WebSocket 建立长连接，`open` 后发送消息，`message` 后收到服务器推送。 |
+
+#### 常见错误
+
+| 错误 | 原因 |
+|---|---|
+| 以为 WebSocket 是 Promise API | WebSocket 是 event-based API，状态通过 `open`、`message`、`error`、`close` 事件驱动。 |
+| 以为 BroadcastChannel 可以跨网站通信 | 它受 origin 和 storage partition 限制，不是跨站通信 API。 |
+| 以为 service worker 注册后立刻控制当前页面 | 通常需要页面重新加载后才被新 service worker 控制。 |
+| 以为 Cache 会自动遵守 HTTP 缓存头更新 | Cache API 需要你自己定义缓存版本、更新和清理策略。 |
+| 在 service worker 中操作 DOM | Service worker 是 worker 上下文，没有 DOM 访问权限。 |
+
+### 16A-6：Trusted Types、DOMParser、Range、Selection、Web Animations 和 Popover
+
+#### 结论
+
+这些 API 不一定每个初学项目都会马上用到，但它们决定了你能不能理解现代浏览器里更底层的 UI、安全和文档操作边界。
+
+| API | 解决什么问题 |
+|---|---|
+| Trusted Types API | 限制不可信字符串进入 HTML / script injection sinks，降低 DOM-based XSS 风险。 |
+| `DOMParser` | 把字符串解析成独立的 `Document`，不要直接塞进当前页面。 |
+| `Range` | 表示文档中的一段连续内容范围。 |
+| `Selection` | 表示用户当前选中的文本或节点范围。 |
+| Web Animations API | 用 JavaScript 创建、控制和检查 DOM 动画。 |
+| Popover API | 用 HTML 属性和少量 JS 实现原生浮层显示与隐藏。 |
+
+#### 安全边界：不要把字符串当成 DOM 信任
+
+危险写法：
+
+```js
+const commentHtml = '<img src=x onerror=alert(1)>';
+document.querySelector('#comments').innerHTML = commentHtml;
+```
+
+这里的问题不是 `innerHTML` 语法复杂，而是它是一个 injection sink。字符串被浏览器当作 HTML 解析后，攻击者可以尝试注入可执行内容。
+
+更安全的默认写法：
+
+```js
+const commentText = '<img src=x onerror=alert(1)>';
+document.querySelector('#comments').textContent = commentText;
+```
+
+`textContent` 把字符串当文本，不当 HTML 解释。
+
+#### DOMParser 的正确定位
+
+`DOMParser` 适合把字符串解析到一个独立文档，再从中提取安全、明确需要的部分：
+
+```js
+// Goal:
+// Parse a string into an isolated document.
+
+const parser = new DOMParser();
+const parsedDocument = parser.parseFromString('<h2>Preview</h2>', 'text/html');
+const heading = parsedDocument.querySelector('h2');
+
+console.log(heading.textContent);
+```
+
+这不等于“解析后就安全”。真正安全的规则仍然是：不要把不可信内容作为可执行 HTML 插入当前页面。
+
+#### Range 和 Selection 的模型
+
+`Range` 表示文档里的一个范围，不一定等于用户选择；`Selection` 是用户当前选择状态，里面可以包含 range。
+
+```js
+// Goal:
+// Read the current selected text.
+
+document.addEventListener('selectionchange', () => {
+  const selection = document.getSelection();
+
+  if (!selection || selection.rangeCount === 0) {
+    return;
+  }
+
+  console.log(selection.toString());
+});
+```
+
+#### Web Animations API 的模型
+
+CSS 动画适合声明式样式；Web Animations API 适合 JS 需要控制播放状态的场景：
+
+```js
+// Goal:
+// Create and control an animation with Element.animate.
+
+const panel = document.querySelector('#panel');
+
+const animation = panel.animate(
+  [
+    { opacity: 0, transform: 'translateY(8px)' },
+    { opacity: 1, transform: 'translateY(0)' },
+  ],
+  {
+    duration: 200,
+    easing: 'ease-out',
+    fill: 'forwards',
+  },
+);
+
+animation.addEventListener('finish', () => {
+  console.log('Animation finished.');
+});
+```
+
+#### Popover API 的模型
+
+Popover API 把“打开 / 关闭浮层”的基础行为交给浏览器，不需要你手写大量 document click 监听和焦点处理。
+
+```html
+<button popovertarget="profile-popover">Open Profile</button>
+
+<div id="profile-popover" popover>
+  Profile actions
+</div>
+```
+
+对应 JS 可以调用：
+
+```js
+// Goal:
+// Control a popover with JavaScript.
+
+const popover = document.querySelector('#profile-popover');
+
+popover.showPopover();
+popover.hidePopover();
+popover.togglePopover();
+```
+
+#### 常见错误
+
+| 错误 | 原因 |
+|---|---|
+| 认为 `DOMParser` 自动消毒 HTML | 解析和消毒不是一回事。 |
+| 为了渲染用户评论直接使用 `innerHTML` | 不可信字符串进入 injection sink 会产生 XSS 风险。 |
+| 混淆 `Range` 和 `Selection` | `Range` 是文档范围对象，`Selection` 是用户当前选择状态。 |
+| 所有动画都用 JS 写 | 纯样式状态变化优先用 CSS transition / animation；需要控制播放状态时再用 Web Animations API。 |
+| 自己手写所有浮层行为 | 简单浮层优先考虑 Popover 或 `<dialog>`，复杂交互再自定义。 |
+
+### 16A API 记忆模型
+
+```text
+Observe:
+  MutationObserver
+  IntersectionObserver
+  ResizeObserver
+
+User data:
+  File
+  Blob
+  FileReader
+  DataTransfer
+  Clipboard
+
+Permission:
+  Permissions
+  Geolocation
+  MediaDevices
+  Notification
+  Web Share
+
+Performance and lifecycle:
+  performance
+  PerformanceObserver
+  requestAnimationFrame
+  visibilitychange
+
+Communication and offline:
+  WebSocket
+  BroadcastChannel
+  ServiceWorker
+  Cache
+
+Security and document editing:
+  Trusted Types
+  DOMParser
+  Range
+  Selection
+
+Native UI:
+  Web Animations
+  Popover
+```
+
+### 16A 常见错误总表
+
+| 错误 | 准确原因 | 修正方式 |
+|---|---|---|
+| 把 MDN Web APIs 当成必须一次背完的列表 | Web APIs 数量很大，学习要按能力边界和项目问题分类 | 先掌握高频主干，再按项目需要查 MDN |
+| 看到 `navigator.xxx` 就以为所有浏览器都支持 | 很多能力受浏览器、设备、secure context、permission policy 限制 | 写 feature detection 和失败路径 |
+| 忘记 observer、channel、media stream 的清理 | 这些对象可能跨越多次 UI 生命周期 | 组件卸载或页面结束时 `disconnect()`、`close()`、停止 media tracks |
+| 把所有异步 API 都当 Promise | 一些 API 是 Promise-based，一些是 event-based，一些是 callback-based | 先判断 API 的异步模型 |
+| 把 Web Worker 和 Service Worker 混为一谈 | Worker 用于后台计算；Service Worker 用于网络拦截、缓存和离线能力 | 按职责区分：compute worker vs network proxy worker |
+| 忽略安全上下文 | 剪贴板、摄像头、通知、Service Worker、Cache 等能力经常要求 HTTPS 或 localhost | 本地用 `localhost`，上线用 HTTPS |
+| 把字符串插入 `innerHTML` | 不可信字符串进入 injection sink 有 XSS 风险 | 默认用 `textContent`，需要 HTML 时使用可信模板和消毒策略 |
+
+
+## 21. 16：小项目整合
 
 ### 结论
 
@@ -2189,7 +3379,7 @@ ES module organization
 
 ---
 
-## 21. 最终文件清单
+## 22. 最终文件清单
 
 ```text
 javascript-web-api-learning/
@@ -2262,6 +3452,30 @@ javascript-web-api-learning/
     workerApp.js
     primeWorker.js
 
+  16a-mdn-observer-apis/
+    index.html
+    observerDemo.css
+    observerDemo.js
+
+  16b-file-clipboard-drag-drop/
+    index.html
+    fileClipboardDemo.css
+    fileClipboardDemo.js
+
+  16c-permissions-device-apis/
+    index.html
+    permissionDeviceDemo.js
+
+  16d-performance-page-state/
+    index.html
+    performancePageDemo.css
+    performancePageDemo.js
+
+  16e-realtime-offline-security/
+    index.html
+    realtimeOfflineDemo.js
+    serviceWorker.js
+
   16-web-api-mini-project/
     index.html
     styles.css
@@ -2278,7 +3492,7 @@ javascript-web-api-learning/
 
 ---
 
-## 22. 最终学习笔记转换要求
+## 23. 最终学习笔记转换要求
 
 每一节最终整理成学习笔记时，固定使用这个结构：
 
@@ -2314,7 +3528,7 @@ Final memory model
 
 ---
 
-## 23. 本章最终要能回答的问题
+## 24. 本章最终要能回答的问题
 
 学完第 15 章，你应该能回答：
 
@@ -2368,7 +3582,7 @@ Workers move heavy work away from the main thread.
 
 ---
 
-## 24. MDN 阅读清单
+## 25. MDN 阅读清单
 
 使用 MDN 的方式：先写本文件里的练习，再查 MDN 补完整签名、边界情况、兼容性和更多示例。
 
@@ -2402,3 +3616,32 @@ Workers move heavy work away from the main thread.
 - [IndexedDB API](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
 - [Web Workers API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
 - [Using Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
+- [MutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver)
+- [Intersection Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+- [Resize Observer API](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API)
+- [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API)
+- [Clipboard](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard)
+- [File API](https://developer.mozilla.org/en-US/docs/Web/API/File_API)
+- [Blob](https://developer.mozilla.org/en-US/docs/Web/API/Blob)
+- [FileReader](https://developer.mozilla.org/en-US/docs/Web/API/FileReader)
+- [HTML Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API)
+- [Permissions API](https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API)
+- [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API)
+- [MediaDevices.getUserMedia()](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia)
+- [Notifications API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API)
+- [Navigator.share()](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share)
+- [Performance API](https://developer.mozilla.org/en-US/docs/Web/API/Performance_API)
+- [PerformanceObserver](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserver)
+- [Window.requestAnimationFrame()](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame)
+- [Page Visibility API](https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API)
+- [WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+- [Broadcast Channel API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API)
+- [Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
+- [Using Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API/Using_Service_Workers)
+- [Cache](https://developer.mozilla.org/en-US/docs/Web/API/Cache)
+- [Trusted Types API](https://developer.mozilla.org/en-US/docs/Web/API/Trusted_Types_API)
+- [DOMParser](https://developer.mozilla.org/en-US/docs/Web/API/DOMParser)
+- [Range](https://developer.mozilla.org/en-US/docs/Web/API/Range)
+- [Selection](https://developer.mozilla.org/en-US/docs/Web/API/Selection)
+- [Web Animations API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API)
+- [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API)

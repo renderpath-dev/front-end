@@ -1025,24 +1025,196 @@ try {
 
 ### 结论
 
-Promise 静态组合方法用于组织多个异步任务：
+Promise 静态组合方法用于组织多个异步任务。它们的共同点是：调用表达式本身都会返回一个新的 Promise；区别在于这个新 Promise 什么时候 fulfilled、什么时候 rejected，以及 fulfilled value 或 rejected reason 的结构是什么。
 
 ```txt
 Promise.all()         -> 全部成功才成功，一个失败就失败
-Promise.allSettled()  -> 等全部结束，保留每个结果
+Promise.allSettled()  -> 等全部结束，永远收集每个结果描述对象
 Promise.race()        -> 第一个 settled 的结果决定最终结果
 Promise.any()         -> 第一个 fulfilled 的结果决定最终结果，全部失败才失败
 ```
 
 ### 新关键字和新概念
 
+#### Promise 静态组合方法（Promise combinator methods）
+
+`Promise.all()`、`Promise.allSettled()`、`Promise.race()`、`Promise.any()` 都是 `Promise` 构造函数上的静态方法。它们不是 Promise 实例方法，所以不能写成 `somePromise.all()`。
+
 #### 并发（concurrency）
 
-多个异步任务在重叠时间段内推进，不等于一定多线程并行。
+并发表示多个异步任务在重叠时间段内推进。它不等于多线程并行（parallelism）。在 JavaScript 中，并发通常表示多个异步任务先启动，然后由事件循环和 Promise reaction 机制在未来调度后续处理。
 
 #### settled
 
-fulfilled 或 rejected 都算 settled。
+`settled` 表示 Promise 已经结束。`fulfilled` 和 `rejected` 都属于 settled。`pending` 不属于 settled。
+
+#### fulfilled value
+
+fulfilled value 是 Promise 成功完成后交给成功处理器的值。比如 `Promise.resolve('cache ready')` 的 fulfilled value 是 `'cache ready'`。
+
+#### rejected reason
+
+rejected reason 是 Promise 失败时交给失败处理器的原因。通常是 `Error` 对象，但也可以是任意 JavaScript 值。项目中应该优先使用 `Error` 对象，因为它有 `message`，也更容易调试。
+
+#### result object
+
+`Promise.allSettled()` 的 fulfilled value 是一个数组。这个数组里的每一项不是原始 Promise，而是 `Promise.allSettled()` 生成的结果描述对象（result object）。
+
+成功项固定形状：
+
+```js
+{ status: 'fulfilled', value: successValue }
+```
+
+失败项固定形状：
+
+```js
+{ status: 'rejected', reason: failureReason }
+```
+
+#### `status`
+
+`status` 是 `Promise.allSettled()` 结果对象的固定属性。它不是普通 Promise 实例上的公开属性。
+
+它只能是两个字符串之一：
+
+```txt
+fulfilled
+rejected
+```
+
+#### `value`
+
+`value` 只存在于 fulfilled result object。它保存对应输入 Promise 的 fulfilled value。
+
+#### `reason`
+
+`reason` 只存在于 rejected result object。它保存对应输入 Promise 的 rejected reason。
+
+#### `AggregateError`
+
+`Promise.any()` 只有在所有输入 Promise 都 rejected 时才会 rejected。此时 rejected reason 是 `AggregateError` 对象。它的 `errors` 属性保存所有失败原因。
+
+### 语法、运行时、对象模型、类型系统边界
+
+这些组合方法属于 JavaScript 标准库 API，不是浏览器专属 API，也不是 TypeScript 类型系统功能。
+
+```js
+Promise.all(iterable);
+Promise.allSettled(iterable);
+Promise.race(iterable);
+Promise.any(iterable);
+```
+
+运行时真正发生的是：组合方法读取输入 iterable，订阅其中每个 Promise 的完成结果，然后根据各自规则决定返回 Promise 的状态和值。
+
+TypeScript 中可以把这些结果建模为类型，比如：
+
+```ts
+type PromiseSettledResult<T> =
+  | PromiseFulfilledResult<T>
+  | PromiseRejectedResult;
+
+type PromiseFulfilledResult<T> = {
+  status: 'fulfilled';
+  value: T;
+};
+
+type PromiseRejectedResult = {
+  status: 'rejected';
+  reason: unknown;
+};
+```
+
+这只是编译期类型建模。运行时对象仍然是普通 JavaScript 对象。
+
+### 底层机制
+
+`Promise.all()`、`Promise.allSettled()`、`Promise.race()`、`Promise.any()` 都会立即返回一个新的 Promise。
+
+区别在于返回的 Promise 如何被解决：
+
+| 方法 | 返回 Promise fulfilled 条件 | 返回 Promise fulfilled value | 返回 Promise rejected 条件 | 返回 Promise rejected reason |
+|---|---|---|---|---|
+| `Promise.all()` | 所有输入都 fulfilled | 按输入顺序排列的成功值数组 | 任意一个输入 rejected | 第一个 rejected reason |
+| `Promise.allSettled()` | 所有输入都 settled | 结果描述对象数组 | 通常不因输入 rejected 而 rejected | 只有 iterable 读取等特殊错误 |
+| `Promise.race()` | 第一个 settled 的输入是 fulfilled | 第一个 settled 的成功值 | 第一个 settled 的输入是 rejected | 第一个 settled 的失败原因 |
+| `Promise.any()` | 第一个输入 fulfilled | 第一个成功值 | 所有输入都 rejected | `AggregateError` |
+
+### API / 语法规则
+
+#### `Promise.all(iterable)`
+
+接收一个 iterable，常见是数组。返回一个新的 Promise。
+
+```txt
+Array<Promise<T>> -> Promise<Array<T>>
+```
+
+如果任意输入 Promise rejected，返回 Promise 立即 rejected。
+
+#### `Promise.allSettled(iterable)`
+
+接收一个 iterable，常见是数组。返回一个新的 Promise。
+
+```txt
+Array<Promise<T>> -> Promise<Array<PromiseSettledResult<T>>>
+```
+
+返回 Promise 会等所有输入 Promise 都 settled，然后 fulfilled。fulfilled value 是结果描述对象数组。
+
+#### `Promise.race(iterable)`
+
+接收一个 iterable。返回一个新的 Promise。第一个 settled 的输入决定返回 Promise 的最终状态。
+
+#### `Promise.any(iterable)`
+
+接收一个 iterable。返回一个新的 Promise。第一个 fulfilled 的输入决定返回 Promise 的成功值。只有全部 rejected 时，返回 Promise 才 rejected，失败原因是 `AggregateError`。
+
+### 固定属性名 / 固定方法名 / 参数签名
+
+固定方法名：
+
+```txt
+Promise.all
+Promise.allSettled
+Promise.race
+Promise.any
+```
+
+`Promise.allSettled()` 的结果对象固定属性名：
+
+```txt
+status
+value
+reason
+```
+
+属性归属必须分清：
+
+```txt
+successfulTask:
+  原始 Promise，没有公开的 status/value/reason 属性。
+
+failedTask:
+  原始 Promise，没有公开的 status/value/reason 属性。
+
+taskResults:
+  Promise.allSettled 返回的 Promise fulfilled 后得到的数组。
+
+taskResults[0]:
+  第一个输入 Promise 对应的结果描述对象。
+
+taskResults[1]:
+  第二个输入 Promise 对应的结果描述对象。
+```
+
+`AggregateError` 的常见固定属性：
+
+```txt
+message
+errors
+```
 
 ### 文件结构
 
@@ -1072,11 +1244,99 @@ Promise.all([
 });
 ```
 
+### 运行方式
+
+```bash
+node promiseAllDemo.js
+```
+
 ### 预期输出
 
 ```txt
 views,orders,refunds
 ```
+
+### `promiseAllDemo.js` 代码逐行解释
+
+```js
+function loadMetric(labelText, valueNumber) {
+```
+
+- 定义函数 `loadMetric`。
+- `labelText` 接收指标名称。
+- `valueNumber` 接收指标数值。
+
+```js
+  return Promise.resolve({ label: labelText, value: valueNumber });
+```
+
+- `Promise.resolve(...)` 创建一个已经 fulfilled 的 Promise。
+- fulfilled value 是对象 `{ label: labelText, value: valueNumber }`。
+- `loadMetric()` 的返回值是 Promise，不是普通对象。
+
+```js
+Promise.all([
+  loadMetric('views', 100),
+  loadMetric('orders', 12),
+  loadMetric('refunds', 1),
+])
+```
+
+- 三次调用 `loadMetric()`，得到三个 Promise。
+- 外层数组是 `Array<Promise<MetricRecord>>`。
+- `Promise.all(...)` 返回一个新的 Promise。
+- 这个新 Promise 的 fulfilled value 是成功值数组，不是 Promise 数组。
+
+```js
+.then((metricList) => {
+```
+
+- `.then()` 给 `Promise.all(...)` 返回的新 Promise 注册成功处理器。
+- `metricList` 指向 `Promise.all(...)` fulfilled 后生成的数组。
+- `metricList` 的元素是普通对象，不是 Promise。
+
+```js
+  console.log(metricList.map((metricRecord) => metricRecord.label).join(','));
+```
+
+- `map()` 遍历成功值数组。
+- `metricRecord` 每次指向一个指标对象。
+- `metricRecord.label` 读取对象的 `label` 属性。
+- `join(',')` 把字符串数组拼成一个字符串。
+
+### `promiseAllDemo.js` 执行过程
+
+| 步骤 | 执行内容 | 运行时发生什么 | 当前关键值 |
+|---|---|---|---|
+| 1 | 三次调用 `loadMetric()` | 创建三个 fulfilled Promise | 输入数组元素是 Promise |
+| 2 | 调用 `Promise.all(...)` | 返回新的 Promise | 等所有输入 fulfilled |
+| 3 | 调用 `.then(...)` | 注册 fulfilled handler | handler 不同步执行 |
+| 4 | 三个输入都 fulfilled | 生成成功值数组 | `metricList` 准备绑定 |
+| 5 | 执行 then handler | 读取每个对象的 `label` | 输出 `views,orders,refunds` |
+
+### `promiseAllDemo.js` 变量和引用变化
+
+```txt
+loadMetric('views', 100)
+  -> Promise fulfilled with { label: 'views', value: 100 }
+
+Promise.all([...])
+  -> Promise fulfilled with [
+       { label: 'views', value: 100 },
+       { label: 'orders', value: 12 },
+       { label: 'refunds', value: 1 }
+     ]
+
+metricList
+  -> 成功值数组
+
+metricRecord
+  -> map 每一轮中的当前指标对象
+```
+
+### 为什么得到这个输出
+
+`Promise.all()` 会等三个输入 Promise 都 fulfilled，然后按照输入顺序收集 fulfilled value。`metricList.map(...)` 读取每个对象的 `label`，最后拼接成 `views,orders,refunds`。
 
 ### `promiseAllSettledDemo.js`
 
@@ -1089,15 +1349,144 @@ const failedTask = Promise.reject(new Error('network failed'));
 
 Promise.allSettled([successfulTask, failedTask]).then((taskResults) => {
   console.log(taskResults[0].status);
+  console.log(taskResults[0].value);
   console.log(taskResults[1].status);
+  console.log(taskResults[1].reason.message);
 });
+```
+
+### 运行方式
+
+```bash
+node promiseAllSettledDemo.js
 ```
 
 ### 预期输出
 
 ```txt
 fulfilled
+cache ready
 rejected
+network failed
+```
+
+### `promiseAllSettledDemo.js` 代码逐行解释
+
+```js
+const successfulTask = Promise.resolve('cache ready');
+```
+
+- 创建一个 fulfilled Promise。
+- `successfulTask` 指向这个 Promise 对象。
+- 这个 Promise 的 fulfilled value 是 `'cache ready'`。
+- `successfulTask` 本身没有公开的 `.status`、`.value`、`.reason` 属性。
+
+```js
+const failedTask = Promise.reject(new Error('network failed'));
+```
+
+- 创建一个 rejected Promise。
+- `failedTask` 指向这个 Promise 对象。
+- rejected reason 是 `Error` 对象。
+- 这个 `Error` 对象的 `message` 是 `'network failed'`。
+
+```js
+Promise.allSettled([successfulTask, failedTask])
+```
+
+- 调用 `Promise.allSettled()`。
+- 输入数组有两个 Promise。
+- 调用表达式返回一个新的 Promise。
+- 这个新 Promise 会等待两个输入 Promise 都 settled。
+- 它不会因为 `failedTask` rejected 就进入 `.catch()`。
+
+```js
+.then((taskResults) => {
+```
+
+- `.then()` 注册成功处理器。
+- `taskResults` 指向 `Promise.allSettled()` 返回的 Promise fulfilled 后得到的结果数组。
+- `taskResults` 不是原始 Promise 数组。
+
+```js
+  console.log(taskResults[0].status);
+```
+
+- `taskResults[0]` 是 `successfulTask` 对应的结果描述对象。
+- 它的形状是 `{ status: 'fulfilled', value: 'cache ready' }`。
+- `status` 的值是 `'fulfilled'`。
+
+```js
+  console.log(taskResults[0].value);
+```
+
+- `value` 只存在于 fulfilled result object。
+- 这里读取到 `'cache ready'`。
+
+```js
+  console.log(taskResults[1].status);
+```
+
+- `taskResults[1]` 是 `failedTask` 对应的结果描述对象。
+- 它的形状是 `{ status: 'rejected', reason: Error('network failed') }`。
+- `status` 的值是 `'rejected'`。
+
+```js
+  console.log(taskResults[1].reason.message);
+```
+
+- `reason` 只存在于 rejected result object。
+- `reason` 指向 `Error('network failed')`。
+- `.message` 读取错误对象的消息文本。
+
+### `promiseAllSettledDemo.js` 执行过程
+
+| 步骤 | 执行内容 | 运行时发生什么 | 当前关键值 |
+|---|---|---|---|
+| 1 | 创建 `successfulTask` | 创建 fulfilled Promise | fulfilled value 是 `'cache ready'` |
+| 2 | 创建 `failedTask` | 创建 rejected Promise | rejected reason 是 `Error('network failed')` |
+| 3 | 调用 `Promise.allSettled(...)` | 返回新的 Promise | 等两个输入都 settled |
+| 4 | 输入全部 settled | 生成结果描述对象数组 | 准备传给 `taskResults` |
+| 5 | 执行 then handler | `taskResults` 绑定结果数组 | 数组有两个 result object |
+| 6 | 读取 `taskResults[0]` | 读取 fulfilled result object | 有 `status` 和 `value` |
+| 7 | 读取 `taskResults[1]` | 读取 rejected result object | 有 `status` 和 `reason` |
+
+### `promiseAllSettledDemo.js` 变量和引用变化
+
+```txt
+successfulTask
+  -> Promise fulfilled with 'cache ready'
+
+failedTask
+  -> Promise rejected with Error('network failed')
+
+Promise.allSettled([successfulTask, failedTask])
+  -> Promise fulfilled with taskResults
+
+taskResults
+  -> [
+       { status: 'fulfilled', value: 'cache ready' },
+       { status: 'rejected', reason: Error('network failed') }
+     ]
+
+taskResults[0]
+  -> { status: 'fulfilled', value: 'cache ready' }
+
+taskResults[1]
+  -> { status: 'rejected', reason: Error('network failed') }
+```
+
+### 为什么得到这个输出
+
+`Promise.allSettled()` 不会因为其中一个输入 Promise rejected 就直接 rejected。它会等待所有输入 Promise 都 settled，然后把每个输入 Promise 的最终结果包装成结果描述对象。
+
+所以输出顺序是：
+
+```txt
+taskResults[0].status        -> fulfilled
+taskResults[0].value         -> cache ready
+taskResults[1].status        -> rejected
+taskResults[1].reason.message -> network failed
 ```
 
 ### `promiseRaceAnyDemo.js`
@@ -1123,6 +1512,12 @@ Promise.any([slowSuccess, fastFailure]).then((firstSuccess) => {
 });
 ```
 
+### 运行方式
+
+```bash
+node promiseRaceAnyDemo.js
+```
+
 ### 预期输出
 
 ```txt
@@ -1130,29 +1525,209 @@ race: fast failure
 any: slow success
 ```
 
-### 执行过程
+### `promiseRaceAnyDemo.js` 代码逐行解释
 
-| 方法 | 决定结果的条件 |
-|---|---|
-| `Promise.all()` | 所有输入都 fulfilled。 |
-| `Promise.allSettled()` | 所有输入都 settled。 |
-| `Promise.race()` | 第一个 settled 的 Promise。 |
-| `Promise.any()` | 第一个 fulfilled 的 Promise。 |
+```js
+const slowSuccess = new Promise((resolve) => {
+  setTimeout(() => resolve('slow success'), 20);
+});
+```
 
-### 常见错误
+- 创建一个 Promise。
+- 20ms 后调用 `resolve('slow success')`。
+- 这个 Promise 会较慢 fulfilled。
 
-不要把 `Promise.race()` 和 `Promise.any()` 混在一起。
+```js
+const fastFailure = new Promise((resolve, reject) => {
+  setTimeout(() => reject(new Error('fast failure')), 10);
+});
+```
+
+- 创建另一个 Promise。
+- 10ms 后调用 `reject(new Error('fast failure'))`。
+- 这个 Promise 会较快 rejected。
+
+```js
+Promise.race([slowSuccess, fastFailure]).catch((raceError) => {
+```
+
+- `Promise.race()` 返回一个新的 Promise。
+- 第一个 settled 的输入决定它的状态。
+- `fastFailure` 先 rejected，所以返回 Promise rejected。
+- `raceError` 指向 `Error('fast failure')`。
+
+```js
+Promise.any([slowSuccess, fastFailure]).then((firstSuccess) => {
+```
+
+- `Promise.any()` 返回一个新的 Promise。
+- 它等待第一个 fulfilled 的输入。
+- `fastFailure` 虽然先 rejected，但不会决定 `Promise.any()` 的成功结果。
+- `slowSuccess` 后来 fulfilled，所以 `firstSuccess` 是 `'slow success'`。
+
+### `promiseRaceAnyDemo.js` 执行过程
+
+| 步骤 | 执行内容 | 运行时发生什么 | 当前关键值 |
+|---|---|---|---|
+| 1 | 创建 `slowSuccess` | 注册 20ms 后 fulfilled | 未来值 `'slow success'` |
+| 2 | 创建 `fastFailure` | 注册 10ms 后 rejected | 未来错误 `fast failure` |
+| 3 | 调用 `Promise.race(...)` | 等第一个 settled | `fastFailure` 先结束 |
+| 4 | `fastFailure` rejected | `race` 返回 Promise rejected | `raceError.message` 是 `'fast failure'` |
+| 5 | 调用 `Promise.any(...)` | 等第一个 fulfilled | 忽略先发生的失败 |
+| 6 | `slowSuccess` fulfilled | `any` 返回 Promise fulfilled | `firstSuccess` 是 `'slow success'` |
+
+### 对比写法：Promise.any 全部失败
+
+```js
+// Goal:
+// Verify that Promise.any rejects with AggregateError when all inputs reject.
+
+Promise.any([
+  Promise.reject(new Error('profile failed')),
+  Promise.reject(new Error('metrics failed')),
+]).catch((aggregateError) => {
+  console.log(aggregateError instanceof AggregateError);
+  console.log(aggregateError.errors.length);
+  console.log(aggregateError.errors[0].message);
+});
+```
+
+输出：
 
 ```txt
-race 看谁最先结束，不管成功失败。
-any 看谁最先成功，失败的会继续等其他成功结果。
+true
+2
+profile failed
 ```
+
+解释：`Promise.any()` 只有在所有输入都 rejected 时才 rejected。此时 `aggregateError` 是 `AggregateError`，`aggregateError.errors` 保存所有失败原因。
+
+### 对比表
+
+| 方法 | 调用表达式返回值 | fulfilled value | rejected reason | 是否保留每个输入结果 |
+|---|---|---|---|---|
+| `Promise.all()` | 新 Promise | 成功值数组 | 第一个失败原因 | 否 |
+| `Promise.allSettled()` | 新 Promise | 结果描述对象数组 | 通常不因输入 rejected 而 rejected | 是 |
+| `Promise.race()` | 新 Promise | 第一个 settled 的成功值 | 第一个 settled 的失败原因 | 否 |
+| `Promise.any()` | 新 Promise | 第一个成功值 | `AggregateError` | 只在全部失败时通过 `errors` 保存失败原因 |
+
+### 常见错误为什么错
+
+#### 错误一：以为 `Promise.all()` 返回数组
+
+错误理解：
+
+```txt
+Promise.all([...]) 直接得到数组。
+```
+
+错误原因：`Promise.all()` 调用表达式返回新的 Promise。数组是这个 Promise 的 fulfilled value，只能在 `then` 或 `await` 后拿到。
+
+#### 错误二：以为普通 Promise 实例有公开的 `status` 属性
+
+错误代码：
+
+```js
+const successfulTask = Promise.resolve('cache ready');
+
+console.log(successfulTask.status);
+```
+
+输出：
+
+```txt
+undefined
+```
+
+错误原因：`status` 是 `Promise.allSettled()` 生成的结果描述对象属性，不是普通 Promise 实例公开属性。
+
+#### 错误三：读取 fulfilled result object 的 `reason`
+
+错误代码：
+
+```js
+Promise.allSettled([Promise.resolve('cache ready')]).then((taskResults) => {
+  console.log(taskResults[0].reason);
+});
+```
+
+输出：
+
+```txt
+undefined
+```
+
+错误原因：fulfilled result object 只有 `status` 和 `value`，没有 `reason`。
+
+#### 错误四：读取 rejected result object 的 `value`
+
+错误代码：
+
+```js
+Promise.allSettled([Promise.reject(new Error('network failed'))]).then((taskResults) => {
+  console.log(taskResults[0].value);
+});
+```
+
+输出：
+
+```txt
+undefined
+```
+
+错误原因：rejected result object 只有 `status` 和 `reason`，没有 `value`。
+
+#### 错误五：以为 `Promise.race()` 等第一个成功
+
+错误原因：`Promise.race()` 等第一个 settled。成功或失败都算 settled。
+
+#### 错误六：以为 `Promise.any()` 的失败原因是第一个失败
+
+错误原因：`Promise.any()` 只有全部输入都 rejected 时才 rejected。此时失败原因是 `AggregateError`，不是某一个单独 Error。
 
 ### 和项目开发的关系
 
-页面初始化经常需要同时发多个请求。你要根据业务决定：一个失败是否整体失败，还是收集所有结果。
+页面初始化经常需要同时发多个请求。选择哪个组合方法取决于业务语义：
 
----
+```txt
+全部数据必须成功才能渲染:
+  Promise.all()
+
+每个数据源独立展示成功或失败:
+  Promise.allSettled()
+
+只关心最快完成的成功或失败:
+  Promise.race()
+
+只关心最快成功，失败可以忽略:
+  Promise.any()
+```
+
+### 和当前学习主线的关系
+
+这一节连接了 Promise 状态模型、Promise 链、错误传播和后面的 `async` / `await`。你后面写 `await Promise.all(...)` 时，本质上还是在等待这些组合方法返回的新 Promise。
+
+### 最终记忆模型
+
+```txt
+Promise.all:
+  input promises -> one Promise -> fulfilled with values array or rejected by first failure.
+
+Promise.allSettled:
+  input promises -> one Promise -> fulfilled with result objects array.
+
+allSettled fulfilled item:
+  { status: 'fulfilled', value: successValue }
+
+allSettled rejected item:
+  { status: 'rejected', reason: failureReason }
+
+Promise.race:
+  first settled decides.
+
+Promise.any:
+  first fulfilled decides; all rejected creates AggregateError.
+```
 
 ## 14. 10：把回调 API 包装成 Promise
 

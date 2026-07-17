@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Observer APIs</title>
+    <link rel="stylesheet" href="./observerDemo.css" />
+</head>
+<body>
+<h1>Observer APIs</h1>
+
+<button id="add-card-button">Add Card</button>
+<button id="resize-card-button">Resize First Card</button>
+
+<p id="mutation-output">DOM mutations: 0</p>
+<p id="resize-output">Resize entries: 0</p>
+<p id="intersection-output">Visible card: none</p>
+
+<main id="card-list" class="card-list">
+    <article class="card observed-card">Initial Card</article>
+</main>
+
+<script type="module" src="./observerDemo.js"></script>
+</body>
+</html>

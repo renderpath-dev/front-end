@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>File Clipboard Drag Drop</title>
+    <link rel="stylesheet" href="./fileClipboardDemo.css" />
+</head>
+<body>
+<h1>File, Clipboard, and Drag Drop</h1>
+
+<input id="file-input" type="file" accept="image/*,.txt" />
+<button id="copy-button">Copy Summary</button>
+
+<section id="drop-zone" class="drop-zone">
+    Drop a file here
+</section>
+
+<pre id="file-output">No file selected.</pre>
+<img id="preview-image" alt="Selected file preview" />
+
+<script type="module" src="./fileClipboardDemo.js"></script>
+</body>
+</html>
