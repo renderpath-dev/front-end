@@ -1,0 +1,4 @@
+interface:
+  display_name: "Next.js Learning Guide Writer"
+  short_description: "Create rigorous Next.js learning guides"
+  default_prompt: "Use $nextjs-learning-guide-writer to create or review a mechanism-first Next.js learning guide."
