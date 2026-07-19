@@ -1,4 +1,4 @@
-# Front-End Engineering Learning Lab
+# Web Engineering Learning Lab
 
 A structured, long-term workspace for studying modern front-end engineering from JavaScript language fundamentals to production-oriented React and Vue application architecture.
 
@@ -30,7 +30,7 @@ The repository is therefore both a learning archive and an engineering practice 
 ## Repository Structure
 
 ```text
-front-end/
+Web-Engineering/
 ├── javascript/      # JavaScript language, runtime, Web API, and tooling studies
 ├── typescript/      # Type-system fundamentals and focused TypeScript exercises
 ├── react/           # Runnable React 19 + TypeScript learning application
@@ -71,8 +71,8 @@ See [`vue/README.md`](./vue/README.md) for the current chapter map, commands, an
 Clone the repository:
 
 ```bash
-git clone https://github.com/renderpath-dev/front-end.git
-cd front-end
+git clone https://github.com/renderpath-dev/Web-Engineering.git
+cd Web-Engineering
 ```
 
 The root is a multi-workspace repository, not a single installable package. Install and run dependencies inside the framework workspace you are studying.
