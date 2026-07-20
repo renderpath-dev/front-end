@@ -1,0 +1,28 @@
+{
+  "name": "nodejs-practice-08-file-upload-storage",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "run:multipart": "tsx 01-multipart-basics/formdata-boundary.ts",
+    "run:temp": "tsx 02-streaming-files/pipeline-to-temp-file.ts",
+    "run:validation": "tsx 03-file-validation/magic-number-validation.ts",
+    "run:storage": "tsx 04-storage-boundary/local-object-store.ts",
+    "run:download": "tsx 05-download-boundary/download-headers.ts"
+  },
+  "dependencies": {
+    "busboy": "^1.6.0",
+    "file-type": "^21.0.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/busboy": "^1.5.4",
+    "@types/node": "^26.1.1",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=26"
+  }
+}

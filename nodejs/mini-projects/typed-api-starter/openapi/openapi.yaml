@@ -1,0 +1,216 @@
+openapi: 3.1.0
+info:
+  title: Typed API Starter Notes API
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:3000
+paths:
+  /notes:
+    get:
+      summary: List notes
+      responses:
+        "200":
+          description: Notes were returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoteListSuccess"
+    post:
+      summary: Create a note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNoteRequest"
+      responses:
+        "201":
+          description: Note was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoteSuccess"
+        "400":
+          description: Request body was invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /notes/{id}:
+    get:
+      summary: Get a note
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      responses:
+        "200":
+          description: Note was returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoteSuccess"
+        "404":
+          description: Note was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      summary: Update a note
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNoteRequest"
+      responses:
+        "200":
+          description: Note was updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoteSuccess"
+        "400":
+          description: Request body was invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Note was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      summary: Delete a note
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      responses:
+        "200":
+          description: Note was deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteNoteSuccess"
+        "404":
+          description: Note was not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  parameters:
+    NoteId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  schemas:
+    CreateNoteRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+    UpdateNoteRequest:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+    Note:
+      type: object
+      required:
+        - id
+        - title
+        - body
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    NoteSuccess:
+      type: object
+      required:
+        - ok
+        - data
+      properties:
+        ok:
+          type: boolean
+          const: true
+        data:
+          $ref: "#/components/schemas/Note"
+    NoteListSuccess:
+      type: object
+      required:
+        - ok
+        - data
+      properties:
+        ok:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Note"
+    DeleteNoteSuccess:
+      type: object
+      required:
+        - ok
+        - data
+      properties:
+        ok:
+          type: boolean
+          const: true
+        data:
+          type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+    ErrorResponse:
+      type: object
+      required:
+        - ok
+        - error
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: object
+          required:
+            - code
+            - message
+            - details
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object

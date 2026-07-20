@@ -1,0 +1,21 @@
+{
+  "name": "chapter-07-redis-cache-jobs-practices",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "bullmq": "^5.80.9",
+    "redis": "^6.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  },
+  "engines": {
+    "node": ">=26"
+  }
+}

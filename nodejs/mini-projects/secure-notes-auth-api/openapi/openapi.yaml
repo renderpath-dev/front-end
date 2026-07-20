@@ -1,0 +1,69 @@
+openapi: 3.1.0
+info:
+  title: Secure Notes Auth API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001
+paths:
+  /auth/register:
+    post:
+      summary: Register a user and set an opaque session cookie.
+      responses:
+        "201":
+          description: User registered.
+  /auth/login:
+    post:
+      summary: Log in with generic failure behavior.
+      responses:
+        "200":
+          description: User logged in.
+  /auth/csrf:
+    get:
+      summary: Issue a session-bound CSRF token.
+      responses:
+        "200":
+          description: CSRF token issued.
+  /notebooks:
+    get:
+      summary: List notebooks owned by the authenticated user.
+      responses:
+        "200":
+          description: Notebook list.
+    post:
+      summary: Create a notebook with CSRF protection.
+      responses:
+        "201":
+          description: Notebook created.
+  /notebooks/{notebookId}/notes:
+    get:
+      summary: List notes inside an owned notebook.
+      responses:
+        "200":
+          description: Note list.
+    post:
+      summary: Create a note inside an owned notebook.
+      responses:
+        "201":
+          description: Note created.
+  /notes/{noteId}:
+    get:
+      summary: Read one owned note by id.
+      responses:
+        "200":
+          description: Note returned.
+    patch:
+      summary: Update one owned note by id with CSRF protection.
+      responses:
+        "200":
+          description: Note updated.
+    delete:
+      summary: Delete one owned note by id with CSRF protection.
+      responses:
+        "200":
+          description: Note deleted.
+  /admin/users:
+    get:
+      summary: List public users for an ADMIN user.
+      responses:
+        "200":
+          description: Public user list.

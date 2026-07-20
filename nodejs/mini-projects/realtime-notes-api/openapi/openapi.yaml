@@ -1,0 +1,123 @@
+openapi: 3.1.0
+info:
+  title: Realtime Notes API
+  version: 1.0.0
+paths:
+  /auth/register:
+    post:
+      summary: Register a user and create a cookie session.
+      responses:
+        "201":
+          description: User registered.
+  /auth/login:
+    post:
+      summary: Log in and create a cookie session.
+      responses:
+        "200":
+          description: User logged in.
+  /auth/logout:
+    post:
+      summary: Revoke the current session.
+      responses:
+        "200":
+          description: User logged out.
+  /auth/me:
+    get:
+      summary: Read the authenticated user.
+      responses:
+        "200":
+          description: Authenticated user.
+  /auth/csrf:
+    get:
+      summary: Issue a CSRF token for unsafe REST requests.
+      responses:
+        "200":
+          description: CSRF token issued.
+  /notebooks:
+    get:
+      summary: List notebooks.
+      responses:
+        "200":
+          description: Notebook list.
+    post:
+      summary: Create notebook.
+      responses:
+        "201":
+          description: Notebook created.
+  /notebooks/{notebookId}:
+    get:
+      summary: Read notebook.
+      parameters:
+        - name: notebookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Notebook.
+    patch:
+      summary: Update notebook.
+      responses:
+        "200":
+          description: Notebook updated.
+    delete:
+      summary: Delete notebook.
+      responses:
+        "200":
+          description: Notebook deleted.
+  /notebooks/{notebookId}/notes:
+    get:
+      summary: List notes for a notebook.
+      responses:
+        "200":
+          description: Notes list.
+    post:
+      summary: Create note and emit realtime event.
+      responses:
+        "201":
+          description: Note created.
+  /notes/{noteId}:
+    get:
+      summary: Read note.
+      responses:
+        "200":
+          description: Note.
+    patch:
+      summary: Update note and emit realtime event.
+      responses:
+        "200":
+          description: Note updated.
+    delete:
+      summary: Delete note and emit realtime event.
+      responses:
+        "200":
+          description: Note deleted.
+  /events:
+    get:
+      summary: Open an authenticated user-scoped SSE stream.
+      responses:
+        "200":
+          description: text/event-stream response.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+  /events/notes/{noteId}:
+    get:
+      summary: Open an authenticated note-scoped SSE stream after owner authorization.
+      responses:
+        "200":
+          description: text/event-stream response.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+  /ws:
+    get:
+      summary: WebSocket upgrade endpoint handled by the Node HTTP server upgrade event.
+      description: OpenAPI can name the endpoint, but the message protocol is documented in README.md.
+      responses:
+        "101":
+          description: Switching Protocols.

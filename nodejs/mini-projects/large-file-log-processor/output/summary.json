@@ -1,0 +1,13 @@
+{
+  "totalRecords": 1000,
+  "statusCodes": {
+    "200": 400,
+    "201": 200,
+    "404": 200,
+    "500": 200
+  },
+  "slowRequests": 499,
+  "errorRequests": 200,
+  "errorRate": 0.2,
+  "slowThresholdMs": 500
+}

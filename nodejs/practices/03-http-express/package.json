@@ -1,0 +1,32 @@
+{
+  "name": "chapter-03-http-express-practices",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "native:json": "node 01-native-http/native-json-server.js",
+    "native:routing": "node 01-native-http/native-routing-server.js",
+    "native:stream": "node 01-native-http/native-stream-response.js",
+    "express:routing": "tsx 02-express-basics/express-routing.ts",
+    "express:middleware": "tsx 02-express-basics/middleware-order.ts",
+    "express:errors": "tsx 02-express-basics/error-middleware.ts",
+    "express:async-errors": "tsx 02-express-basics/async-handler-error.ts",
+    "api:status": "tsx 03-api-design/status-code-model.ts",
+    "api:error-response": "tsx 03-api-design/unified-error-response.ts",
+    "api:validation": "tsx 03-api-design/request-validation.ts"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/node": "26.1.0",
+    "tsx": "4.22.5",
+    "typescript": "5.9.3"
+  }
+}

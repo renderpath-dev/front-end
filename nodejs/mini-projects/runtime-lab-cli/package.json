@@ -1,0 +1,13 @@
+{
+  "name": "runtime-lab-cli",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A dependency-free Node.js runtime observation lab.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "demo:block": "node src/index.js --task=block --block-ms=120",
+    "demo:async": "node src/index.js --task=async --async-ms=120",
+    "demo:both": "node src/index.js --task=both --block-ms=120 --async-ms=120"
+  }
+}

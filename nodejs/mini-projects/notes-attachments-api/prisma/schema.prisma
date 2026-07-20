@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum NoteStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum AttachmentStatus {
+  READY
+  DELETED
+}
+
+model User {
+  id           String       @id @default(uuid()) @db.Uuid
+  email        String       @unique @db.VarChar(320)
+  passwordHash String       @db.Text
+  role         Role         @default(USER)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  sessions     Session[]
+  notebooks    Notebook[]
+  notes        Note[]
+  attachments  Attachment[] @relation("AttachmentOwner")
+}
+
+model Session {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @db.Uuid
+  tokenHash     String    @unique @db.VarChar(96)
+  csrfTokenHash String?   @db.VarChar(96)
+  userAgent     String?   @db.VarChar(512)
+  ipHash        String?   @db.VarChar(96)
+  createdAt     DateTime  @default(now())
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Notebook {
+  id        String   @id @default(uuid()) @db.Uuid
+  ownerId   String   @db.Uuid
+  name      String   @db.VarChar(120)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner     User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  notes     Note[]
+
+  @@index([ownerId])
+  @@unique([ownerId, name])
+}
+
+model Note {
+  id          String       @id @default(uuid()) @db.Uuid
+  ownerId     String       @db.Uuid
+  notebookId  String       @db.Uuid
+  title       String       @db.VarChar(160)
+  body        String       @default("")
+  status      NoteStatus   @default(ACTIVE)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  owner       User         @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  notebook    Notebook     @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
+
+  @@index([ownerId])
+  @@index([notebookId])
+  @@index([status, createdAt])
+  @@unique([notebookId, title])
+}
+
+model Attachment {
+  id               String           @id @default(uuid()) @db.Uuid
+  ownerId          String           @db.Uuid
+  noteId           String           @db.Uuid
+  originalName     String           @db.VarChar(255)
+  storedName       String           @db.VarChar(160)
+  storageKey       String           @unique @db.VarChar(512)
+  mimeType         String           @db.VarChar(160)
+  detectedMimeType String           @db.VarChar(160)
+  extension        String           @db.VarChar(16)
+  byteSize         BigInt
+  sha256           String           @db.Char(64)
+  status           AttachmentStatus @default(READY)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+  owner            User             @relation("AttachmentOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  note             Note             @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, noteId])
+  @@index([ownerId, status])
+  @@index([noteId, createdAt])
+}

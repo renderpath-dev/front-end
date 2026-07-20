@@ -1,0 +1,62 @@
+openapi: 3.1.0
+info:
+  title: Notes Attachments API
+  version: 1.0.0
+paths:
+  /auth/register:
+    post:
+      summary: Register a user and create a session.
+  /auth/login:
+    post:
+      summary: Create a session.
+  /auth/logout:
+    post:
+      summary: Revoke the current session.
+  /auth/me:
+    get:
+      summary: Return the authenticated user.
+  /auth/csrf:
+    get:
+      summary: Issue a CSRF token for unsafe methods.
+  /notebooks:
+    get:
+      summary: List owned notebooks.
+    post:
+      summary: Create an owned notebook.
+  /notebooks/{notebookId}/notes:
+    get:
+      summary: List notes in an owned notebook.
+    post:
+      summary: Create a note in an owned notebook.
+  /notes/{noteId}:
+    get:
+      summary: Return an owned note.
+    patch:
+      summary: Update an owned note.
+    delete:
+      summary: Delete an owned note.
+  /notes/{noteId}/attachments:
+    post:
+      summary: Upload exactly one file field named file.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+    get:
+      summary: List ready attachments for an owned note.
+  /attachments/{attachmentId}:
+    get:
+      summary: Return attachment metadata without internal storage paths.
+    delete:
+      summary: Soft delete attachment metadata and remove the stored object.
+  /attachments/{attachmentId}/download:
+    get:
+      summary: Download bytes after owner authorization.

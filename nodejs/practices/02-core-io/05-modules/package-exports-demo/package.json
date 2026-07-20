@@ -1,0 +1,13 @@
+{
+  "name": "package-exports-demo",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./parser": "./dist/parser.js"
+  }
+}

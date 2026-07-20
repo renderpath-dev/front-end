@@ -1,0 +1,191 @@
+openapi: 3.1.0
+info:
+  title: Persistent Notes API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+paths:
+  /health:
+    get:
+      summary: Read service health
+      responses:
+        "200":
+          description: Service is ready to accept requests
+  /notebooks:
+    get:
+      summary: List notebooks
+      responses:
+        "200":
+          description: Notebook list
+    post:
+      summary: Create notebook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNotebookRequest"
+      responses:
+        "201":
+          description: Notebook created
+        "409":
+          description: Notebook name already exists
+  /notebooks/{notebookId}:
+    get:
+      summary: Read notebook
+      parameters:
+        - $ref: "#/components/parameters/NotebookId"
+      responses:
+        "200":
+          description: Notebook found
+        "404":
+          description: Notebook not found
+    patch:
+      summary: Update notebook
+      parameters:
+        - $ref: "#/components/parameters/NotebookId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNotebookRequest"
+      responses:
+        "200":
+          description: Notebook updated
+    delete:
+      summary: Delete notebook
+      parameters:
+        - $ref: "#/components/parameters/NotebookId"
+      responses:
+        "200":
+          description: Notebook deleted
+  /notebooks/{notebookId}/notes:
+    get:
+      summary: List notes in a notebook
+      parameters:
+        - $ref: "#/components/parameters/NotebookId"
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/NoteStatus"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Notes in notebook
+    post:
+      summary: Create note in a notebook
+      parameters:
+        - $ref: "#/components/parameters/NotebookId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNoteRequest"
+      responses:
+        "201":
+          description: Note created
+  /notes/{noteId}:
+    get:
+      summary: Read note
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      responses:
+        "200":
+          description: Note found
+    patch:
+      summary: Update note
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNoteRequest"
+      responses:
+        "200":
+          description: Note updated
+    delete:
+      summary: Delete note
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      responses:
+        "200":
+          description: Note deleted
+components:
+  parameters:
+    NotebookId:
+      name: notebookId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    NoteId:
+      name: noteId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    NoteStatus:
+      type: string
+      enum:
+        - DRAFT
+        - ACTIVE
+        - ARCHIVED
+    CreateNotebookRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+    UpdateNotebookRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+    CreateNoteRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        body:
+          type: string
+          maxLength: 5000
+        status:
+          $ref: "#/components/schemas/NoteStatus"
+    UpdateNoteRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 160
+        body:
+          type: string
+          maxLength: 5000
+        status:
+          $ref: "#/components/schemas/NoteStatus"

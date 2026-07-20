@@ -1,0 +1,116 @@
+openapi: 3.1.0
+info:
+  title: Typed Notes API
+  version: 1.0.0
+paths:
+  /notes:
+    get:
+      summary: List notes
+      responses:
+        "200":
+          description: Notes were returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoteListSuccess"
+    post:
+      summary: Create a note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateNoteRequest"
+      responses:
+        "201":
+          description: Note was created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoteSuccess"
+        "400":
+          description: Request body was invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+components:
+  schemas:
+    CreateNoteRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+    Note:
+      type: object
+      required:
+        - id
+        - title
+        - body
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    NoteSuccess:
+      type: object
+      required:
+        - ok
+        - data
+      properties:
+        ok:
+          type: boolean
+          const: true
+        data:
+          $ref: "#/components/schemas/Note"
+    NoteListSuccess:
+      type: object
+      required:
+        - ok
+        - data
+      properties:
+        ok:
+          type: boolean
+          const: true
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Note"
+    ErrorResponse:
+      type: object
+      required:
+        - ok
+        - error
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object

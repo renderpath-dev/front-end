@@ -1,0 +1,63 @@
+openapi: 3.1.0
+info:
+  title: Redis Job Notes API
+  version: 1.0.0
+paths:
+  /auth/register:
+    post:
+      summary: Register a user and create a session
+      responses:
+        "201":
+          description: User registered
+  /auth/login:
+    post:
+      summary: Create a session
+      responses:
+        "200":
+          description: Session created
+  /notebooks:
+    get:
+      summary: List notebooks with cache-aside behavior
+      responses:
+        "200":
+          description: Notebook list
+    post:
+      summary: Create a notebook and invalidate cache
+      responses:
+        "201":
+          description: Notebook created
+  /cache/debug/notebooks:
+    get:
+      summary: Inspect the current user's notebook cache key
+      responses:
+        "200":
+          description: Cache metadata
+  /cache/debug/clear:
+    post:
+      summary: Clear the current user's cache
+      responses:
+        "200":
+          description: Cache cleared
+  /exports/notes:
+    post:
+      summary: Enqueue a notes export job
+      responses:
+        "202":
+          description: Export accepted
+        "429":
+          description: Export rate limit exceeded
+  /exports/{exportId}:
+    get:
+      summary: Read an owned export status row
+      parameters:
+        - name: exportId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Export status
+        "404":
+          description: Export not found
