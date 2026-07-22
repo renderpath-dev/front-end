@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { chapters } from "@/content/chapters";
 
+const inactiveChapterStyles = {
+  Complete:
+    "block rounded-md px-3 py-2 text-sm text-muted outline-none hover:bg-muted-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent",
+  "In progress":
+    "block rounded-md border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-sm text-muted outline-none hover:bg-muted-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent",
+  Planned:
+    "block rounded-md border border-dashed border-border px-3 py-2 text-sm text-muted/70 outline-none hover:bg-muted-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent",
+} as const;
+
 export function SiteSidebar({ activeSlug }: { activeSlug?: string }) {
   return (
     <aside className="hidden border-r border-border lg:block">
@@ -27,7 +36,7 @@ export function SiteSidebar({ activeSlug }: { activeSlug?: string }) {
                 className={
                   isActive
                     ? "block rounded-md bg-accent-soft px-3 py-2 text-sm font-semibold text-accent outline-none focus-visible:ring-2 focus-visible:ring-accent"
-                    : "block rounded-md px-3 py-2 text-sm text-muted outline-none hover:bg-muted-surface hover:text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+                    : inactiveChapterStyles[chapter.status]
                 }
                 href={chapter.route}
                 key={chapter.slug}

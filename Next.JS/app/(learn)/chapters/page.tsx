@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { AnimatedList } from "@/components/motion/AnimatedList";
+import { AnimatedReveal } from "@/components/motion/AnimatedReveal";
 import { ChapterCard } from "@/components/site/ChapterCard";
 import { chapters } from "@/content/chapters";
 
@@ -11,7 +13,8 @@ export const metadata: Metadata = {
 export default function ChaptersPage() {
   return (
     <div className="mx-auto max-w-5xl">
-      <header className="max-w-3xl border-b border-border pb-10">
+      <AnimatedReveal>
+        <header className="max-w-3xl border-b border-border pb-10">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
           Learning path
         </p>
@@ -22,7 +25,8 @@ export default function ChaptersPage() {
           Each chapter connects the framework surface to its build phase,
           runtime environment, observable output, and failure modes.
         </p>
-      </header>
+        </header>
+      </AnimatedReveal>
       <section
         aria-labelledby="available-chapters-heading"
         className="py-10"
@@ -33,11 +37,11 @@ export default function ChaptersPage() {
         >
           Available now
         </h2>
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
+        <AnimatedList className="mt-6 grid gap-5 md:grid-cols-2">
           {chapters.map((chapter) => (
             <ChapterCard chapter={chapter} key={chapter.slug} />
           ))}
-        </div>
+        </AnimatedList>
       </section>
     </div>
   );

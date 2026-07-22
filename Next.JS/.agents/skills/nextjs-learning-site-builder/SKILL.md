@@ -38,6 +38,24 @@ Do not add authentication, databases, CMSs, Algolia, command palettes, MDX, synt
 
 Create an original docs-inspired interface. Do not clone another site pixel-for-pixel or copy its brand assets, trademarks, or branded copy.
 
+## Experience Enhancement Mode
+
+Use this mode only when the user explicitly requests experience polish such as syntax highlighting, copyable code blocks, animation, reading progress, active table-of-contents behavior, or comparable learning-site enhancements.
+
+- Add syntax-highlighting or animation dependencies only when explicitly requested.
+- Prefer Shiki for syntax highlighting.
+- Prefer server-side highlighting for static or structured learning content.
+- Prefer Motion for component-level animation when the user explicitly requests animation.
+- Keep animation Client Components small and deep in the tree.
+- Do not convert pages or layouts to Client Components just to animate static content.
+- Server pages may pass server-rendered children into small Client Component wrappers.
+- Respect `prefers-reduced-motion`; remove or reduce non-essential transforms when the user requests reduced motion.
+- Keep Clipboard API logic in a Client Component because it requires browser APIs and user interaction.
+- Keep IntersectionObserver logic in a Client Component because it depends on browser viewport state.
+- Tailwind utility classes do not require Client Components.
+- Structured TypeScript content is the website layer. Markdown learning documents remain the canonical long-form source.
+- Do not add MDX, search engines, command palettes, CMSs, analytics, authentication, databases, UI libraries, additional highlighters, or additional animation libraries in this mode unless the user explicitly requests them.
+
 ## Language Rules
 
 - Keep source code, comments, identifiers, filenames, commands, package names, route paths, and runtime UI strings in English.
@@ -111,3 +129,10 @@ Also:
 - inspect console errors and failed network requests;
 - report every check as `PASS`, `FAIL`, `UNKNOWN`, or `NOT RUN`;
 - never claim a check passed unless it actually ran.
+
+### Validation status definitions
+
+- `PASS`: The check ran and produced the expected result.
+- `FAIL`: The check ran and produced an error, regression, mismatch, or unexpected result.
+- `NOT RUN`: The check was intentionally skipped or could not be executed in the current turn.
+- `UNKNOWN`: The available evidence is insufficient to classify the result, even after the relevant safe checks were attempted.

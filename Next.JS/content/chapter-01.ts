@@ -33,6 +33,23 @@ export type TailwindUtilityNote = {
   why: string;
 };
 
+export type CodeExample = {
+  title: string;
+  language: string;
+  code: string;
+  description: string;
+  boundary: BoundaryKind;
+  runtime: RuntimeKind;
+  learningPoint: string;
+  highlightedLines?: readonly number[];
+};
+
+export type ExperienceBoundaryNote = {
+  title: string;
+  detail: string;
+  boundary: BoundaryKind;
+};
+
 export const chapterOneContent = {
   heroSummary:
     "Use concrete repository evidence to determine who owns a feature, when code runs, and which runtime APIs are available.",
@@ -107,7 +124,32 @@ export const chapterOneContent = {
       owner: "React client module graph",
       phase: "Browser hydration and interaction",
       runtime: "browser",
-      evidence: "The file starts with use client and owns useState.",
+      evidence:
+        "The file starts with use client and owns menu state, event handlers, and Motion animation state.",
+    },
+    {
+      file: "lib/codeHighlighter.ts",
+      owner: "Server-only Shiki highlighting",
+      phase: "Build-time prerender for structured examples",
+      runtime: "build",
+      evidence:
+        "The module imports server-only and converts Shiki HAST to React elements before browser delivery.",
+    },
+    {
+      file: "components/site/CopyButton.tsx",
+      owner: "React client module graph",
+      phase: "Browser event handling after hydration",
+      runtime: "browser",
+      evidence:
+        "The file starts with use client and calls navigator.clipboard inside a click handler.",
+    },
+    {
+      file: "components/site/ActiveTableOfContents.tsx",
+      owner: "Browser viewport observer",
+      phase: "Browser scroll observation after hydration",
+      runtime: "browser",
+      evidence:
+        "The file starts with use client and creates an IntersectionObserver inside useEffect.",
     },
     {
       file: "app/api/runtime-check/route.ts",
@@ -142,8 +184,10 @@ export const chapterOneContent = {
     },
     {
       concern: "This site",
-      server: "Layouts, pages, cards, badges, code windows, and content",
-      client: "Only the mobile navigation toggle",
+      server:
+        "Layouts, pages, cards, badges, content, and server-rendered Shiki code markup",
+      client:
+        "Mobile navigation, copy buttons, reveal wrappers, active TOC, and reading progress",
     },
   ],
   experiments: [
@@ -158,7 +202,7 @@ export const chapterOneContent = {
       action:
         "Search for use client, then inspect every import owned by that file.",
       expected:
-        "Only SiteMobileNav creates a client module boundary in the new site shell.",
+        "Every client boundary owns state, effects, event handlers, browser APIs, or Motion animation state.",
     },
     {
       title: "Compare build and request evidence",
@@ -232,27 +276,140 @@ export const chapterOneContent = {
     { id: "mechanism-chain", title: "Mechanism chain" },
     { id: "boundary-audit", title: "Boundary audit" },
     { id: "server-client", title: "Server vs. client" },
-    { id: "tailwind-utilities", title: "Tailwind utility map" },
-    { id: "experiments", title: "Experiments" },
+    { id: "code-examples", title: "Code examples" },
+    { id: "tailwind-utilities", title: "Tailwind utility notes" },
+    { id: "experience-boundaries", title: "Experience boundaries" },
+    { id: "experiments", title: "Debugging experiments" },
     { id: "common-mistakes", title: "Common mistakes" },
     { id: "source-documents", title: "Source documents" },
   ] satisfies readonly ChapterSectionLink[],
-  codeExamples: {
-    serverPage: `export default function ChapterPage() {
-  return <main>Rendered as a Server Component by default.</main>;
+  codeExamples: [
+    {
+      title: "Server Component timestamp",
+      language: "tsx",
+      code: `export default function BoundaryTimestamp() {
+  const renderedAt = new Date().toISOString();
+
+  return <p>Server render timestamp: {renderedAt}</p>;
 }`,
-    clientIsland: `"use client";
+      description:
+        "This component has no use client directive. In a static route it can run during prerendering; in a dynamic route it can run on the server for a request.",
+      boundary: "server",
+      runtime: "build",
+      learningPoint:
+        "Server Component source is not shipped as client JavaScript, but its rendered result crosses to the browser.",
+      highlightedLines: [1, 2],
+    },
+    {
+      title: "Client Component hydration",
+      language: "tsx",
+      code: `"use client";
 
 import { useState } from "react";
 
-export function MobileMenu() {
+export function HydratedToggle() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <button onClick={() => setIsOpen((current) => !current)}>
-      {isOpen ? "Close menu" : "Open menu"}
+    <button type="button" onClick={() => setIsOpen((current) => !current)}>
+      {isOpen ? "Panel open" : "Panel closed"}
     </button>
   );
 }`,
-  },
+      description:
+        "The directive creates a client module boundary because this component owns state and a click handler.",
+      boundary: "client",
+      runtime: "browser",
+      learningPoint:
+        "Hydration attaches event handlers to server-rendered HTML so the button can update browser state.",
+      highlightedLines: [1, 5, 8],
+    },
+    {
+      title: "Route Handler runtime JSON",
+      language: "ts",
+      code: `export const runtime = "nodejs";
+
+export async function GET() {
+  return Response.json({
+    generatedAt: new Date().toISOString(),
+    hasWindow: typeof window !== "undefined",
+  });
+}`,
+      description:
+        "A route.ts file handles HTTP requests outside the React component tree and returns JSON from the configured runtime.",
+      boundary: "request",
+      runtime: "nodejs",
+      learningPoint:
+        "Route Handlers use Web Request and Response primitives, and their output is not a React component render.",
+      highlightedLines: [1, 3, 4],
+    },
+    {
+      title: "Wrong Server Component localStorage read",
+      language: "tsx",
+      code: `export default function BrokenServerComponent() {
+  const savedDraft = localStorage.getItem("draft");
+
+  return <p>{savedDraft}</p>;
+}`,
+      description:
+        "This is intentionally wrong because localStorage belongs to the browser, not the server render environment.",
+      boundary: "server",
+      runtime: "nodejs",
+      learningPoint:
+        "If a value requires window, document, localStorage, or navigator, move that read behind a Client Component boundary.",
+      highlightedLines: [2],
+    },
+    {
+      title: "Tailwind utility layout",
+      language: "tsx",
+      code: `import type { ReactNode } from "react";
+
+export function DocsShell({ children }: { children: ReactNode }) {
+  return (
+    <main className="grid gap-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
+      {children}
+    </main>
+  );
+}`,
+      description:
+        "Tailwind utility strings are static class names compiled into CSS; they do not require a client boundary.",
+      boundary: "build",
+      runtime: "build",
+      learningPoint:
+        "Styling can stay in Server Components because CSS generation is tooling work, not browser state.",
+      highlightedLines: [5],
+    },
+  ] satisfies readonly CodeExample[],
+  experienceBoundaries: [
+    {
+      title: "Code highlighting stays server-side",
+      detail:
+        "Structured code examples are static page content, so Shiki can convert tokens to server-rendered JSX before the browser receives the route.",
+      boundary: "server",
+    },
+    {
+      title: "Copy buttons are browser-only",
+      detail:
+        "The Clipboard API is exposed through navigator.clipboard and must run from a user action after hydration.",
+      boundary: "browser",
+    },
+    {
+      title: "Motion wrappers are focused clients",
+      detail:
+        "Animation state and viewport timing run in the browser, but Server pages can pass server-rendered children into small client wrappers.",
+      boundary: "client",
+    },
+    {
+      title: "Tailwind does not imply client rendering",
+      detail:
+        "Utility classes compile to CSS and can style Server Components without shipping component source to the browser.",
+      boundary: "build",
+    },
+    {
+      title: "Reduced motion is an accessibility boundary",
+      detail:
+        "Motion decisions must respect the user's reduced-motion preference and remove non-essential transforms when requested.",
+      boundary: "browser",
+    },
+  ] satisfies readonly ExperienceBoundaryNote[],
 } as const;

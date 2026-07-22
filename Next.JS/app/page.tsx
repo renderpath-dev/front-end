@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { AnimatedList } from "@/components/motion/AnimatedList";
+import { AnimatedReveal } from "@/components/motion/AnimatedReveal";
 import { ChapterCard } from "@/components/site/ChapterCard";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { chapters } from "@/content/chapters";
@@ -24,10 +26,21 @@ export default function HomePage() {
   return (
     <>
       <SiteHeader />
-      <main id="main-content">
+      <main
+        className="relative overflow-hidden"
+        id="main-content"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.20),transparent_34rem)]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[linear-gradient(rgba(148,163,184,0.12)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.12)_1px,transparent_1px)] bg-[size:3rem_3rem]"
+        />
         <section className="border-b border-border">
           <div className="mx-auto max-w-[90rem] px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
-            <div className="max-w-3xl">
+            <AnimatedReveal className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
                 Local learning workspace
               </p>
@@ -54,12 +67,12 @@ export default function HomePage() {
                   Open runtime API
                 </a>
               </div>
-            </div>
+            </AnimatedReveal>
           </div>
         </section>
 
         <section className="mx-auto max-w-[90rem] px-4 py-16 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
+          <AnimatedReveal className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
               Start with evidence
             </p>
@@ -70,12 +83,12 @@ export default function HomePage() {
               Read the curated chapter route, inspect the styling mechanism,
               and compare server evidence with browser behavior.
             </p>
-          </div>
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          </AnimatedReveal>
+          <AnimatedList className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             <ChapterCard chapter={chapters[0]} />
             {learningCards.map((card) => (
               <article
-                className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm"
+                className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm shadow-slate-950/5 motion-safe:transition motion-safe:duration-200 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lg"
                 key={card.title}
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
@@ -95,7 +108,7 @@ export default function HomePage() {
                 </Link>
               </article>
             ))}
-          </div>
+          </AnimatedList>
         </section>
       </main>
     </>

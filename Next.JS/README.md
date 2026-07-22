@@ -18,27 +18,28 @@ failure case understandable.
 - Tailwind CSS v4
 - PostCSS
 - ESLint
+- Shiki
+- Motion
 
-No UI library, MDX renderer, syntax highlighter, database, authentication
-system, CMS, search integration, analytics, or deployment configuration is
-included.
+No UI library, MDX renderer, database, authentication system, CMS, search
+integration, analytics, or deployment configuration is included.
 
 ## Local commands
 
 ```bash
-pnpm install
-pnpm dev
-pnpm lint
-pnpm typecheck
-pnpm build
-pnpm start
+npm install
+npm run dev
+npm run lint
+npm run typecheck
+npm run build
+npm run start
 ```
 
-- `pnpm dev` starts the development server.
-- `pnpm lint` runs the repository ESLint configuration.
-- `pnpm typecheck` checks TypeScript without emitting files.
-- `pnpm build` creates and validates the production output.
-- `pnpm start` serves an existing production build.
+- `npm run dev` starts the development server.
+- `npm run lint` runs the repository ESLint configuration.
+- `npm run typecheck` checks TypeScript without emitting files.
+- `npm run build` creates and validates the production output.
+- `npm run start` serves an existing production build.
 
 Development success does not prove production success. Run lint, typecheck,
 and build separately.
@@ -70,6 +71,7 @@ app/
   page.tsx
 components/
   learning/
+  motion/
   site/
 content/
   chapter-01.ts
@@ -80,7 +82,8 @@ docs/
 
 The `(learn)` route group applies the documentation shell without changing the
 public URL. Shared UI stays in Server Components except for the focused mobile
-navigation toggle.
+navigation, code-copy, animation, active table-of-contents, and reading
+progress islands.
 
 ## Content model
 
@@ -90,8 +93,49 @@ cheatsheet, and interview questions.
 
 `content/chapter-01.ts` stores concise, typed, web-ready content: objectives,
 the mechanism chain, the boundary audit, comparisons, experiments, common
-mistakes, Tailwind utility mappings, and the table of contents. It does not
-duplicate the complete guide.
+mistakes, code examples, experience boundary notes, Tailwind utility mappings,
+and the table of contents. It does not duplicate the complete guide.
+
+## Syntax highlighting architecture
+
+`components/site/CodeWindow.tsx` is an async Server Component. It calls
+`lib/codeHighlighter.ts`, which imports `server-only`, uses Shiki, and converts
+Shiki HAST into React elements with `hast-util-to-jsx-runtime`. The highlighted
+markup is created before the browser receives the route, so Shiki does not need
+to run in the client bundle for static structured examples.
+
+`components/site/CopyButton.tsx` is separate and starts with `"use client"`
+because `navigator.clipboard.writeText` is a browser API that must run from a
+user interaction after hydration.
+
+To add future code examples:
+
+1. Add a typed item to `chapterOneContent.codeExamples` or the matching future
+   chapter content file.
+2. Include `title`, `language`, `code`, `description`, `boundary`, `runtime`,
+   `learningPoint`, and optional `highlightedLines`.
+3. Keep code strings and runtime UI strings English-only.
+4. Run lint, typecheck, build, source-boundary scans, and browser smoke tests.
+
+## Animation and reading architecture
+
+Motion is isolated to small Client Components:
+
+- `components/motion/AnimatedReveal.tsx` handles subtle section reveal.
+- `components/motion/AnimatedList.tsx` handles simple staggered lists.
+- `components/motion/PageTransitionShell.tsx` adds entry transitions for route
+  content without converting pages or layouts to Client Components.
+- `components/site/SiteMobileNav.tsx` owns the animated mobile menu.
+
+These components use `useReducedMotion` so reduced-motion users avoid
+non-essential transforms. Static Tailwind hover and focus states remain plain
+CSS and do not require client rendering.
+
+`components/site/ActiveTableOfContents.tsx` is a Client Component because it
+uses `IntersectionObserver` to read viewport state. `components/site/ReadingProgress.tsx`
+is also client-only because it reads scroll position and document height. Both
+are intentionally small and are rendered by Server layouts/pages as focused
+interactive islands.
 
 ## Tailwind CSS setup
 
@@ -127,19 +171,23 @@ duplicate the complete guide.
 
 ## Validation checklist
 
-- [ ] `pnpm lint` exits successfully.
-- [ ] `pnpm typecheck` exits successfully.
-- [ ] `pnpm build` exits successfully.
+- [ ] `npm run lint` exits successfully.
+- [ ] `npm run typecheck` exits successfully.
+- [ ] `npm run build` exits successfully.
 - [ ] Required routes return the expected page or JSON response.
 - [ ] Desktop and mobile navigation work in a real browser.
+- [ ] Syntax-highlighted code windows render line numbers, highlighted lines,
+  titles, language badges, and working copy buttons.
+- [ ] Section reveal, page entry transitions, active table of contents, and
+  reading progress work without console errors.
 - [ ] Browser console and network checks show no unexplained failures.
 - [ ] Source code and the site-builder skill contain no CJK characters.
-- [ ] `"use client"` appears only in the intended interactive island.
+- [ ] `"use client"` appears only in focused interactive islands.
 - [ ] Existing Chapter 1 documents remain unchanged.
 
 ## What not to add yet
 
-Do not add MDX, a search engine, command palette, syntax-highlighting or copy
-dependencies, authentication, a database, a CMS, analytics, deployment
-configuration, UI libraries, animation libraries, or copied third-party
-branding until a later chapter explicitly requires them.
+Do not add MDX, a search engine, command palette, authentication, a database,
+a CMS, analytics, deployment configuration, UI libraries, extra animation
+libraries, extra highlighters, or copied third-party branding until a later
+chapter explicitly requires them.

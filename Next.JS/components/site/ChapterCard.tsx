@@ -12,7 +12,7 @@ const statusStyles: Record<ChapterMetadata["status"], string> = {
 
 export function ChapterCard({ chapter }: { chapter: ChapterMetadata }) {
   return (
-    <article className="group relative flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <article className="group relative flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm shadow-slate-950/5 motion-safe:transition motion-safe:duration-200 motion-safe:hover:-translate-y-1 motion-safe:hover:shadow-lg">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
           Chapter {chapter.chapterNumber}
@@ -45,7 +45,10 @@ export function ChapterCard({ chapter }: { chapter: ChapterMetadata }) {
         ))}
       </div>
       <div className="mt-6 text-sm font-semibold text-accent">
-        Open chapter <span aria-hidden="true">→</span>
+        <span className="underline-offset-4 group-hover:underline">
+          Open chapter
+        </span>{" "}
+        <span aria-hidden="true">→</span>
       </div>
     </article>
   );

@@ -45,6 +45,7 @@
 
 html {
   background: var(--background);
+  scroll-padding-top: 6rem;
 }
 
 body {
@@ -69,4 +70,52 @@ code {
 ::selection {
   background: var(--accent-soft);
   color: var(--foreground);
+}
+
+.code-window-pre {
+  margin: 0;
+  overflow-x: auto;
+  background: transparent !important;
+  padding-block: 1rem;
+  color: var(--shiki-light);
+}
+
+.code-window-pre span {
+  color: var(--shiki-light);
+}
+
+.code-window-code {
+  display: block;
+  min-width: max-content;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.code-window-line {
+  display: block;
+  min-height: 1.7em;
+  padding-inline: 1rem;
+}
+
+.code-window-numbered .code-window-line::before {
+  content: attr(data-line);
+  display: inline-block;
+  width: 2.5rem;
+  margin-right: 1rem;
+  color: rgb(148 163 184 / 0.58);
+  text-align: right;
+  user-select: none;
+}
+
+.code-window-line-highlighted {
+  background: rgb(14 165 233 / 0.12);
+  box-shadow: inset 3px 0 0 rgb(125 211 252 / 0.9);
+}
+
+@media (prefers-color-scheme: dark) {
+  .code-window-pre,
+  .code-window-pre span {
+    color: var(--shiki-dark);
+  }
 }
